@@ -281,6 +281,8 @@ npm start
 
 La app ya tiene un `Dockerfile` raíz, por lo que puedes desplegarla como contenedor.
 
+> Nota: También se agregó un `package.json` en la raíz para que Dockploy/Nixpacks detecte el proyecto correctamente cuando el servicio intenta generar el build plan.
+
 1. Construye la imagen desde la raíz del proyecto:
 
 ```bash

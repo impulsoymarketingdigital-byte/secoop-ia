@@ -1,0 +1,14 @@
+{
+  "name": "secoop-ia",
+  "private": true,
+  "packageManager": "npm@10",
+  "scripts": {
+    "start": "npm --prefix backend start"
+  },
+  "workspaces": [
+    "backend"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
