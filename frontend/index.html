@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIREHAI - Gana más licitaciones con IA | SECOP II</title>
+    <meta name="description" content="JIREHAI analiza automáticamente SECOP II y te ayuda a ganar más contratos públicos con IA. Prueba gratis.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0A0A0B;
+            --bg2: #111113;
+            --bg3: #18181B;
+            --orange: #F97316;
+            --orange2: #EA580C;
+            --purple: #8B5CF6;
+            --green: #22C55E;
+            --text: #FAFAFA;
+            --text2: #A1A1AA;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
+            min-height: 100vh;
+        }
+
+        /* Mesh gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(249, 115, 22, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 10, 11, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            padding: 1rem 2rem;
+        }
+
+        nav.scrolled {
+            background: rgba(10, 10, 11, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        nav .nav-links a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        nav .nav-links a:hover {
+            color: var(--orange);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 140px;
+            padding-bottom: 80px;
+            text-align: center;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            color: var(--orange);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text) 0%, var(--text2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text2);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-large.primary {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            color: white;
+        }
+
+        .btn-large.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(249, 115, 22, 0.4);
+        }
+
+        .btn-large.secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-large.secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat {
+            font-size: 0.95rem;
+            color: var(--text2);
+        }
+
+        .stat strong {
+            color: var(--orange);
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-mockup {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            height: 400px;
+        }
+
+        .mockup-card {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            position: absolute;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .mockup-card:nth-child(1) {
+            top: 20px;
+            left: 5%;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .mockup-card:nth-child(2) {
+            top: 80px;
+            right: 5%;
+            animation: float 4s ease-in-out 1s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .mockup-header {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mockup-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(249, 115, 22, 0.3);
+        }
+
+        .mockup-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--orange);
+        }
+
+        .mockup-text {
+            font-size: 0.85rem;
+            color: var(--text2);
+            line-height: 1.4;
+        }
+
+        /* Social Proof */
+        .social-proof {
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .social-proof-title {
+            color: var(--text2);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .company-logos {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .company-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            color: var(--text2);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4rem;
+            color: var(--text);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(249, 115, 22, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--text);
+        }
+
+        .feature-card p {
+            color: var(--text2);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* How it Works */
+        .how-it-works {
+            padding: 6rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--text);
+        }
+
+        .step p {
+            color: var(--text2);
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 6rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            padding: 2.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--orange);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: var(--text2);
+            font-size: 0.95rem;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 0;
+            background: rgba(255, 255, 255, 0.01);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pricing-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text2);
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            color: white;
+            border-color: var(--orange);
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2.5rem;
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--orange);
+            background: rgba(249, 115, 22, 0.05);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured:hover {
+            box-shadow: 0 20px 50px rgba(249, 115, 22, 0.2);
+        }
+
+        .pricing-badge {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--orange);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-badge.discount {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--green);
+        }
+
+        .pricing-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-period {
+            color: var(--text2);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.6rem 0;
+            color: var(--text2);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--green);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .pricing-features li.disabled {
+            opacity: 0.5;
+        }
+
+        .pricing-features li.disabled::before {
+            content: '✕';
+            color: var(--text2);
+        }
+
+        .pricing-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .pricing-btn.primary {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            color: white;
+        }
+
+        .pricing-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
+        }
+
+        .pricing-btn.secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .pricing-btn.secondary:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .pricing-note {
+            text-align: center;
+            color: var(--text2);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 0;
+            background: rgba(255, 255, 255, 0.01);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            border-color: rgba(249, 115, 22, 0.3);
+            background: rgba(249, 115, 22, 0.05);
+        }
+
+        .testimonial-text {
+            color: var(--text2);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+
+        .testimonial-role {
+            color: var(--text2);
+            font-size: 0.85rem;
+        }
+
+        .testimonial-rating {
+            color: var(--orange);
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        /* FAQ */
+        .faq {
+            padding: 6rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .faq-container {
+            max-width: 700px;
+            margin: 4rem auto 0;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item.active {
+            border-color: rgba(249, 115, 22, 0.3);
+            background: rgba(249, 115, 22, 0.05);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            transition: color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--orange);
+        }
+
+        .faq-toggle {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--orange);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: var(--text2);
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        /* CTA Final */
+        .cta-final {
+            padding: 6rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-top: 1px solid rgba(249, 115, 22, 0.2);
+            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
+            border-radius: 16px;
+            margin: 4rem 0;
+        }
+
+        .cta-final h2 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-final p {
+            color: var(--text2);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg2);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.7rem;
+        }
+
+        .footer-section ul li a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--orange);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text2);
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--orange);
+        }
+
+        .footer-links a.admin-link {
+            font-size: 0.7rem;
+            opacity: 0.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: rgba(10, 10, 11, 0.95);
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 0;
+            }
+
+            nav .nav-links.active {
+                display: flex;
+            }
+
+            nav .nav-links li {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            nav .nav-links a {
+                display: block;
+                padding: 1rem 2rem;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: rotate(45deg) translate(10px, 10px);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -7px);
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn-large {
+                width: 100%;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">JR</div>
+                JIREHAI
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="#features">Características</a></li>
+                <li><a href="#how-it-works">Cómo funciona</a></li>
+                <li><a href="#pricing">Precios</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+
+            <div class="nav-buttons">
+                <button class="btn-ghost" onclick="window.location.href='./JIREHAI.html'">Iniciar Sesión</button>
+                <button class="btn-primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Gratis</button>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="badge">✦ Potenciado por IA · Datos oficiales SECOP II</div>
+
+            <h1>Gana más licitaciones con Inteligencia Artificial</h1>
+
+            <p class="hero-subtitle">
+                JIREHAI analiza automáticamente los procesos de contratación de SECOP II, evalúa si cumples los requisitos y te ayuda a presentar propuestas ganadoras.
+            </p>
+
+            <div class="hero-buttons">
+                <button class="btn-large primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Gratis →</button>
+                <button class="btn-large secondary">Ver demostración</button>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat">
+                    <strong>200+</strong>
+                    Procesos analizados diario
+                </div>
+                <div class="stat">
+                    <strong>98%</strong>
+                    Precisión en análisis
+                </div>
+                <div class="stat">
+                    <strong>3x</strong>
+                    Más propuestas exitosas
+                </div>
+            </div>
+
+            <div class="hero-mockup">
+                <div class="mockup-card">
+                    <div class="mockup-header">
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                    </div>
+                    <div class="mockup-title">Proceso SECOP II - ID 2024-001</div>
+                    <div class="mockup-text">
+                        Búsqueda de Consultoría en Sistemas de Información. Presupuesto: $50M. Cierre: 15 May
+                    </div>
+                </div>
+                <div class="mockup-card">
+                    <div class="mockup-header">
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                    </div>
+                    <div class="mockup-title">✓ Análisis: Cumples requisitos</div>
+                    <div class="mockup-text">
+                        Tu empresa tiene capacidad financiera. Análisis completado en 2 min.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+        <div class="container">
+            <p class="social-proof-title">Confiado por empresas en toda Colombia</p>
+            <div class="company-logos">
+                <div class="company-chip">Construcciones ABC</div>
+                <div class="company-chip">Consultores Plus</div>
+                <div class="company-chip">Tech Services</div>
+                <div class="company-chip">Innovar SAS</div>
+                <div class="company-chip">Soluciones Totales</div>
+                <div class="company-chip">Premier Group</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Todo lo que necesitas para ganar contratos</h2>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Búsqueda Inteligente</h3>
+                    <p>Conecta directamente con SECOP II y filtra procesos por tus códigos UNSPSC, modalidad y capacidad financiera</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Análisis IA de Pliegos</h3>
+                    <p>Lee automáticamente los pliegos de condiciones y te dice si cumples los requisitos técnicos y financieros</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3>Fechas Clave</h3>
+                    <p>Nunca pierdas una fecha límite. Alertas automáticas de cierres, observaciones y presentación de ofertas</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3>Gestión de Documentos</h3>
+                    <p>Organiza tu carpeta de documentos y recibe alertas cuando alguno esté por vencer</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>Formularios Asistidos</h3>
+                    <p>Completa automáticamente los formularios de SECOP II con tu información registrada</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📧</div>
+                    <h3>Alertas Diarias</h3>
+                    <p>Recibe cada día los nuevos procesos que coincidan con tus servicios directamente en tu correo</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">Comienza a ganar en 3 pasos</h2>
+
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Configura tu empresa</h3>
+                    <p>Ingresa tu información financiera, códigos UNSPSC y tipo de servicios. El sistema aprende tu perfil.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Descubre oportunidades</h3>
+                    <p>JIREHAI escanea SECOP II y te muestra solo los procesos donde puedes ganar, con análisis de viabilidad.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Presenta y gana</h3>
+                    <p>Usa nuestros formularios asistidos y documentación automatizada para preparar propuestas irresistibles.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <h2 class="section-title">Números que hablan</h2>
+
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <div class="stats-number" data-target="12000">0</div>
+                    <div class="stats-label">Procesos analizados al mes</div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="stats-number" data-target="98">0</div>
+                    <div class="stats-label">% Precisión en análisis</div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="stats-number" data-target="500">0</div>
+                    <div class="stats-label">Empresas activas</div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="stats-number" data-target="3.2">0</div>
+                    <div class="stats-label">x Aumento en propuestas exitosas</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2 class="section-title">Planes para cada etapa de tu negocio</h2>
+
+            <div class="pricing-toggle">
+                <button class="toggle-btn active" data-plan="monthly">Mensual</button>
+                <button class="toggle-btn" data-plan="annual">Anual <span class="discount-label">(Ahorra 20%)</span></button>
+            </div>
+
+            <div class="pricing-cards">
+                <!-- Básico -->
+                <div class="pricing-card">
+                    <div class="pricing-badge">Para empezar</div>
+                    <h3 class="pricing-name">Básico</h3>
+                    <div class="pricing-price" data-monthly="149000" data-annual="119200">$149.000</div>
+                    <p class="pricing-period">COP/mes</p>
+
+                    <ul class="pricing-features">
+                        <li>100 procesos/mes</li>
+                        <li>1 usuario</li>
+                        <li>Alertas por email</li>
+                        <li>Mis Documentos (10 slots)</li>
+                        <li>Formularios básicos (3)</li>
+                        <li class="disabled">Análisis IA de pliegos</li>
+                        <li class="disabled">Exportación Excel/PDF</li>
+                        <li class="disabled">Soporte prioritario</li>
+                    </ul>
+
+                    <button class="pricing-btn secondary" onclick="window.location.href='./JIREHAI.html'">Comenzar Básico</button>
+                </div>
+
+                <!-- Profesional -->
+                <div class="pricing-card featured">
+                    <div class="pricing-badge" style="background: rgba(249, 115, 22, 0.3); color: var(--orange);">Más popular ⭐</div>
+                    <h3 class="pricing-name">Profesional</h3>
+                    <div class="pricing-price" data-monthly="349000" data-annual="279200">$349.000</div>
+                    <p class="pricing-period">COP/mes</p>
+
+                    <ul class="pricing-features">
+                        <li>500 procesos/mes</li>
+                        <li>3 usuarios</li>
+                        <li>Alertas email + Telegram</li>
+                        <li>Mis Documentos (ilimitado)</li>
+                        <li>Todos los formularios SECOP</li>
+                        <li>Análisis IA de pliegos</li>
+                        <li>Exportación Excel/PDF</li>
+                        <li>Chat IA por proceso</li>
+                    </ul>
+
+                    <button class="pricing-btn primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Profesional</button>
+                </div>
+
+                <!-- Empresarial -->
+                <div class="pricing-card">
+                    <div class="pricing-badge">Para equipos</div>
+                    <h3 class="pricing-name">Empresarial</h3>
+                    <div class="pricing-price" data-monthly="899000" data-annual="719200">$899.000</div>
+                    <p class="pricing-period">COP/mes</p>
+
+                    <ul class="pricing-features">
+                        <li>Procesos ilimitados</li>
+                        <li>Usuarios ilimitados</li>
+                        <li>Todas las alertas</li>
+                        <li>API Access</li>
+                        <li>Todo lo del plan Profesional</li>
+                        <li>Soporte dedicado 24/7</li>
+                        <li>Onboarding personalizado</li>
+                        <li>Reportes avanzados</li>
+                    </ul>
+
+                    <button class="pricing-btn secondary" onclick="window.location.href='./JIREHAI.html'">Contactar Ventas</button>
+                </div>
+            </div>
+
+            <p class="pricing-note">💳 Pago con tarjeta, PSE o transferencia bancaria. Cancela cuando quieras.</p>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">Lo que dicen nuestros usuarios</h2>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "JIREHAI nos ayudó a identificar 15 procesos relevantes en nuestra primera semana. Ganamos 2 contratos que no habríamos encontrado solos."
+                    </p>
+                    <div class="testimonial-author">María González</div>
+                    <div class="testimonial-role">Consultora IT, Bogotá</div>
+                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "El análisis automático de pliegos nos ahorra 3 horas por proceso. Ahora presentamos el doble de propuestas con el mismo equipo."
+                    </p>
+                    <div class="testimonial-author">Carlos Mendez</div>
+                    <div class="testimonial-role">Gerente, Medellín</div>
+                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "Las alertas de documentos vencidos son increíbles. Nunca más perdemos una licitación por papeles desactualizados."
+                    </p>
+                    <div class="testimonial-author">Ana Ríos</div>
+                    <div class="testimonial-role">Directora, Cali</div>
+                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <h2 class="section-title">Preguntas frecuentes</h2>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Necesito conocimientos técnicos para usar JIREHAI?
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        No, JIREHAI está diseñado para ser intuitivo y fácil de usar. No necesitas conocimientos técnicos. Solo registra tu empresa, configura tus preferencias, y el sistema hace el trabajo por ti.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Los datos de SECOP II son en tiempo real?
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí, JIREHAI se sincroniza con SECOP II cada 6 horas para traerte los datos más actualizados. Nuestras alertas diarias incluyen todos los procesos nuevos que coinciden con tu perfil.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Puedo cancelar mi suscripción en cualquier momento?
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Absolutamente. No hay contratos de largo plazo ni penalizaciones. Puedes cancelar cuando quieras desde tu panel de control.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿JIREHAI funciona para personas naturales y jurídicas?
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Sí, nuestros planes funcionan para ambas. Tanto personas naturales como empresas pueden registrarse y usar todas nuestras herramientas para participar en licitaciones públicas.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        ¿Cómo funciona el análisis de pliegos con IA?
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Nuestro sistema de IA lee el documento PDF del pliego, identifica los requisitos técnicos y financieros, y los compara con tu perfil de empresa. Te muestra un análisis detallado de si cumples o no los requisitos en cuestión de segundos.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta-final">
+        <div class="container">
+            <h2>¿Listo para ganar más contratos?</h2>
+            <p>Únete a más de 500 empresas que ya usan JIREHAI para identificar y ganar licitaciones en SECOP II.</p>
+            <button class="btn-large primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Gratis — Sin tarjeta de crédito</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 1rem;">
+                        <div class="logo-icon">JR</div>
+                        JIREHAI
+                    </div>
+                    <p style="color: var(--text2); font-size: 0.9rem; line-height: 1.6;">
+                        La plataforma de IA más inteligente para ganar licitaciones públicas en SECOP II. Análisis automático, alertas y formularios asistidos.
+                    </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Producto</h4>
+                    <ul>
+                        <li><a href="#features">Características</a></li>
+                        <li><a href="#how-it-works">Cómo funciona</a></li>
+                        <li><a href="#pricing">Precios</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Términos de Servicio</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Cookies</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Síguenos</h4>
+                    <ul>
+                        <li><a href="#">LinkedIn</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#features">Características</a>
+                    <a href="#pricing">Precios</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Contacto</a>
+                    <a href="#">Términos</a>
+                    <a href="#">Privacidad</a>
+                    <a href="./admin.html" class="admin-link">⚙</a>
+                </div>
+                <p>© 2025 JIREHAI. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Navbar scroll effect
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Animated counters
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 2000;
+            const start = Date.now();
+
+            function update() {
+                const elapsed = Date.now() - start;
+                const progress = Math.min(elapsed / duration, 1);
+
+                if (target < 10) {
+                    element.textContent = (target * progress).toFixed(1);
+                } else {
+                    element.textContent = Math.floor(target * progress).toLocaleString();
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            update();
+        }
+
+        // Intersection Observer for counters
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('[data-target]');
+                    counters.forEach(counter => {
+                        animateCounter(counter);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) observer.observe(statsSection);
+
+        // Pricing toggle
+        const toggleButtons = document.querySelectorAll('.toggle-btn');
+        const priceElements = document.querySelectorAll('[data-monthly]');
+
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                toggleButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const isPlan = btn.getAttribute('data-plan');
+                priceElements.forEach(el => {
+                    if (isPlan === 'annual') {
+                        el.textContent = '$' + parseInt(el.getAttribute('data-annual')).toLocaleString();
+                    } else {
+                        el.textContent = '$' + parseInt(el.getAttribute('data-monthly')).toLocaleString();
+                    }
+                });
+            });
+        });
+
+        // FAQ accordion
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                faqItems.forEach(i => {
+                    if (i !== item) {
+                        i.classList.remove('active');
+                    }
+                });
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

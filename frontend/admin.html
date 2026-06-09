@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JIREHAI – Panel Administrativo</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#0f172a;--card:#1e293b;--border:rgba(255,255,255,0.08);
+      --accent:#f97316;--purple:#818cf8;--green:#22c55e;--red:#ef4444;
+      --cyan:#22d3ee;--text:#f1f5f9;--muted:#94a3b8;--dim:#475569;
+    }
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.5}
+    /* ── LOGIN ── */
+    .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+    .login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px}
+    .logo{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+    .login-sub{color:var(--muted);font-size:13px;margin-bottom:28px}
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+    .field input,.field select,.field textarea{width:100%;padding:10px 12px;background:#0f172a;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;transition:border-color .2s}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+    .field select option{background:#1e293b}
+    .btn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;justify-content:center}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    .btn-primary:active{transform:none}
+    .btn-sm{padding:6px 12px;font-size:12px}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+    .btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red)}
+    .btn-danger:hover{background:rgba(239,68,68,.25)}
+    .btn-green{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+    .btn-green:hover{background:rgba(34,197,94,.25)}
+    .btn-cyan{background:rgba(34,211,238,.15);border:1px solid rgba(34,211,238,.3);color:var(--cyan)}
+    .btn-cyan:hover{background:rgba(34,211,238,.25)}
+    .btn-block{width:100%}
+    .err-msg{color:var(--red);font-size:13px;margin-top:8px}
+    /* ── LAYOUT ── */
+    #admin{display:flex;min-height:100vh}
+    .sidebar{width:220px;background:var(--card);border-right:1px solid var(--border);position:fixed;height:100vh;overflow-y:auto;padding:24px 0;z-index:50}
+    .sidebar-logo{padding:0 16px;font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+    .sidebar-user{padding:0 16px;margin-bottom:24px;font-size:11px;color:var(--muted);word-break:break-all}
+    .nav-section{padding:0 16px;font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:16px}
+    .nav-item{padding:10px 16px;margin:2px 8px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:10px;transition:all .15s;border:none;background:none;width:calc(100% - 16px);text-align:left}
+    .nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+    .nav-item.active{background:rgba(249,115,22,.15);color:var(--accent)}
+    .nav-divider{height:1px;background:var(--border);margin:16px 16px}
+    .main{margin-left:220px;flex:1;padding:32px;min-height:100vh}
+    /* ── SECTIONS ── */
+    .section{display:none}
+    .section.active{display:block}
+    .page-title{font-size:24px;font-weight:700;margin-bottom:4px}
+    .page-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+    /* ── STATS ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden}
+    .stat-card::after{content:'';position:absolute;top:-60px;right:-60px;width:140px;height:140px;border-radius:50%;opacity:.07}
+    .stat-card.orange::after{background:var(--accent)}
+    .stat-card.purple::after{background:var(--purple)}
+    .stat-card.green::after{background:var(--green)}
+    .stat-card.cyan::after{background:var(--cyan)}
+    .stat-label{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:500}
+    .stat-value{font-size:30px;font-weight:800;color:var(--text)}
+    .stat-note{font-size:11px;color:var(--dim);margin-top:4px}
+    /* ── TABLES ── */
+    .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+    .table-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .table-title{font-size:15px;font-weight:600}
+    table{width:100%;border-collapse:collapse}
+    thead{background:rgba(255,255,255,.03)}
+    th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+    td{padding:12px 16px;border-top:1px solid var(--border);font-size:13px}
+    tbody tr:hover{background:rgba(255,255,255,.02)}
+    .no-data{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+    /* ── SEARCH ── */
+    .search-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+    .search-input{flex:1;min-width:200px;padding:9px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px}
+    .search-input:focus{outline:none;border-color:var(--accent)}
+    .search-input::placeholder{color:var(--dim)}
+    /* ── BADGES ── */
+    .badge{display:inline-block;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600}
+    .badge.active,.badge.activo{background:rgba(34,197,94,.15);color:var(--green)}
+    .badge.trial{background:rgba(34,211,238,.15);color:var(--cyan)}
+    .badge.expired,.badge.vencido{background:rgba(239,68,68,.15);color:var(--red)}
+    .badge.noplan{background:rgba(148,163,184,.12);color:var(--muted)}
+    .badge.basico{background:rgba(148,163,184,.12);color:var(--muted)}
+    .badge.profesional{background:rgba(129,140,248,.15);color:var(--purple)}
+    .badge.empresarial{background:rgba(249,115,22,.15);color:var(--accent)}
+    .badge.admin{background:rgba(249,115,22,.2);color:var(--accent);border:1px solid rgba(249,115,22,.3)}
+    .badge.gift{background:rgba(34,197,94,.12);color:var(--green)}
+    .badge.wompi{background:rgba(34,211,238,.12);color:var(--cyan)}
+    /* ── CHARTS ── */
+    .charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:24px}
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .chart-title{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--muted)}
+    .bar-chart{display:flex;align-items:flex-end;height:140px;gap:6px}
+    .bar-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+    .bar-fill{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--accent),var(--purple));min-height:2px;transition:height .5s}
+    .bar-label{font-size:9px;color:var(--dim);margin-top:6px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+    .bar-val{font-size:9px;color:var(--muted);margin-bottom:2px}
+    .plan-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .plan-row-name{font-size:12px;color:var(--muted);width:90px;flex-shrink:0}
+    .plan-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+    .plan-bar-fill{height:100%;border-radius:4px;transition:width .5s}
+    .plan-bar-fill.basico{background:var(--dim)}
+    .plan-bar-fill.profesional{background:var(--purple)}
+    .plan-bar-fill.empresarial{background:var(--accent)}
+    .plan-row-pct{font-size:11px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
+    /* ── MODALS ── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:200;padding:16px}
+    .overlay.open{display:flex}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+    .modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .modal-title{font-size:17px;font-weight:700}
+    .modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:0}
+    .modal-body{padding:24px}
+    .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-grid .full{grid-column:1/-1}
+    /* ── TOAST ── */
+    #toast-container{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .toast{padding:14px 18px;border-radius:10px;font-size:13px;font-weight:500;max-width:360px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .3s ease}
+    .toast.success{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+    .toast.error{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red)}
+    .toast.info{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.25);color:var(--cyan)}
+    @keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+    /* ── GRANT ── */
+    .grant-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:640px}
+    .user-results{background:#0f172a;border:1px solid var(--border);border-radius:8px;margin-top:4px;max-height:200px;overflow-y:auto;display:none}
+    .user-result-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background .15s}
+    .user-result-item:last-child{border-bottom:none}
+    .user-result-item:hover,.user-result-item.sel{background:rgba(249,115,22,.12);color:var(--accent)}
+    /* ── MISC ── */
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-cell{text-align:center;padding:40px;color:var(--muted)}
+    .info-box{background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.18);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--cyan);margin-bottom:16px}
+    .warn-box{background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.18);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--accent);margin-bottom:16px}
+    .flex{display:flex}.gap-2{gap:8px}.items-center{align-items:center}
+    .text-sm{font-size:13px}.text-xs{font-size:11px}.text-muted{color:var(--muted)}.text-accent{color:var(--accent)}
+    .mb-2{margin-bottom:8px}.mb-4{margin-bottom:16px}.mt-2{margin-top:8px}.mt-4{margin-top:16px}
+    .pagination{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+    @media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.stats-grid{grid-template-columns:1fr 1fr}.charts-row{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="logo">JIREHAI</div>
+      <div class="login-sub">Panel Administrativo · Acceso Restringido</div>
+      <div class="warn-box" style="margin-bottom:24px">⚠ Solo administradores autorizados.</div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" id="l-email" placeholder="admin@ejemplo.com" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="login-err" class="err-msg" style="display:none;margin-bottom:12px"></div>
+      <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">Iniciar sesión</button>
+      <div style="text-align:center;margin-top:16px">
+        <a href="JIREHAI.html" style="font-size:12px;color:var(--dim)">← Volver a JIREHAI</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ADMIN PANEL ═══════════════ -->
+<div id="admin" style="display:none">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">JIREHAI</div>
+    <div class="sidebar-user" id="sidebar-email"></div>
+    <div class="nav-section">Principal</div>
+    <button class="nav-item active" onclick="nav('dashboard',this)">📊 Dashboard</button>
+    <button class="nav-item" onclick="nav('usuarios',this)">👥 Usuarios</button>
+    <button class="nav-item" onclick="nav('suscripciones',this)">💳 Suscripciones</button>
+    <div class="nav-section">Herramientas</div>
+    <button class="nav-item" onclick="nav('grant',this)">🎁 Asignar Días</button>
+    <div class="nav-divider"></div>
+    <button class="nav-item" onclick="window.location='JIREHAI.html'">↩ Ir a JIREHAI</button>
+    <button class="nav-item" onclick="doLogout()">🚪 Cerrar sesión</button>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="sec-dashboard" class="section active">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="dash-ts">Resumen general del sistema</div>
+
+      <div class="stats-grid">
+        <div class="stat-card orange"><div class="stat-label">Total Usuarios</div><div class="stat-value" id="k-total">–</div><div class="stat-note">registrados</div></div>
+        <div class="stat-card green"><div class="stat-label">Planes Activos</div><div class="stat-value" id="k-active">–</div><div class="stat-note">suscripción vigente</div></div>
+        <div class="stat-card cyan"><div class="stat-label">En Trial</div><div class="stat-value" id="k-trial">–</div><div class="stat-note">período de prueba</div></div>
+        <div class="stat-card purple"><div class="stat-label">Ingresos Totales</div><div class="stat-value" id="k-revenue">–</div><div class="stat-note">COP acumulado</div></div>
+        <div class="stat-card orange"><div class="stat-label">Este Mes</div><div class="stat-value" id="k-month">–</div><div class="stat-note">COP</div></div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Distribución de Planes</div>
+          <div id="plan-dist-chart">
+            <div class="plan-row"><div class="plan-row-name">Básico</div><div class="plan-bar-wrap"><div class="plan-bar-fill basico" id="pb-basico" style="width:0%"></div></div><div class="plan-row-pct" id="pp-basico">–</div></div>
+            <div class="plan-row"><div class="plan-row-name">Profesional</div><div class="plan-bar-wrap"><div class="plan-bar-fill profesional" id="pb-pro" style="width:0%"></div></div><div class="plan-row-pct" id="pp-pro">–</div></div>
+            <div class="plan-row"><div class="plan-row-name">Empresarial</div><div class="plan-bar-wrap"><div class="plan-bar-fill empresarial" id="pb-emp" style="width:0%"></div></div><div class="plan-row-pct" id="pp-emp">–</div></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Ingresos por Mes (COP)</div>
+          <div class="bar-chart" id="revenue-chart"><div style="margin:auto;color:var(--muted);font-size:13px">Cargando…</div></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-head"><div class="table-title">Usuarios Recientes</div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()">🔄</button></div>
+        <table><thead><tr><th>Email</th><th>Plan</th><th>Estado</th><th>Registro</th></tr></thead>
+        <tbody id="recent-tbody"><tr><td colspan="4" class="loading-cell"><span class="spinner"></span></td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div id="sec-usuarios" class="section">
+      <div class="page-title">Usuarios</div>
+      <div class="page-sub">Gestión completa de usuarios del sistema</div>
+      <div class="search-row">
+        <input class="search-input" id="u-search" placeholder="Buscar email o nombre…" oninput="filterUsers()">
+        <select class="search-input" style="flex:0 1 160px" id="u-plan" onchange="filterUsers()">
+          <option value="">Todos los planes</option>
+          <option value="basico">Básico</option>
+          <option value="profesional">Profesional</option>
+          <option value="empresarial">Empresarial</option>
+        </select>
+        <select class="search-input" style="flex:0 1 160px" id="u-status" onchange="filterUsers()">
+          <option value="">Todos los estados</option>
+          <option value="active">Activo</option>
+          <option value="trial">Trial</option>
+          <option value="expired">Vencido</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openCreateUser()">➕ Nuevo Usuario</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadUsers()">🔄</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Email</th><th>Nombre</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Rol</th><th>Acciones</th></tr></thead>
+        <tbody id="users-tbody"><tr><td colspan="8" class="loading-cell"><span class="spinner"></span></td></tr></tbody>
+      </table></div>
+      <div class="pagination" id="users-pagination"></div>
+    </div>
+
+    <!-- SUSCRIPCIONES -->
+    <div id="sec-suscripciones" class="section">
+      <div class="page-title">Suscripciones y Pagos</div>
+      <div class="page-sub">Historial completo de suscripciones y transacciones</div>
+      <div class="search-row">
+        <input class="search-input" id="s-search" placeholder="Buscar por usuario…" oninput="filterSubs()">
+        <select class="search-input" style="flex:0 1 160px" id="s-method" onchange="filterSubs()">
+          <option value="">Todos los métodos</option>
+          <option value="wompi">Wompi</option>
+          <option value="gift">Regalo</option>
+          <option value="trial">Trial</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="loadSubs()">🔄</button>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card purple"><div class="stat-label">Total Registros</div><div class="stat-value" id="sk-total">–</div></div>
+        <div class="stat-card cyan"><div class="stat-label">Pagos Wompi</div><div class="stat-value" id="sk-wompi">–</div></div>
+        <div class="stat-card green"><div class="stat-label">Regalos</div><div class="stat-value" id="sk-gift">–</div></div>
+        <div class="stat-card orange"><div class="stat-label">Ingresos</div><div class="stat-value" id="sk-revenue">–</div><div class="stat-note">COP</div></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Usuario</th><th>Plan</th><th>Monto</th><th>Método</th><th>Estado</th><th>Inicio</th><th>Vence</th></tr></thead>
+        <tbody id="subs-tbody"><tr><td colspan="7" class="loading-cell"><span class="spinner"></span></td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- GRANT DAYS -->
+    <div id="sec-grant" class="section">
+      <div class="page-title">Asignar Días Gratuitos</div>
+      <div class="page-sub">Extiende el acceso de cualquier usuario sin cobro</div>
+      <div class="grant-card">
+        <div class="info-box">🎁 Los días se agregan desde la fecha de vencimiento actual del usuario.</div>
+        <div class="field">
+          <label>Buscar usuario</label>
+          <input id="grant-search" class="search-input" style="flex:none;width:100%" placeholder="Escribe email o nombre…" oninput="searchGrant()">
+          <div class="user-results" id="grant-results"></div>
+        </div>
+        <div id="grant-selected" style="display:none">
+          <div class="field"><label>Usuario seleccionado</label>
+            <div id="grant-user-label" style="padding:10px 12px;background:#0f172a;border:1px solid var(--accent);border-radius:8px;font-size:13px;color:var(--accent)"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Días a otorgar</label><input type="number" id="grant-days" value="30" min="1" max="365"></div>
+            <div class="field"><label>Plan a asignar</label>
+              <select id="grant-plan"><option value="profesional">Profesional</option><option value="empresarial">Empresarial</option><option value="basico">Básico</option></select>
+            </div>
+            <div class="field full"><label>Razón (opcional)</label><input type="text" id="grant-reason" placeholder="ej. Cortesía por soporte técnico"></div>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button class="btn btn-primary btn-sm" id="grant-btn" onclick="doGrant()">🎁 Otorgar Días</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearGrant()">✕ Cancelar</button>
+          </div>
+          <div id="grant-err" class="err-msg" style="margin-top:8px"></div>
+        </div>
+        <div class="mt-4">
+          <div class="table-title mb-2">Últimos regalos otorgados</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Usuario</th><th>Plan</th><th>Días</th><th>Razón</th><th>Fecha</th></tr></thead>
+            <tbody id="gifts-tbody"><tr><td colspan="5" class="loading-cell"><span class="spinner"></span></td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL Crear Usuario -->
+<div class="overlay" id="modal-user">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-user-title">Nuevo Usuario</div>
+      <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="mu-id">
+      <div class="form-grid">
+        <div class="field full"><label>Email *</label><input type="email" id="mu-email" placeholder="usuario@empresa.com"></div>
+        <div class="field full"><label>Nombre</label><input type="text" id="mu-name" placeholder="Nombre completo"></div>
+        <div class="field"><label>Plan</label>
+          <select id="mu-plan"><option value="basico">Básico</option><option value="profesional">Profesional</option><option value="empresarial">Empresarial</option></select>
+        </div>
+        <div class="field"><label>Rol</label>
+          <select id="mu-role"><option value="user">Usuario</option><option value="admin">Administrador</option></select>
+        </div>
+        <div class="field full"><label>Contraseña *</label><input type="password" id="mu-pass" placeholder="Mínimo 6 caracteres"></div>
+        <div class="field full"><label>Días de trial</label><input type="number" id="mu-trial" value="30" min="0" max="365"></div>
+      </div>
+      <div id="mu-err" class="err-msg" style="margin-top:8px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-user')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="mu-save-btn" onclick="saveUser()">Crear Usuario</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<script>
+/* ════════════════════════════════════════
+   JIREHAI Admin Panel — Real API Version
+   Conectado a Express.js backend con JWT
+════════════════════════════════════════ */
+
+const API_BASE = window.location.origin; // mismo origen; ajustar si backend en otro puerto
+let TOKEN = localStorage.getItem('jirehai_token') || '';
+let ME = null;
+let ALL_USERS = [];
+let ALL_SUBS  = [];
+let GRANT_UID = null;
+let USER_PAGE = 0;
+const PER_PAGE = 25;
+
+/* ── Helpers ── */
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API_BASE + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + TOKEN,
+      ...(opts.headers || {})
+    }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || data.message || 'Error ' + res.status);
+  return data;
+}
+
+function $id(id) { return document.getElementById(id); }
+function fmtNum(n) { return Number(n || 0).toLocaleString('es-CO'); }
+function fmtCOP(cents) { return '$' + fmtNum(Math.round((cents || 0) / 100)); }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('es-CO') : '–'; }
+
+function toast(msg, type = 'info', ms = 4000) {
+  const c = $id('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+
+function setLoading(btnId, loading, label) {
+  const b = $id(btnId);
+  if (!b) return;
+  b.disabled = loading;
+  b.innerHTML = loading ? '<span class="spinner"></span> ' + label : label;
+}
+
+function closeModal(id) { $id(id).classList.remove('open'); }
+function openModal(id)  { $id(id).classList.add('open'); }
+
+/* ── Navigation ── */
+function nav(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  $id('sec-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'dashboard')      loadDashboard();
+  if (name === 'usuarios')       loadUsers();
+  if (name === 'suscripciones')  loadSubs();
+  if (name === 'grant')          { loadGiftHistory(); }
+}
+
+/* ══════════════════════════════════════
+   AUTH
+══════════════════════════════════════ */
+async function doLogin() {
+  const email = $id('l-email').value.trim();
+  const pass  = $id('l-pass').value;
+  const errEl = $id('login-err');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Completa todos los campos.'; errEl.style.display = 'block'; return; }
+  setLoading('login-btn', true, 'Iniciando sesión…');
+  try {
+    const data = await apiFetch('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: pass })
+    });
+    if (!data.token) throw new Error('Respuesta inválida del servidor');
+    if (data.user?.role !== 'admin') throw new Error('No tienes permisos de administrador');
+    TOKEN = data.token;
+    localStorage.setItem('jirehai_token', TOKEN);
+    enterAdmin(data.user);
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  } finally {
+    setLoading('login-btn', false, 'Iniciar sesión');
+  }
+}
+
+['l-pass','l-email'].forEach(id => {
+  const el = $id(id);
+  if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+});
+
+function enterAdmin(user) {
+  ME = user;
+  $id('login-screen').style.display = 'none';
+  $id('admin').style.display = 'flex';
+  $id('sidebar-email').textContent = user.email;
+  loadDashboard();
+  loadUsers(); // preload for grant search
+}
+
+function doLogout() {
+  localStorage.removeItem('jirehai_token');
+  TOKEN = ''; ME = null; ALL_USERS = [];
+  $id('admin').style.display = 'none';
+  $id('login-screen').style.display = 'flex';
+}
+
+async function checkAuth() {
+  if (!TOKEN) return;
+  try {
+    const d = await apiFetch('/api/auth/me');
+    const user = d.user || d;
+    if (user?.role === 'admin') enterAdmin(user);
+    else { localStorage.removeItem('jirehai_token'); TOKEN = ''; }
+  } catch { localStorage.removeItem('jirehai_token'); TOKEN = ''; }
+}
+
+/* ══════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════ */
+async function loadDashboard() {
+  try {
+    const d = await apiFetch('/api/admin/dashboard');
+    const kpis = d.kpis || {};
+
+    $id('k-total').textContent   = fmtNum(kpis.totalUsers);
+    $id('k-active').textContent  = fmtNum(kpis.activeSubscriptions);
+    $id('k-trial').textContent   = fmtNum(kpis.trialUsers);
+    $id('k-revenue').textContent = fmtCOP(kpis.totalRevenueCents);
+    $id('k-month').textContent   = fmtCOP(kpis.monthRevenueCents);
+    $id('dash-ts').textContent   = 'Actualizado: ' + new Date().toLocaleString('es-CO');
+
+    // Plan distribution
+    const dist  = d.planDist || {};
+    const total = (dist.basico||0) + (dist.profesional||0) + (dist.empresarial||0) || 1;
+    const pct   = v => Math.round(v / total * 100);
+    [['basico','pb-basico','pp-basico'], ['profesional','pb-pro','pp-pro'], ['empresarial','pb-emp','pp-emp']].forEach(([key, barId, pctId]) => {
+      $id(barId).style.width = pct(dist[key]||0) + '%';
+      $id(pctId).textContent = pct(dist[key]||0) + '%';
+    });
+
+    // Revenue chart
+    const revEl = $id('revenue-chart');
+    const rev   = d.revenueByMonth || [];
+    if (!rev.length) { revEl.innerHTML = '<div style="margin:auto;color:var(--muted);font-size:13px">Sin datos aún</div>'; }
+    else {
+      const maxV = Math.max(...rev.map(r => r.totalCents || 0)) || 1;
+      revEl.innerHTML = rev.slice(-8).map(r => {
+        const h = Math.max(4, Math.round(((r.totalCents||0) / maxV) * 120));
+        return `<div class="bar-col">
+          <div class="bar-val">${fmtCOP(r.totalCents)}</div>
+          <div class="bar-fill" style="height:${h}px"></div>
+          <div class="bar-label">${r.month||r.yearMonth||''}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Recent users
+    const ru = d.recentUsers || [];
+    $id('recent-tbody').innerHTML = !ru.length
+      ? '<tr><td colspan="4" class="no-data">Sin usuarios registrados aún</td></tr>'
+      : ru.map(u => `<tr>
+          <td class="text-sm">${u.email}</td>
+          <td><span class="badge ${u.plan||'basico'}">${u.plan||'básico'}</span></td>
+          <td><span class="badge ${u.subStatus||'noplan'}">${u.subStatus||'sin plan'}</span></td>
+          <td class="text-xs text-muted">${fmtDate(u.created_at)}</td>
+        </tr>`).join('');
+  } catch (e) {
+    toast('Error cargando dashboard: ' + e.message, 'error');
+  }
+}
+
+/* ══════════════════════════════════════
+   USUARIOS
+══════════════════════════════════════ */
+async function loadUsers() {
+  $id('users-tbody').innerHTML = '<tr><td colspan="8" class="loading-cell"><span class="spinner"></span></td></tr>';
+  try {
+    const d = await apiFetch('/api/admin/users/status');
+    ALL_USERS = d.users || d || [];
+    USER_PAGE = 0;
+    renderUsers();
+  } catch (e) {
+    $id('users-tbody').innerHTML = '<tr><td colspan="8" class="no-data">Error al cargar usuarios</td></tr>';
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+function filterUsers() { USER_PAGE = 0; renderUsers(); }
+
+function filteredUsers() {
+  const q  = ($id('u-search')?.value || '').toLowerCase();
+  const fp = $id('u-plan')?.value   || '';
+  const fs = $id('u-status')?.value || '';
+  return ALL_USERS.filter(u =>
+    (!q  || (u.email||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)) &&
+    (!fp || (u.plan||'') === fp) &&
+    (!fs || (u.subStatus||'') === fs)
+  );
+}
+
+function renderUsers() {
+  const list  = filteredUsers();
+  const start = USER_PAGE * PER_PAGE;
+  const page  = list.slice(start, start + PER_PAGE);
+  const body  = $id('users-tbody');
+  if (!page.length) { body.innerHTML = '<tr><td colspan="8" class="no-data">Sin resultados</td></tr>'; $id('users-pagination').innerHTML = ''; return; }
+  body.innerHTML = page.map((u, i) => `
+    <tr>
+      <td class="text-xs text-muted">${start + i + 1}</td>
+      <td class="text-sm">${u.email}</td>
+      <td class="text-sm text-muted">${u.name || '–'}</td>
+      <td><span class="badge ${u.plan||'basico'}">${u.plan||'básico'}</span></td>
+      <td><span class="badge ${u.subStatus||'noplan'}">${u.subStatus||'sin plan'}</span></td>
+      <td class="text-xs text-muted">${fmtDate(u.plan_expires_at || u.trial_expires_at)}</td>
+      <td>${u.role === 'admin' ? '<span class="badge admin">admin</span>' : ''}</td>
+      <td><div class="flex gap-2">
+        <button class="btn btn-cyan btn-sm" title="Dar días" onclick='grantForUser(${JSON.stringify({id:u.id,email:u.email,name:u.name,plan:u.plan})})'>🎁</button>
+        <button class="btn btn-danger btn-sm" title="Eliminar" onclick="deleteUser(${u.id},'${escHtml(u.email)}')">🗑</button>
+      </div></td>
+    </tr>`).join('');
+
+  const totalPages = Math.ceil(list.length / PER_PAGE);
+  $id('users-pagination').innerHTML = totalPages <= 1 ? '' :
+    Array.from({length: totalPages}, (_, i) =>
+      `<button class="btn ${i===USER_PAGE?'btn-primary':'btn-ghost'} btn-sm" onclick="USER_PAGE=${i};renderUsers()">${i+1}</button>`
+    ).join('');
+}
+
+function escHtml(str) { return (str||'').replace(/'/g, "\\'"); }
+
+async function deleteUser(id, email) {
+  if (!confirm('¿Eliminar al usuario ' + email + '?\nEsta acción no se puede deshacer.')) return;
+  try {
+    await apiFetch('/api/admin/users/' + id, { method: 'DELETE' });
+    toast('Usuario eliminado', 'success');
+    loadUsers();
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+/* ── Create User ── */
+function openCreateUser() {
+  $id('modal-user-title').textContent = 'Nuevo Usuario';
+  $id('mu-id').value   = '';
+  $id('mu-email').value  = '';
+  $id('mu-name').value   = '';
+  $id('mu-pass').value   = '';
+  $id('mu-plan').value   = 'basico';
+  $id('mu-role').value   = 'user';
+  $id('mu-trial').value  = '30';
+  $id('mu-err').textContent = '';
+  $id('mu-save-btn').textContent = 'Crear Usuario';
+  openModal('modal-user');
+}
+
+async function saveUser() {
+  const email    = $id('mu-email').value.trim();
+  const name     = $id('mu-name').value.trim();
+  const password = $id('mu-pass').value;
+  const plan     = $id('mu-plan').value;
+  const role     = $id('mu-role').value;
+  const trial    = parseInt($id('mu-trial').value) || 0;
+  const errEl    = $id('mu-err');
+  errEl.textContent = '';
+  if (!email)         { errEl.textContent = 'El email es obligatorio'; return; }
+  if (!password || password.length < 6) { errEl.textContent = 'La contraseña debe tener al menos 6 caracteres'; return; }
+  setLoading('mu-save-btn', true, 'Guardando…');
+  try {
+    await apiFetch('/api/admin/users', {
+      method: 'POST',
+      body: JSON.stringify({ email, name, password, plan, role, trialDays: trial })
+    });
+    toast('Usuario creado exitosamente', 'success');
+    closeModal('modal-user');
+    loadUsers();
+  } catch (e) {
+    errEl.textContent = e.message;
+  } finally {
+    setLoading('mu-save-btn', false, 'Crear Usuario');
+  }
+}
+
+/* ══════════════════════════════════════
+   SUSCRIPCIONES
+══════════════════════════════════════ */
+async function loadSubs() {
+  $id('subs-tbody').innerHTML = '<tr><td colspan="7" class="loading-cell"><span class="spinner"></span></td></tr>';
+  try {
+    const d = await apiFetch('/api/admin/subscriptions');
+    ALL_SUBS = d.subscriptions || d || [];
+    // KPIs
+    const wompiC = ALL_SUBS.filter(s => (s.payment_method||'').includes('wompi') || (s.payment_method||'').includes('stripe')).length;
+    const giftC  = ALL_SUBS.filter(s => (s.payment_method||'').includes('gift') || (s.type||'').includes('gift')).length;
+    const revC   = ALL_SUBS.reduce((a, s) => a + (s.amount_cents || 0), 0);
+    $id('sk-total').textContent   = ALL_SUBS.length;
+    $id('sk-wompi').textContent   = wompiC;
+    $id('sk-gift').textContent    = giftC;
+    $id('sk-revenue').textContent = fmtCOP(revC);
+    renderSubs();
+  } catch (e) {
+    toast('Error cargando suscripciones: ' + e.message, 'error');
+    $id('subs-tbody').innerHTML = '<tr><td colspan="7" class="no-data">Error al cargar. Asegúrate de que el servidor está corriendo.</td></tr>';
+  }
+}
+
+function filterSubs() { renderSubs(); }
+
+function renderSubs() {
+  const q  = ($id('s-search')?.value || '').toLowerCase();
+  const fm = $id('s-method')?.value  || '';
+  const filtered = ALL_SUBS.filter(s => {
+    const em = (s.email || s.user_email || '').toLowerCase();
+    const mt = s.payment_method || s.type || '';
+    return (!q || em.includes(q)) && (!fm || mt.includes(fm));
+  });
+  const body = $id('subs-tbody');
+  if (!filtered.length) { body.innerHTML = '<tr><td colspan="7" class="no-data">Sin resultados</td></tr>'; return; }
+  body.innerHTML = filtered.slice(0, 100).map(s => {
+    const method = s.payment_method || s.type || '–';
+    const mBadge = method.includes('wompi') ? 'wompi' : method.includes('gift') ? 'gift' : method.includes('trial') ? 'trial' : 'basico';
+    return `<tr>
+      <td class="text-sm">${s.email || s.user_email || '–'}</td>
+      <td><span class="badge ${s.plan || s.plan_type || 'basico'}">${s.plan || s.plan_type || '–'}</span></td>
+      <td class="text-sm">${s.amount_cents ? fmtCOP(s.amount_cents) : '–'}</td>
+      <td><span class="badge ${mBadge}">${method}</span></td>
+      <td><span class="badge ${s.status || 'active'}">${s.status || '–'}</span></td>
+      <td class="text-xs text-muted">${fmtDate(s.starts_at || s.created_at)}</td>
+      <td class="text-xs text-muted">${fmtDate(s.ends_at || s.expires_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
+   GRANT DAYS
+══════════════════════════════════════ */
+function searchGrant() {
+  const q = ($id('grant-search').value || '').trim().toLowerCase();
+  const res = $id('grant-results');
+  if (!q) { res.style.display = 'none'; return; }
+  const hits = ALL_USERS.filter(u =>
+    (u.email||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)
+  ).slice(0, 8);
+  if (!hits.length) { res.style.display = 'none'; return; }
+  res.innerHTML = hits.map(u =>
+    `<div class="user-result-item${GRANT_UID===u.id?' sel':''}" onclick='selectGrantUser(${JSON.stringify({id:u.id,email:u.email,name:u.name,plan:u.plan})})'>${u.email}${u.name?' — '+u.name:''}</div>`
+  ).join('');
+  res.style.display = 'block';
+}
+
+function selectGrantUser(u) {
+  GRANT_UID = u.id;
+  $id('grant-user-label').textContent = u.email + (u.name ? ' — ' + u.name : '') + ' | Plan: ' + (u.plan || 'básico');
+  $id('grant-selected').style.display = 'block';
+  $id('grant-results').style.display  = 'none';
+  $id('grant-err').textContent = '';
+}
+
+function clearGrant() {
+  GRANT_UID = null;
+  $id('grant-selected').style.display = 'none';
+  $id('grant-search').value = '';
+  $id('grant-err').textContent = '';
+}
+
+function grantForUser(u) {
+  nav('grant', document.querySelectorAll('.nav-item')[3]);
+  selectGrantUser(u);
+  $id('grant-search').value = u.email;
+}
+
+async function doGrant() {
+  if (!GRANT_UID) { toast('Selecciona un usuario primero', 'error'); return; }
+  const days   = parseInt($id('grant-days').value) || 30;
+  const plan   = $id('grant-plan').value;
+  const reason = $id('grant-reason').value.trim();
+  const errEl  = $id('grant-err');
+  errEl.textContent = '';
+  if (days < 1 || days > 365) { errEl.textContent = 'Los días deben estar entre 1 y 365'; return; }
+  setLoading('grant-btn', true, 'Otorgando…');
+  try {
+    const r = await apiFetch('/api/admin/users/' + GRANT_UID + '/grant-days', {
+      method: 'POST',
+      body: JSON.stringify({ days, plan, reason })
+    });
+    toast('✅ ' + days + ' días otorgados correctamente', 'success', 5000);
+    clearGrant();
+    loadGiftHistory();
+    loadUsers();
+  } catch (e) {
+    errEl.textContent = e.message || 'Error al otorgar días';
+    toast('Error: ' + e.message, 'error');
+  } finally {
+    setLoading('grant-btn', false, '🎁 Otorgar Días');
+  }
+}
+
+async function loadGiftHistory() {
+  try {
+    const d = await apiFetch('/api/admin/subscriptions');
+    const gifts = (d.subscriptions || d || []).filter(s =>
+      (s.payment_method||'').includes('gift') || (s.type||'').includes('gift')
+    );
+    const body = $id('gifts-tbody');
+    if (!gifts.length) { body.innerHTML = '<tr><td colspan="5" class="no-data">Sin regalos otorgados aún</td></tr>'; return; }
+    body.innerHTML = gifts.slice(0, 20).map(s => `<tr>
+      <td class="text-sm">${s.email || s.user_email || '–'}</td>
+      <td><span class="badge ${s.plan||'basico'}">${s.plan||'–'}</span></td>
+      <td class="text-sm">${s.days_granted || '?'} días</td>
+      <td class="text-xs text-muted">${s.reason || '–'}</td>
+      <td class="text-xs text-muted">${fmtDate(s.created_at)}</td>
+    </tr>`).join('');
+  } catch {
+    $id('gifts-tbody').innerHTML = '<tr><td colspan="5" class="no-data">No disponible</td></tr>';
+  }
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+checkAuth();
+</script>
+</body>
+</html>

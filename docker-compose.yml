@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  jirehai:
+    build: .
+    container_name: jirehai-app
+    ports:
+      - "3000:3000"
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend/jirehai.db:/app/backend/jirehai.db
+    restart: unless-stopped

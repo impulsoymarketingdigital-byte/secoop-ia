@@ -1,0 +1,29 @@
+# Node modules
+/backend/node_modules
+
+# Local environment files
+/backend/.env
+/.env
+
+# Local SQLite database
+/backend/jirehai.db
+/backend/jirehai.db.corrupted_*
+
+# Python artifacts and temporary outputs
+/backend/ai/outputs/
+/backend/ai/secop-ai-analyst/__pycache__/
+
+# Local npm state
+/backend/.npmrc
+/npm-debug.log*
+yarn-debug.log*
+
+# Docker
+/docker-compose.override.yml
+
+# VS Code
+/.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

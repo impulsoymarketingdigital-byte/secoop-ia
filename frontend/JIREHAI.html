@@ -1,0 +1,4221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>JIREHAI - Procurement Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0A0A0B;
+  --bg2: #141415;
+  --bg3: #1F1F23;
+  --orange: #F97316;
+  --purple: #8B5CF6;
+  --green: #22C55E;
+  --red: #EF4444;
+  --text: #FFFFFF;
+  --text3: #A1A1A6;
+  --text4: #71717A;
+  --border: #1F1F23;
+  --border2: #27272A;
+  --secondary: #A1A1A6;
+  --radius-sm: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; width: 100%; }
+body {
+  font-family: Inter, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+#root { width: 100%; height: 100%; }
+.mesh-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+    linear-gradient(to bottom, var(--bg), var(--bg));
+  z-index: 0;
+}
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+.sidebar {
+  width: 240px;
+  background-color: rgba(10, 10, 11, 0.95);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px 0;
+}
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.sidebar-header h1 {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--purple), var(--orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-item {
+  padding: 12px 20px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s;
+  border: 1px solid transparent;
+  position: relative;
+}
+.nav-item:hover {
+  background-color: rgba(139, 92, 246, 0.1);
+  border-color: var(--purple);
+}
+.nav-item.active {
+  background-color: rgba(139, 92, 246, 0.2);
+  border-color: var(--purple);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+}
+.nav-item-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--orange);
+  color: var(--bg);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge.red {
+  background-color: var(--red);
+}
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 30px 40px;
+}
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-header {
+  margin-bottom: 30px;
+}
+.page-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.page-header p {
+  color: var(--secondary);
+  font-size: 14px;
+}
+.stat-boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.stat-box {
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+}
+.stat-box-label {
+  font-size: 12px;
+  color: var(--secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-box-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--orange);
+}
+.stat-box-change {
+  font-size: 12px;
+  color: var(--green);
+  margin-top: 8px;
+}
+.alert-banner {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid var(--red);
+}
+.alert-banner.warning {
+  background-color: rgba(251, 146, 60, 0.1);
+  border-color: rgba(251, 146, 60, 0.3);
+  border-left-color: #FB923C;
+}
+.alert-banner.info {
+  background-color: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+  border-left-color: var(--purple);
+}
+.alert-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.alert-text {
+  flex: 1;
+}
+.alert-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.alert-desc {
+  font-size: 13px;
+  color: var(--secondary);
+}
+.btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Inter, sans-serif;
+}
+.btn-primary {
+  background-color: var(--orange);
+  color: var(--bg);
+}
+.btn-primary:hover {
+  background-color: #F08200;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(249, 115, 22, 0.3);
+}
+.btn-secondary {
+  background-color: rgba(31, 31, 35, 0.5);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background-color: rgba(31, 31, 35, 0.8);
+  border-color: var(--purple);
+}
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.btn-danger {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.3);
+  border-color: var(--red);
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.input-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.input-field {
+  padding: 10px 12px;
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  transition: all 0.3s;
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--purple);
+  background-color: rgba(31, 31, 35, 0.8);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.2);
+}
+.input-field::placeholder {
+  color: var(--secondary);
+}
+.select-field {
+  padding: 10px 12px;
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.select-field:focus {
+  outline: none;
+  border-color: var(--purple);
+  background-color: rgba(31, 31, 35, 0.8);
+}
+.select-field option {
+  background-color: #1F1F23;
+  color: var(--text);
+}
+.textarea-field {
+  padding: 10px 12px;
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  min-height: 80px;
+  resize: vertical;
+  transition: all 0.3s;
+}
+.textarea-field:focus {
+  outline: none;
+  border-color: var(--purple);
+  background-color: rgba(31, 31, 35, 0.8);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.2);
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.card {
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+.card:hover {
+  border-color: var(--purple);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.1);
+  transform: translateY(-4px);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+.card-subtitle {
+  font-size: 13px;
+  color: var(--secondary);
+  margin-bottom: 12px;
+}
+.card-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--secondary);
+  margin-bottom: 16px;
+}
+.card-footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.badge-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background-color: rgba(139, 92, 246, 0.2);
+  color: var(--purple);
+}
+.badge-pill.orange {
+  background-color: rgba(249, 115, 22, 0.2);
+  color: var(--orange);
+}
+.badge-pill.green {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: var(--green);
+}
+.badge-pill.red {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+}
+.table-wrapper {
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table thead {
+  background-color: rgba(31, 31, 35, 0.8);
+  border-bottom: 1px solid var(--border);
+}
+.table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.table tbody tr:hover {
+  background-color: rgba(139, 92, 246, 0.05);
+}
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+}
+.toast {
+  background-color: rgba(31, 31, 35, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideIn 0.3s;
+}
+.toast.success {
+  border-left: 4px solid var(--green);
+}
+.toast.error {
+  border-left: 4px solid var(--red);
+}
+.toast.info {
+  border-left: 4px solid var(--purple);
+}
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s;
+}
+@keyframes modalSlideIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.modal-close:hover {
+  color: var(--text);
+}
+.modal-body {
+  margin-bottom: 24px;
+}
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.timeline {
+  position: relative;
+  padding: 20px 0 20px 40px;
+}
+.timeline-item {
+  position: relative;
+  padding: 20px;
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -40px;
+  top: 24px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--purple);
+  border: 2px solid var(--bg);
+}
+.timeline-item.red::before {
+  background-color: var(--red);
+}
+.timeline-item.yellow::before {
+  background-color: #FB923C;
+}
+.timeline-item.green::before {
+  background-color: var(--green);
+}
+.timeline-item.gray::before {
+  background-color: var(--border);
+}
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  left: -34px;
+  top: 36px;
+  width: 2px;
+  height: calc(100% + 16px);
+  background-color: var(--border);
+}
+.timeline-item:last-child::after {
+  display: none;
+}
+.doc-slot {
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border-left: 4px solid var(--border);
+}
+.doc-slot.vigente {
+  border-left-color: var(--green);
+}
+.doc-slot.por-vencer {
+  border-left-color: #FB923C;
+}
+.doc-slot.vencido {
+  border-left-color: var(--red);
+}
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.doc-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.doc-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: rgba(139, 92, 246, 0.2);
+  color: var(--purple);
+}
+.doc-status.vigente {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: var(--green);
+}
+.doc-status.por-vencer {
+  background-color: rgba(251, 146, 60, 0.2);
+  color: #FB923C;
+}
+.doc-status.vencido {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+}
+.doc-desc {
+  font-size: 12px;
+  color: var(--secondary);
+  margin-bottom: 12px;
+}
+.doc-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 12px;
+}
+.doc-note {
+  color: var(--secondary);
+  margin-top: 12px;
+  font-style: italic;
+}
+.process-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.action-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(139, 92, 246, 0.2);
+  color: var(--purple);
+}
+.action-btn:hover {
+  background-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+}
+.action-btn.orange {
+  background-color: rgba(249, 115, 22, 0.2);
+  color: var(--orange);
+}
+.action-btn.orange:hover {
+  background-color: rgba(249, 115, 22, 0.3);
+}
+.action-btn.red {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+}
+.action-btn.red:hover {
+  background-color: rgba(239, 68, 68, 0.3);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.form-grid.full {
+  grid-template-columns: 1fr;
+}
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: rgba(31, 31, 35, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.toggle-input {
+  appearance: none;
+  width: 44px;
+  height: 24px;
+  background-color: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: relative;
+}
+.toggle-input:checked {
+  background-color: var(--green);
+}
+.toggle-input::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--text);
+  top: 2px;
+  left: 2px;
+  transition: left 0.3s;
+}
+.toggle-input:checked::before {
+  left: 22px;
+}
+.auth-overlay{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 25px 60px rgba(0,0,0,0.6)}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;justify-content:center}
+.auth-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--orange),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff}
+.auth-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:24px}
+.auth-tabs{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:4px;margin-bottom:20px;gap:4px}
+.auth-tab{flex:1;padding:8px;text-align:center;border:none;background:transparent;color:var(--text3);font-weight:600;font-size:13px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
+.auth-tab.active{background:var(--orange);color:#fff}
+.auth-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:14px}
+.auth-link{color:var(--orange);text-decoration:none;font-size:12px;display:block;text-align:center;margin-top:14px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="mesh-bg"></div>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="./api.js?v=20260526b"></script>
+
+<script type="text/babel">
+// ============================================================================
+// UTILITIES & CONSTANTS
+// ============================================================================
+
+const UNSPSC_DB = {
+  // Software/TI
+  'software': '72101600', 'desarrollo web': '72101600', 'aplicaciones': '72101600',
+  'sistemas de información': '72101600', 'mantenimiento de software': '72101600', 'ti': '72101600',
+  'programación': '72101600', 'soporte técnico': '81110000', 'infraestructura it': '81110000',
+  'cloud': '81110000', 'hosting': '81110000', 'dominio': '81110000',
+
+  // Construcción y obra civil
+  'construcción': '30201600', 'infraestructura': '30201600', 'vivienda': '30201600',
+  'obra civil': '30201600', 'reparaciones': '30201600', 'reforma': '30201600',
+  'arquitectura': '82110000', 'diseño': '82110000', 'ingeniería civil': '82110000',
+
+  // Salud y medicamentos
+  'salud': '85102200', 'medicamentos': '51202500', 'farmacéutico': '51202500',
+  'equipos médicos': '42202500', 'servicios médicos': '85102200', 'hospitales': '85102200',
+
+  // Consultoría y asesoría
+  'consultoría': '81101600', 'asesoría': '81101600', 'consultor': '81101600',
+  'asesor empresarial': '81101600', 'auditoría': '91121600',
+
+  // Educación y capacitación
+  'educación': '80101600', 'capacitación': '80101600', 'formación': '80101600',
+  'cursos': '80101600', 'entrenamiento': '80101600', 'seminarios': '80101600',
+
+  // Transporte y logística
+  'transporte': '49101500', 'logística': '49101500', 'distribución': '49101500',
+  'carga': '49101500', 'mensajería': '49101500', 'envíos': '49101500',
+
+  // Seguridad y vigilancia
+  'seguridad': '81121700', 'vigilancia': '81121700', 'guardianía': '81121700',
+  'protección': '81121700',
+
+  // Aseo y limpieza
+  'limpieza': '37101500', 'aseo': '37101500', 'servicios de limpieza': '37101500',
+  'mantenimiento de áreas': '37101500',
+
+  // Alimentos y suministros
+  'catering': '55121500', 'alimentos': '55121500', 'suministros': '55121500',
+  'comida': '55121500', 'restaurante': '55121500',
+
+  // Servicios ambientales
+  'ambiente': '39101500', 'ambiental': '39101500', 'reciclaje': '39101500',
+  'residuos': '39101500',
+
+  // Ingeniería y diseño
+  'ingeniería': '82110000', 'diseñador': '82110000', 'diseño gráfico': '82110000',
+  'diseño industrial': '82110000',
+
+  // Comunicaciones y telecomunicaciones
+  'telecomunicaciones': '81112100', 'internet': '81112100', 'telefonía': '81112100',
+  'comunicaciones': '81112100', 'radiocomunicaciones': '81112100',
+
+  // Servicios jurídicos
+  'abogado': '82121100', 'jurídico': '82121100', 'legal': '82121100',
+  'asesoría legal': '82121100',
+
+  // Contabilidad y auditoría
+  'contable': '91121500', 'contabilidad': '91121500', 'facturación': '91121500',
+  'tesorería': '91121500',
+
+  // Publicidad y medios
+  'publicidad': '99101500', 'marketing': '99101500', 'medios': '99101500',
+  'comunicación': '99101500', 'redes sociales': '99101500',
+
+  // Equipos y maquinaria
+  'equipos': '42101500', 'maquinaria': '45101500', 'herramientas': '42101500',
+  'máquinas': '45101500',
+
+  // Dotación y uniformes
+  'uniformes': '45101500', 'dotación': '45101500', 'ropa': '45101500',
+  'vestuario': '45101500',
+
+  // Energía y servicios públicos
+  'energía': '49101800', 'agua': '49101900', 'servicios públicos': '49101800',
+  'electricidad': '49101800', 'gas': '49101900',
+
+  // Investigación y ciencia
+  'investigación': '82101600', 'ciencia': '82101600', 'investigador': '82101600',
+  'estudio': '82101600',
+
+  // Servicios financieros
+  'banco': '65101500', 'financiero': '65101500', 'seguros': '65101500',
+  'inversiones': '65101500',
+
+  // Mantenimiento general
+  'mantenimiento': '80101500', 'reparación': '80101500', 'mantenedor': '80101500',
+  'servicios': '81101500'
+};
+
+const MODALIDADES = [
+  'Concurso de méritos abierto',
+  'Contratación directa (con ofertas)',
+  'Contratación régimen especial',
+  'Contratación régimen especial (con ofertas)',
+  'Licitación Pública Acuerdo Marco de Precios',
+  'Licitación pública',
+  'Licitación pública (Obra pública)',
+  'Mínima cuantía',
+  'Selección Abreviada de Menor Cuantía sin Manifestación de Interés',
+  'Selección abreviada menor cuantía',
+  'Selección abreviada subasta inversa',
+  'Solicitud de información a los Proveedores'
+];
+
+const DEPARTAMENTOS = [
+  'Amazonas', 'Antioquia', 'Arauca', 'Atlántico', 'Bolívar', 'Boyacá', 'Caldas',
+  'Caquetá', 'Casanare', 'Cauca', 'Cesar', 'Chocó', 'Córdoba', 'Cundinamarca',
+  'Darién', 'Distrito Capital de Bogotá', 'Guainía', 'Guaviare', 'Huila',
+  'La Guajira', 'Magdalena', 'Meta', 'Nariño', 'Norte de Santander', 'Putumayo',
+  'Quindío', 'Risaralda', 'Salauaria', 'Santander', 'Sucre', 'Tolima', 'Valle del Cauca',
+  'Vaupés', 'Vichada'
+];
+
+function fmtCOP(valor) {
+  if (!valor) return '$0';
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(valor);
+}
+
+function diasRestantes(fecha) {
+  if (!fecha) return null;
+  const hoy = new Date();
+  const cierre = new Date(fecha);
+  const diff = Math.ceil((cierre - hoy) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
+function sugerirUNSPSC(keyword) {
+  const lower = keyword.toLowerCase();
+  const matches = [];
+  const seen = new Set();
+
+  for (let [key, code] of Object.entries(UNSPSC_DB)) {
+    if (lower.includes(key) && !seen.has(code)) {
+      seen.add(code);
+      const score = (key.length / lower.length) * 100;
+      matches.push({ code, key, score: Math.min(100, score) });
+    }
+  }
+
+  return matches.sort((a, b) => b.score - a.score);
+}
+
+// Returns true ONLY if connected to the real backend (not offline fake token)
+function isRealBackend() {
+  if (!window.Api || !window.Api.isLoggedIn()) return false;
+  return localStorage.getItem('jrh_token') !== 'offline_mode_token';
+}
+
+function loadConfig() {
+  const defaults = {
+    empresa: { nombre: '', nit: '', direccion: '', telefono: '', email: '', objeto: '' },
+    represLegal: { nombre: '', cedula: '', cargo: '' },
+    capacidad: { activos: 0, patrimonio: 0, capTrabajo: 0, ingresos: 0, utilidad: 0 },
+    filters: { entidad: '', depto: '', modalidad: '', minCuantia: 0, maxCuantia: 999999999, keywords: '', unspsc: [] },
+    ia: { apiKey: '', model: 'gpt-4' },
+    notif: { email: true, scan: '8h', scanEnabled: true },
+    servicios: { descripcion: '' },
+    unspscGuardados: [],
+    secop: { user: '', pass: '' },
+    backend: { url: 'http://localhost:3001' }
+  };
+  try {
+    const stored = localStorage.getItem('jrh_v4_cfg');
+    if (!stored) return defaults;
+    const parsed = JSON.parse(stored);
+    // Fusionar con defaults para que campos nuevos (secop, backend) siempre existan
+    return {
+      ...defaults,
+      ...parsed,
+      secop:   { ...defaults.secop,   ...(parsed.secop   || {}) },
+      ia:      { ...defaults.ia,      ...(parsed.ia      || {}) },
+      notif:   { ...defaults.notif,   ...(parsed.notif   || {}) },
+      filters: { ...defaults.filters, ...(parsed.filters || {}) },
+      backend: { ...defaults.backend, ...(parsed.backend || {}) },
+    };
+  } catch {
+    return defaults;
+  }
+}
+
+function saveConfig(cfg) {
+  localStorage.setItem('jrh_v4_cfg', JSON.stringify(cfg));
+}
+
+function loadApplied() {
+  const stored = localStorage.getItem('jrh_v4_applied');
+  return stored ? JSON.parse(stored) : [];
+}
+
+function saveApplied(applied) {
+  localStorage.setItem('jrh_v4_applied', JSON.stringify(applied));
+}
+
+function loadProcData() {
+  const stored = localStorage.getItem('jrh_v4_procdata');
+  return stored ? JSON.parse(stored) : [];
+}
+
+function saveProcData(data) {
+  localStorage.setItem('jrh_v4_procdata', JSON.stringify(data));
+}
+
+function loadDocs() {
+  const stored = localStorage.getItem('jrh_v4_docfolder');
+  if (stored) return JSON.parse(stored);
+  return Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    nombre: ['RUT', 'Cámara Comercio', 'RUP', 'Cédula Rep Legal', 'Certificados Experiencia',
+      'Estados Financieros', 'Cert Parafiscales', 'Autorización Datos', 'Póliza Cumplimiento', 'Carta Presentación'][i],
+    descripcion: ['Registro Único Tributario', 'Certificado Existencia y Representación Legal',
+      'Registro Único de Proponentes', 'Cédula del Representante Legal', 'Certificados de Experiencia Laboral',
+      'Estados Financieros Auditados', 'Certificación Aportes Parafiscales', 'Autorización para Consultar Datos',
+      'Póliza de Cumplimiento de Contrato', 'Carta de Presentación'][i],
+    fechaVencimiento: '',
+    notas: '',
+    maxValidity: [null, 30, 365, null, null, 365, 30, 365, null, null][i]
+  }));
+}
+
+function saveDocs(docs) {
+  localStorage.setItem('jrh_v4_docfolder', JSON.stringify(docs));
+}
+
+function loadNotifHist() {
+  const stored = localStorage.getItem('jrh_v4_notifhist');
+  return stored ? JSON.parse(stored) : [];
+}
+
+function saveNotifHist(hist) {
+  localStorage.setItem('jrh_v4_notifhist', JSON.stringify(hist));
+}
+
+function loadProcessAnalysis() {
+  const stored = localStorage.getItem('jrh_v4_analysis');
+  return stored ? JSON.parse(stored) : {};
+}
+
+function saveProcessAnalysis(analysis) {
+  localStorage.setItem('jrh_v4_analysis', JSON.stringify(analysis));
+}
+
+function getProcessAnalysis(processId) {
+  const analysis = loadProcessAnalysis();
+  return analysis[processId] || null;
+}
+
+function setProcessAnalysis(processId, data) {
+  const analysis = loadProcessAnalysis();
+  analysis[processId] = { ...data, analyzedAt: new Date().toISOString() };
+  saveProcessAnalysis(analysis);
+}
+
+// ============================================================================
+// AUTH COMPONENT
+// ============================================================================
+
+// ── Forgot-password modal ────────────────────────────────────────────────
+function ForgotPasswordModal({ onClose }) {
+  const [email, setEmail] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [sent, setSent] = React.useState(false);
+  const [error, setError] = React.useState('');
+
+  async function handleSend() {
+    if (!email) { setError('Ingresa tu email'); return; }
+    setLoading(true); setError('');
+    try {
+      if (window.Api && await window.Api.health().catch(() => null)) {
+        await window.Api.forgotPassword(email);
+      }
+      setSent(true);
+    } catch(e) { setError(e.message); }
+    setLoading(false);
+  }
+
+  return (
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.75)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}
+      onClick={onClose}>
+      <div style={{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:16,padding:32,width:380,maxWidth:'95vw'}}
+        onClick={e=>e.stopPropagation()}>
+        <div style={{fontSize:18,fontWeight:700,marginBottom:8}}>Recuperar contraseña</div>
+        {sent ? (
+          <>
+            <div style={{color:'var(--green)',marginBottom:16,lineHeight:1.5}}>
+              ✅ Si ese correo existe en JIREHAI, recibirás un enlace de recuperación en los próximos minutos.
+            </div>
+            <button className="btn btn-orange" style={{width:'100%'}} onClick={onClose}>Cerrar</button>
+          </>
+        ) : (
+          <>
+            <div style={{color:'var(--text3)',fontSize:13,marginBottom:16}}>
+              Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
+            </div>
+            {error && <div style={{color:'var(--red)',fontSize:13,marginBottom:12,padding:'8px 12px',background:'rgba(239,68,68,0.1)',borderRadius:6}}>{error}</div>}
+            <CField label="Email" value={email} onChange={setEmail} type="email" placeholder="correo@empresa.com"/>
+            <div style={{display:'flex',gap:10,marginTop:16}}>
+              <button className="btn" style={{flex:1,background:'var(--bg3)',border:'1px solid var(--border2)',color:'var(--text3)'}} onClick={onClose}>Cancelar</button>
+              <button className="btn btn-orange" style={{flex:1}} onClick={handleSend} disabled={loading}>
+                {loading ? 'Enviando...' : 'Enviar enlace'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Reset-password screen (shown via ?reset_token=...) ───────────────────
+function ResetPasswordScreen({ token, onDone }) {
+  const [newPassword, setNewPassword] = React.useState('');
+  const [confirm, setConfirm] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [validating, setValidating] = React.useState(true);
+  const [tokenValid, setTokenValid] = React.useState(false);
+  const [done, setDone] = React.useState(false);
+  const [error, setError] = React.useState('');
+
+  React.useEffect(() => {
+    async function check() {
+      try {
+        if (window.Api && await window.Api.health().catch(() => null)) {
+          const r = await window.Api.validateResetToken(token);
+          setTokenValid(r.valid);
+        } else {
+          setTokenValid(false);
+        }
+      } catch { setTokenValid(false); }
+      setValidating(false);
+    }
+    check();
+  }, [token]);
+
+  async function handleReset() {
+    if (!newPassword || !confirm) { setError('Completa ambos campos'); return; }
+    if (newPassword.length < 6) { setError('Mínimo 6 caracteres'); return; }
+    if (newPassword !== confirm) { setError('Las contraseñas no coinciden'); return; }
+    setLoading(true); setError('');
+    try {
+      await window.Api.resetPassword(token, newPassword);
+      setDone(true);
+    } catch(e) { setError(e.message); }
+    setLoading(false);
+  }
+
+  return (
+    <div className="auth-overlay">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="auth-logo-icon">JR</div>
+          <div style={{fontSize:20,fontWeight:800}}>JIREHAI</div>
+        </div>
+        <div className="auth-title">Nueva contraseña</div>
+        {validating && <div style={{textAlign:'center',color:'var(--text3)',margin:'20px 0'}}>Verificando enlace…</div>}
+        {!validating && !tokenValid && (
+          <>
+            <div style={{color:'var(--red)',textAlign:'center',margin:'16px 0',lineHeight:1.5}}>
+              ❌ Este enlace de recuperación es inválido o ya expiró.<br/>Solicita uno nuevo.
+            </div>
+            <button className="btn btn-orange" style={{width:'100%'}} onClick={onDone}>Volver al inicio</button>
+          </>
+        )}
+        {!validating && tokenValid && !done && (
+          <>
+            <div style={{color:'var(--text3)',fontSize:13,marginBottom:16}}>Elige una contraseña segura de mínimo 6 caracteres.</div>
+            {error && <div style={{color:'var(--red)',fontSize:13,marginBottom:12,padding:'8px 12px',background:'rgba(239,68,68,0.1)',borderRadius:6}}>{error}</div>}
+            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+              <CField label="Nueva contraseña" value={newPassword} onChange={setNewPassword} type="password" placeholder="Mínimo 6 caracteres"/>
+              <CField label="Confirmar contraseña" value={confirm} onChange={setConfirm} type="password" placeholder="Repite la contraseña"/>
+            </div>
+            <button className="btn btn-orange" style={{width:'100%',marginTop:16,padding:'11px'}} onClick={handleReset} disabled={loading}>
+              {loading ? 'Guardando...' : '→ Establecer contraseña'}
+            </button>
+          </>
+        )}
+        {done && (
+          <>
+            <div style={{color:'var(--green)',textAlign:'center',margin:'16px 0',lineHeight:1.5}}>
+              ✅ ¡Contraseña actualizada correctamente!<br/>Ya puedes iniciar sesión.
+            </div>
+            <button className="btn btn-orange" style={{width:'100%'}} onClick={onDone}>Ir a inicio de sesión</button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LoginScreen({onLogin}) {
+  const [mode, setMode] = React.useState('login');
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [showForgot, setShowForgot] = React.useState(false);
+
+  async function handleSubmit() {
+    if (!email || !password) { setError('Email y contraseña son requeridos'); return; }
+    if (mode === 'register' && !name) { setError('El nombre es requerido'); return; }
+    setLoading(true); setError('');
+    try {
+      if (window.Api && await window.Api.health().catch(() => null)) {
+        // Use backend
+        const data = mode === 'login'
+          ? await window.Api.login(email, password)
+          : await window.Api.register(name, email, password);
+        onLogin(data.user);
+      } else {
+        // Offline mode — allow any login, store locally
+        const fakeUser = { id: 1, name: name || email.split('@')[0], email, plan: 'profesional', role: email.includes('admin') ? 'admin' : 'user' };
+        localStorage.setItem('jrh_user', JSON.stringify(fakeUser));
+        localStorage.setItem('jrh_token', 'offline_mode_token');
+        onLogin(fakeUser);
+      }
+    } catch(e) { setError(e.message); }
+    setLoading(false);
+  }
+
+  return (
+    <>
+    {showForgot && <ForgotPasswordModal onClose={() => setShowForgot(false)} />}
+    <div className="auth-overlay">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="auth-logo-icon">JR</div>
+          <div style={{fontSize:20,fontWeight:800}}>JIREHAI</div>
+        </div>
+        <div className="auth-title">{mode==='login'?'Iniciar Sesión':'Crear Cuenta'}</div>
+        <div className="auth-sub">{mode==='login'?'Bienvenido de nuevo a tu plataforma de licitaciones':'Comienza gratis hoy — 3 días de prueba gratuita'}</div>
+        <div className="auth-tabs">
+          <button className={`auth-tab${mode==='login'?' active':''}`} onClick={()=>{setMode('login');setError('')}}>Iniciar Sesión</button>
+          <button className={`auth-tab${mode==='register'?' active':''}`} onClick={()=>{setMode('register');setError('')}}>Registrarse</button>
+        </div>
+        {error && <div className="auth-error">{error}</div>}
+        <div style={{display:'flex',flexDirection:'column',gap:12}}>
+          {mode==='register' && <CField label="Nombre completo" value={name} onChange={setName} placeholder="Tu nombre o empresa"/>}
+          <CField label="Email" value={email} onChange={setEmail} type="email" placeholder="correo@empresa.com"/>
+          <CField label="Contraseña" value={password} onChange={setPassword} type="password" placeholder="Mínimo 6 caracteres"/>
+        </div>
+        {mode==='login' && (
+          <div style={{textAlign:'right',marginTop:6}}>
+            <span style={{color:'var(--purple)',fontSize:12,cursor:'pointer'}} onClick={()=>setShowForgot(true)}>
+              ¿Olvidaste tu contraseña?
+            </span>
+          </div>
+        )}
+        <button className="btn btn-orange" style={{width:'100%',marginTop:16,padding:'11px',fontSize:14}} onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Procesando...' : mode==='login' ? '→ Iniciar Sesión' : '→ Crear Cuenta Gratis'}
+        </button>
+        <div className="auth-link" onClick={()=>{setMode(mode==='login'?'register':'login');setError('')}}>
+          {mode==='login' ? '¿No tienes cuenta? Regístrate gratis' : '¿Ya tienes cuenta? Inicia sesión'}
+        </div>
+        {mode==='register' && (
+          <div style={{textAlign:'center',marginTop:12,fontSize:11,color:'var(--text4)',padding:'8px',background:'rgba(139,92,246,0.1)',borderRadius:6}}>
+            🎁 3 días de prueba gratuita al registrarte
+          </div>
+        )}
+      </div>
+    </div>
+    </>
+  );
+}
+
+// ============================================================================
+// FORM COMPONENTS (MODULE LEVEL)
+// ============================================================================
+
+function CField({ label, value, onChange, type = 'text', placeholder = '' }) {
+  return (
+    <div className="input-group">
+      {label && <label className="input-label">{label}</label>}
+      <input
+        type={type}
+        className="input-field"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
+function CSelect({ label, value, onChange, options }) {
+  return (
+    <div className="input-group">
+      {label && <label className="input-label">{label}</label>}
+      <select
+        className="select-field"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">-- Seleccionar --</option>
+        {options.map(opt => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function CTextarea({ label, value, onChange, rows = 3, placeholder = '' }) {
+  return (
+    <div className="input-group">
+      {label && <label className="input-label">{label}</label>}
+      <textarea
+        className="textarea-field"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={rows}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
+// ============================================================================
+// TOAST COMPONENT
+// ============================================================================
+
+function Toast({ toasts, onRemove }) {
+  return (
+    <div className="toast-container">
+      {toasts.map(t => (
+        <div key={t.id} className={`toast ${t.type}`}>
+          <span>{t.icon}</span>
+          <span>{t.msg}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================================
+// PAGE COMPONENTS
+// ============================================================================
+
+function PageDashboard({ config, applied, procData }) {
+  const procCount = procData.length;
+  const appliedCount = applied.length;
+  const docsExpiring = 0; // Would compute from docs
+  const closingSoon = procData.filter(p => {
+    const d = diasRestantes(p.fechaCierre);
+    return d && d <= 7 && d > 0;
+  }).length;
+
+  const analysis = loadProcessAnalysis();
+  const analyzedCount = applied.filter(p => {
+    const key = p.entidad + '|' + (p.object || p.objeto);
+    return analysis[key];
+  }).length;
+  const unanalyzedCount = appliedCount - analyzedCount;
+  const analysisPercentage = appliedCount > 0 ? Math.round((analyzedCount / appliedCount) * 100) : 0;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Dashboard</h2>
+        <p>Resumen de tu gestión de procesos SECOP II</p>
+      </div>
+
+      <div className="stat-boxes">
+        <div className="stat-box">
+          <div className="stat-box-label">Procesos Disponibles</div>
+          <div className="stat-box-value">{procCount}</div>
+          <div className="stat-box-change">+12 esta semana</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-box-label">Procesos Aplicados</div>
+          <div className="stat-box-value">{appliedCount}</div>
+          <div className="stat-box-change">2 en revisión</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-box-label">Docs por Vencer</div>
+          <div className="stat-box-value">{docsExpiring}</div>
+          <div className="stat-box-change">Actualiza pronto</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-box-label">Próximos Cierres</div>
+          <div className="stat-box-value">{closingSoon}</div>
+          <div className="stat-box-change">Esta semana</div>
+        </div>
+      </div>
+
+      {unanalyzedCount > 0 && (
+        <div className="alert-banner warning">
+          <span className="alert-icon">⚠️</span>
+          <div className="alert-text">
+            <div className="alert-title">Procesos sin analizar</div>
+            <div className="alert-desc">{unanalyzedCount} procesos aplicados sin analizar — Analiza los pliegos para exportar</div>
+          </div>
+        </div>
+      )}
+
+      {appliedCount > 0 && (
+        <div style={{ marginBottom: '20px', background: 'rgba(139, 92, 246, 0.1)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+          <div style={{ marginBottom: '12px', fontWeight: 600 }}>Progreso de Análisis</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
+            <span>{analyzedCount} de {appliedCount} procesados</span>
+            <span style={{ color: 'var(--orange)' }}>{analysisPercentage}%</span>
+          </div>
+          <div style={{ width: '100%', height: '8px', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ width: analysisPercentage + '%', height: '100%', background: 'linear-gradient(90deg, var(--purple), var(--orange))', transition: 'width 0.3s' }}></div>
+          </div>
+        </div>
+      )}
+
+      {docsExpiring > 0 && (
+        <div className="alert-banner">
+          <span className="alert-icon">⚠️</span>
+          <div className="alert-text">
+            <div className="alert-title">Documentos por vencer</div>
+            <div className="alert-desc">Tienes {docsExpiring} documentos que vencen en los próximos 30 días</div>
+          </div>
+        </div>
+      )}
+
+      {closingSoon > 0 && (
+        <div className="alert-banner warning">
+          <span className="alert-icon">⏰</span>
+          <div className="alert-text">
+            <div className="alert-title">Cierres próximos</div>
+            <div className="alert-desc">{closingSoon} procesos cierran esta semana</div>
+          </div>
+        </div>
+      )}
+
+      <div className="alert-banner info">
+        <span className="alert-icon">ℹ️</span>
+        <div className="alert-text">
+          <div className="alert-title">¡Bienvenido a JIREHAI!</div>
+          <div className="alert-desc">Configura tu perfil empresarial para obtener recomendaciones personalizadas de procesos</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PageConfiguracion({ config, onConfigUpdate }) {
+  const [cfg, setCfg] = React.useState(config);
+
+  const handleUpdate = (field, subfield, value) => {
+    const updated = { ...cfg };
+    if (subfield) {
+      // Inicializar el sub-objeto si no existe (para campos nuevos como 'secop')
+      if (!updated[field] || typeof updated[field] !== 'object') {
+        updated[field] = {};
+      }
+      updated[field] = { ...updated[field], [subfield]: value };
+    } else {
+      updated[field] = value;
+    }
+    setCfg(updated);
+    onConfigUpdate(updated);
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Configuración</h2>
+        <p>Configura tu perfil empresarial y preferencias de búsqueda</p>
+      </div>
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>Información de la Empresa</h3>
+      <div className="form-grid">
+        <CField label="Nombre de la Empresa" value={cfg.empresa.nombre}
+          onChange={(v) => handleUpdate('empresa', 'nombre', v)} />
+        <CField label="NIT" value={cfg.empresa.nit}
+          onChange={(v) => handleUpdate('empresa', 'nit', v)} />
+        <CField label="Dirección" value={cfg.empresa.direccion}
+          onChange={(v) => handleUpdate('empresa', 'direccion', v)} />
+        <CField label="Teléfono" value={cfg.empresa.telefono}
+          onChange={(v) => handleUpdate('empresa', 'telefono', v)} />
+        <CField label="Email" type="email" value={cfg.empresa.email}
+          onChange={(v) => handleUpdate('empresa', 'email', v)} />
+      </div>
+      <CTextarea label="Objeto Social" value={cfg.empresa.objeto}
+        onChange={(v) => handleUpdate('empresa', 'objeto', v)} />
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>Representante Legal</h3>
+      <div className="form-grid">
+        <CField label="Nombre" value={cfg.represLegal.nombre}
+          onChange={(v) => handleUpdate('represLegal', 'nombre', v)} />
+        <CField label="Cédula" value={cfg.represLegal.cedula}
+          onChange={(v) => handleUpdate('represLegal', 'cedula', v)} />
+        <CField label="Cargo" value={cfg.represLegal.cargo}
+          onChange={(v) => handleUpdate('represLegal', 'cargo', v)} />
+      </div>
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>Capacidad Financiera</h3>
+      <div className="form-grid">
+        <CField label="Activos Totales (COP)" type="number" value={cfg.capacidad.activos}
+          onChange={(v) => handleUpdate('capacidad', 'activos', parseInt(v) || 0)} />
+        <CField label="Patrimonio (COP)" type="number" value={cfg.capacidad.patrimonio}
+          onChange={(v) => handleUpdate('capacidad', 'patrimonio', parseInt(v) || 0)} />
+        <CField label="Capital de Trabajo (COP)" type="number" value={cfg.capacidad.capTrabajo}
+          onChange={(v) => handleUpdate('capacidad', 'capTrabajo', parseInt(v) || 0)} />
+        <CField label="Ingresos Operacionales (COP)" type="number" value={cfg.capacidad.ingresos}
+          onChange={(v) => handleUpdate('capacidad', 'ingresos', parseInt(v) || 0)} />
+        <CField label="Utilidad Operacional (COP)" type="number" value={cfg.capacidad.utilidad}
+          onChange={(v) => handleUpdate('capacidad', 'utilidad', parseInt(v) || 0)} />
+      </div>
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>Filtros de Búsqueda</h3>
+      <div className="form-grid">
+        <CField label="Nombre de Entidad" value={cfg.filters.entidad}
+          onChange={(v) => handleUpdate('filters', 'entidad', v)} />
+        <CSelect label="Departamento" value={cfg.filters.depto}
+          onChange={(v) => handleUpdate('filters', 'depto', v)}
+          options={DEPARTAMENTOS} />
+        <CSelect label="Modalidad" value={cfg.filters.modalidad}
+          onChange={(v) => handleUpdate('filters', 'modalidad', v)}
+          options={MODALIDADES} />
+        <CField label="Cuantía Mínima (COP)" type="number" value={cfg.filters.minCuantia}
+          onChange={(v) => handleUpdate('filters', 'minCuantia', parseInt(v) || 0)} />
+        <CField label="Cuantía Máxima (COP)" type="number" value={cfg.filters.maxCuantia}
+          onChange={(v) => handleUpdate('filters', 'maxCuantia', parseInt(v) || 0)} />
+      </div>
+      <CTextarea label="Palabras Clave" value={cfg.filters.keywords}
+        onChange={(v) => handleUpdate('filters', 'keywords', v)}
+        placeholder="Separadas por comas" />
+      <CTextarea label="Códigos UNSPSC" value={cfg.filters.unspsc.join('\n')}
+        onChange={(v) => handleUpdate('filters', 'unspsc', v.split('\n').filter(x => x))}
+        placeholder="Un código por línea" />
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>🏷 Mis Servicios y Códigos UNSPSC</h3>
+      <CTextarea label="Describe tus servicios" value={cfg.servicios.descripcion}
+        onChange={(v) => handleUpdate('servicios', 'descripcion', v)}
+        placeholder="Describe con tus propias palabras qué servicios o bienes ofrece tu empresa"
+        rows={4} />
+
+      <div style={{ marginTop: '12px', marginBottom: '20px' }}>
+        <button className="btn btn-secondary" onClick={() => {
+          const sugerencias = sugerirUNSPSC(cfg.servicios.descripcion);
+          if (sugerencias && sugerencias.length > 0) {
+            const codigosGuardados = cfg.unspscGuardados || [];
+            const nuevosCodigos = sugerencias.map(s => s.code).filter(c => !codigosGuardados.includes(c));
+            handleUpdate('unspscGuardados', null, [...codigosGuardados, ...nuevosCodigos]);
+          }
+        }}>Sugerir Códigos UNSPSC</button>
+      </div>
+
+      {cfg.unspscGuardados && cfg.unspscGuardados.length > 0 && (
+        <div style={{ marginBottom: '20px', padding: '12px', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '6px', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+          <div style={{ fontSize: '12px', marginBottom: '8px', fontWeight: 600 }}>Códigos UNSPSC Guardados</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {cfg.unspscGuardados.map(code => (
+              <div key={code} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(139, 92, 246, 0.2)', padding: '6px 10px', borderRadius: '4px', fontSize: '12px' }}>
+                <span>{code}</span>
+                <button onClick={() => handleUpdate('unspscGuardados', null, cfg.unspscGuardados.filter(c => c !== code))} style={{ background: 'none', border: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: '14px' }}>✕</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>IA y Análisis</h3>
+      <div className="form-grid">
+        <CField label="OpenAI API Key" type="password" value={cfg.ia.apiKey}
+          onChange={(v) => handleUpdate('ia', 'apiKey', v)} />
+        <CSelect label="Modelo" value={cfg.ia.model}
+          onChange={(v) => handleUpdate('ia', 'model', v)}
+          options={['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo']} />
+      </div>
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '8px' }}>🔐 Credenciales SECOP II</h3>
+      <div style={{ fontSize: '12px', color: 'var(--text4)', marginBottom: '14px', lineHeight: '1.6',
+        padding: '10px 14px', background: 'rgba(139,92,246,0.06)', borderRadius: '8px', border: '1px solid rgba(139,92,246,0.15)' }}>
+        <strong style={{ color: 'var(--purple)' }}>Descarga automática de documentos:</strong> Al configurar tu usuario y contraseña de SECOP II,
+        el sistema iniciará sesión automáticamente en <em>community.secop.gov.co</em> y descargará todos los documentos del proceso
+        (Estudio Previo, Invitación, Presupuesto, Cotizaciones, CDP, PAA) para analizarlos con IA.
+        Sin credenciales, deberás subir los archivos manualmente.
+      </div>
+      <div className="form-grid">
+        <CField label="Usuario SECOP II" type="text" value={cfg.secop?.user || ''}
+          onChange={(v) => handleUpdate('secop', 'user', v)}
+          placeholder="Tu usuario de community.secop.gov.co" />
+        <CField label="Contraseña SECOP II" type="password" value={cfg.secop?.pass || ''}
+          onChange={(v) => handleUpdate('secop', 'pass', v)}
+          placeholder="Tu contraseña de SECOP II" />
+      </div>
+      <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '6px' }}>
+        🔒 Las credenciales se guardan solo en el servidor local y nunca se comparten.
+      </div>
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>Notificaciones</h3>
+      <div style={{ marginBottom: '16px' }}>
+        <CField label="Email para Notificaciones" value={cfg.notif.email}
+          onChange={(v) => handleUpdate('notif', 'email', v)} />
+        <CSelect label="Intervalo de Escaneo" value={cfg.notif.scan}
+          onChange={(v) => handleUpdate('notif', 'scan', v)}
+          options={['1h', '2h', '4h', '8h', '24h']} />
+      </div>
+
+      <div style={{ marginTop: '30px', display: 'flex', gap: '12px' }}>
+        <button className="btn btn-orange" onClick={async () => {
+          try {
+            if (isRealBackend()) {
+              await window.Api.saveConfig(cfg);
+              onConfigUpdate(cfg);
+            } else {
+              onConfigUpdate(cfg);
+            }
+          } catch (e) {
+            console.error('Error saving config:', e);
+          }
+        }}>💾 Guardar Configuración</button>
+      </div>
+    </div>
+  );
+}
+
+function PageProcesos({ config, procData, onApply, onOpenDetailModal, onOpenAIModal }) {
+  const PAGE_SIZE = 2000; // procesos por página
+  const [procesos, setProcesos] = React.useState(procData);
+  const [filteredMod, setFilteredMod] = React.useState('');
+  const [searchInput, setSearchInput] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [loadMsg, setLoadMsg] = React.useState('');
+  const [hasMore, setHasMore] = React.useState(false);
+  const [currentOffset, setCurrentOffset] = React.useState(0);
+  const [lastFilters, setLastFilters] = React.useState({});
+
+  // Búsqueda UNSPSC — independiente
+  const [unspscInput, setUnspscInput] = React.useState('');
+  // Búsqueda por palabra clave — independiente
+  const [keywordInput, setKeywordInput] = React.useState('');
+
+  // Auto-cargar procesos vigentes al entrar a la página
+  React.useEffect(() => {
+    handleAutoLoad();
+  }, []);
+
+  // Función central de fetch — soporta paginación y modo append
+  const fetchFromSecop = async (filters = {}, append = false) => {
+    if (append) setIsLoadingMore(true); else setIsLoading(true);
+    const off = append ? currentOffset : 0;
+    try {
+      let data;
+      const today = new Date().toISOString().slice(0, 10);
+
+      let backendHasMore = null; // null → inferir desde data.length
+      if (isRealBackend()) {
+        // Backend proxy con JWT real
+        const params = {
+          ...filters,
+          limit: PAGE_SIZE,
+          offset: off,
+        };
+        if (config.entity) params.nombre_entidad = config.entity;
+        if (config.dept)   params.departamento   = config.dept;
+        if (config.filters?.minCuantia) params.minVal = config.filters.minCuantia;
+        if (config.filters?.maxCuantia) params.maxVal = config.filters.maxCuantia;
+        const result = await window.Api.getProcesos(params);
+        data = result.data || [];
+        if (typeof result.hasMore === 'boolean') backendHasMore = result.hasMore;
+      } else {
+        // ── Modo offline: consulta directa a SECOP II API pública ──────────
+        // Descubrir columnas reales la primera vez (las guardamos en window._secopSchema)
+        if (!window._secopSchema) {
+          window._secopSchema = { dateColumn: null, pubColumn: null, descColumn: null, estadoColumn: null };
+          try {
+            const probe = await fetch('https://www.datos.gov.co/resource/p6dx-8zbt.json?$limit=1');
+            if (probe.ok) {
+              const rows = await probe.json();
+              if (rows && rows.length > 0) {
+                const keys = Object.keys(rows[0]);
+                window._secopSchema.dateColumn  = keys.find(k => /cierre/i.test(k)) || null;
+                window._secopSchema.pubColumn   =
+                  keys.find(k => /fecha/i.test(k) && /publicaci/i.test(k)) ||
+                  keys.find(k => /^fecha_de_publicaci/i.test(k)) || null;
+                window._secopSchema.estadoColumn =
+                  keys.find(k => /^estado_del_proc/i.test(k)) ||
+                  keys.find(k => /^estado/i.test(k)) || null;
+                window._secopSchema.descColumn  =
+                  keys.find(k => /descripci/i.test(k)) ||
+                  keys.find(k => /objeto.*contrat/i.test(k)) ||
+                  keys.find(k => /nombre.*proc/i.test(k)) ||
+                  keys.find(k => k === 'objeto') ||
+                  null;
+                console.log('SECOP schema (offline):', window._secopSchema);
+              }
+            }
+          } catch (e) {
+            console.warn('Offline schema discovery failed:', e.message);
+          }
+        }
+
+        const dc  = window._secopSchema.dateColumn;
+        const pc  = window._secopSchema.pubColumn;
+        const sc  = window._secopSchema.descColumn;
+        const ec  = window._secopSchema.estadoColumn;
+
+        // Ventana: procesos publicados en los últimos 60 días, cierre >= hoy
+        const sixtyDaysAgo = new Date(Date.now() - 60*24*60*60*1000).toISOString().slice(0,10);
+
+        const whereParts = [];
+        if (dc) whereParts.push(`${dc} >= '${today}'`);                              // aún abiertos
+        if (pc) whereParts.push(`${pc} >= '${sixtyDaysAgo}'`);                       // publicados últimos 60 días
+        if (config.dept) whereParts.push(`departamento_entidad = '${config.dept.replace(/'/g,"''")}'`);
+        if (filters.unspscFilter) {
+          whereParts.push(`codigo_unspsc = '${filters.unspscFilter.replace(/'/g,"''")}'`);
+        }
+
+        // Construir URL manualmente (NO URLSearchParams — encoda '+' que Socrata rechaza)
+        let url = `https://www.datos.gov.co/resource/p6dx-8zbt.json`
+          + `?$limit=${PAGE_SIZE}`
+          + `&$offset=${off}`;
+        // Ordenar por publicación descendente (más recientes primero)
+        if (pc)  url += `&$order=${encodeURIComponent(pc + ' DESC')}`;
+        else if (dc) url += `&$order=${encodeURIComponent(dc + ' ASC')}`;
+        if (whereParts.length > 0) url += `&$where=${encodeURIComponent(whereParts.join(' AND '))}`;
+        if (filters.keywords) url += `&$q=${encodeURIComponent(filters.keywords)}`;
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`SECOP II respondió con error ${res.status}`);
+        const raw = await res.json();
+
+        // Normalizar igual que hace el backend (campos con prefijo _)
+        let normalized = raw.map(proc => ({
+          ...proc,
+          _entidad:          proc.entidad || proc.nombre_entidad || '',
+          _descripcion:      (sc ? proc[sc] : '') ||
+                             proc.descripcion_del_proceso ||
+                             proc.descripci_n_del_procedimiento ||
+                             proc.nombre_del_procedimiento ||
+                             proc.objeto || '',
+          _fechaCierre:      (dc ? proc[dc] : '') || proc.fecha_de_cierre || '',
+          _fechaPublicacion: (pc ? proc[pc] : '') || proc.fecha_de_publicacion_del || proc.fecha_de_publicacion || '',
+          _estado:           (ec ? proc[ec] : '') || proc.estado_del_proceso || proc.estado || '',
+          _cuantia:          parseFloat(proc.precio_base || proc.cuantia_proceso || 0) || 0,
+          _modalidad:        proc.modalidad_de_contratacion || proc.modalidad || '',
+          _departamento:     proc.departamento_entidad || proc.departamento || proc.ciudad_entidad || '',
+          _url:              proc.url_proceso || proc.urlproceso || '',
+          _referencia:       proc.referencia_del_proceso || proc.numero_del_proceso || proc.id_del_proceso || ''
+        }));
+
+        // Filtrar estado: solo Publicado / Abierto / Activo
+        const ESTADOS_OK = ['publicado', 'abierto', 'activo', 'convocado'];
+        if (ec) {
+          normalized = normalized.filter(p => {
+            const est = (p._estado || '').toLowerCase().trim();
+            return !est || ESTADOS_OK.some(v => est.includes(v));
+          });
+        }
+        // Descartar cualquier remanente de años anteriores a 2026
+        normalized = normalized.filter(p => {
+          const fp = p._fechaPublicacion || '';
+          if (!fp) return true;
+          const yr = parseInt(fp.substring(0, 4), 10);
+          return isNaN(yr) || yr >= 2026;
+        });
+
+        data = normalized;
+      }
+
+      if (append) {
+        setProcesos(prev => [...prev, ...data]);
+        setCurrentOffset(off + data.length);
+      } else {
+        setProcesos(data);
+        setCurrentOffset(data.length);
+        setLastFilters(filters);
+      }
+
+      // Use backend's hasMore if available; otherwise infer from page size
+      const more = backendHasMore !== null ? backendHasMore : data.length === PAGE_SIZE;
+      setHasMore(more);
+      if (!append) saveProcData(data);
+      return data.length;
+    } catch (err) {
+      console.error('Error fetching SECOP II:', err);
+      alert('Error consultando SECOP II. Verifica tu conexión a internet.\n\n' + err.message);
+      return 0;
+    } finally {
+      if (append) setIsLoadingMore(false); else setIsLoading(false);
+    }
+  };
+
+  // Carga automática: TODOS los procesos vigentes (sin importar modalidad ni antigüedad)
+  const handleAutoLoad = async () => {
+    setLoadMsg('Cargando todos los procesos vigentes…');
+    const count = await fetchFromSecop({}, false);
+    setLoadMsg(count === PAGE_SIZE
+      ? `${count} procesos vigentes cargados — hay más disponibles`
+      : `${count} procesos vigentes cargados`);
+  };
+
+  // Cargar más procesos (siguiente página)
+  const handleLoadMore = async () => {
+    const prevCount = procesos.length;
+    setLoadMsg('Cargando más procesos…');
+    const count = await fetchFromSecop(lastFilters, true);
+    setLoadMsg(`${prevCount + count} procesos vigentes en total`);
+  };
+
+  // Búsqueda por código UNSPSC (independiente de keyword)
+  const handleSearchUNSPSC = async () => {
+    if (!unspscInput.trim()) return;
+    setLoadMsg('Buscando por código UNSPSC…');
+    const count = await fetchFromSecop({ unspscFilter: unspscInput.trim() }, false);
+    setLoadMsg(`${count} proceso(s) vigente(s) para UNSPSC: "${unspscInput.trim()}"`);
+  };
+
+  // Búsqueda por palabra clave (independiente de UNSPSC)
+  const handleSearchKeyword = async () => {
+    if (!keywordInput.trim()) return;
+    setLoadMsg('Buscando por palabra clave…');
+    const count = await fetchFromSecop({ keywords: keywordInput.trim() }, false);
+    setLoadMsg(`${count} proceso(s) vigente(s) para: "${keywordInput.trim()}"`);
+  };
+
+  // Filtro local sobre resultados ya cargados (sin nueva llamada al API)
+  const filtered = procesos.filter(p => {
+    const mod = p.modalidad || p.modalidad_de_contratacion || '';
+    if (filteredMod && mod !== filteredMod) return false;
+    const cuantia = p._cuantia || parseFloat(p.cuantía) || parseFloat(p.precio_base) || 0;
+    if (config.filters?.minCuantia && cuantia < config.filters.minCuantia) return false;
+    if (config.filters?.maxCuantia && cuantia > config.filters.maxCuantia) return false;
+    if (searchInput.trim()) {
+      const q = searchInput.toLowerCase().trim();
+      const texto = [
+        p._entidad || p.entidad || '', p.nombre_entidad || '',
+        p._descripcion || p.object || p.objeto || p.descripcion_del_proceso || p.descripci_n_del_procedimiento || p.nombre_del_procedimiento || p.descripcion || '',
+        p._departamento || p.departamento_entidad || p.departamento || '', mod
+      ].join(' ').toLowerCase();
+      if (!texto.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const totalCuantia = filtered.reduce((sum, p) => sum + (parseFloat(p.cuantía) || parseFloat(p.precio_base) || 0), 0);
+
+  // Resalta la coincidencia del filtro local dentro del texto de la tarjeta
+  function highlight(text, q) {
+    if (!q || !text) return text;
+    const idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if (idx === -1) return text;
+    return (
+      <span>
+        {text.slice(0, idx)}
+        <mark style={{ background: 'rgba(249,115,22,0.25)', color: 'var(--orange)', borderRadius: '2px', padding: '0 2px' }}>
+          {text.slice(idx, idx + q.length)}
+        </mark>
+        {text.slice(idx + q.length)}
+      </span>
+    );
+  }
+
+  const q = searchInput.trim();
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Procesos SECOP II</h2>
+        <p>Explora y aplica a procesos de contratación pública vigentes</p>
+      </div>
+
+      {/* ─── Dos paneles de búsqueda INDEPENDIENTES ─── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+
+        {/* Panel 1: Búsqueda por Código UNSPSC */}
+        <div style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '10px', padding: '14px' }}>
+          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--purple)', marginBottom: '10px' }}>
+            🔢 Buscar por Código UNSPSC
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input
+              className="input-field"
+              style={{ flex: 1, fontSize: '13px' }}
+              placeholder="Ej: 72000000, 81000000…"
+              value={unspscInput}
+              onChange={e => setUnspscInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearchUNSPSC()}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={handleSearchUNSPSC}
+              disabled={isLoading || !unspscInput.trim()}
+              style={{ whiteSpace: 'nowrap', fontSize: '12px', padding: '8px 14px' }}>
+              {isLoading ? '⏳' : '🔍 Buscar'}
+            </button>
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '6px' }}>
+            Ingresa el código numérico o nombre del segmento UNSPSC
+          </div>
+        </div>
+
+        {/* Panel 2: Búsqueda por Palabra Clave */}
+        <div style={{ background: 'rgba(249,115,22,0.06)', border: '1px solid rgba(249,115,22,0.22)', borderRadius: '10px', padding: '14px' }}>
+          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--orange)', marginBottom: '10px' }}>
+            🔑 Buscar por Palabra Clave
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input
+              className="input-field"
+              style={{ flex: 1, fontSize: '13px' }}
+              placeholder="Ej: consultoría, software, obra civil…"
+              value={keywordInput}
+              onChange={e => setKeywordInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearchKeyword()}
+            />
+            <button
+              onClick={handleSearchKeyword}
+              disabled={isLoading || !keywordInput.trim()}
+              style={{ whiteSpace: 'nowrap', fontSize: '12px', padding: '8px 14px', background: 'var(--orange)', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', opacity: (isLoading || !keywordInput.trim()) ? 0.5 : 1 }}>
+              {isLoading ? '⏳' : '🔍 Buscar'}
+            </button>
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '6px' }}>
+            Busca en título, objeto del contrato, entidad y descripción
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Filtros locales sobre resultados ya cargados ─── */}
+      <div style={{ marginBottom: '14px', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <input
+          className="input-field"
+          style={{ flex: 1, minWidth: '160px', fontSize: '12px', background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.2)' }}
+          placeholder="🔎 Filtrar resultados actuales por texto…"
+          value={searchInput}
+          onChange={e => setSearchInput(e.target.value)}
+        />
+        <select className="select-field" style={{ flex: 1, maxWidth: '240px', fontSize: '12px' }}
+          value={filteredMod} onChange={e => setFilteredMod(e.target.value)}>
+          <option value="">-- Todas las modalidades --</option>
+          {MODALIDADES.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
+        {(searchInput || filteredMod) && (
+          <button
+            style={{ padding: '7px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '6px', color: 'var(--red)', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+            onClick={() => { setSearchInput(''); setFilteredMod(''); }}>
+            ✕ Limpiar
+          </button>
+        )}
+        <button
+          style={{ padding: '7px 14px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '6px', color: '#10b981', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          onClick={handleAutoLoad} disabled={isLoading}>
+          🔄 Recargar vigentes
+        </button>
+      </div>
+
+      {/* ─── Contadores y estado de carga ─── */}
+      <div style={{ marginBottom: '14px', display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text3)', flexWrap: 'wrap', alignItems: 'center' }}>
+        {isLoading ? (
+          <div style={{ color: 'var(--purple)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid var(--purple)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }}></span>
+            {loadMsg || 'Cargando todos los procesos vigentes…'}
+          </div>
+        ) : (
+          <>
+            <div>
+              <strong style={{ color: 'var(--orange)' }}>{filtered.length}</strong>
+              {filtered.length !== procesos.length && <span style={{ color: 'var(--text4)' }}> de {procesos.length}</span>}
+              <span> procesos vigentes</span>
+              {hasMore && <span style={{ color: 'var(--text4)', marginLeft: '6px' }}>(hay más por cargar)</span>}
+            </div>
+            {totalCuantia > 0 && <div><strong>Cuantía total:</strong> {fmtCOP(totalCuantia)}</div>}
+            {loadMsg && <div style={{ color: 'var(--text4)', fontSize: '12px' }}>✓ {loadMsg}</div>}
+          </>
+        )}
+      </div>
+
+      {/* ─── Sin resultados de filtro local ─── */}
+      {filtered.length === 0 && procesos.length > 0 && (
+        <div style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text4)' }}>
+          <div style={{ fontSize: '32px', marginBottom: '12px' }}>🔎</div>
+          <div style={{ fontSize: '15px', fontWeight: '600', marginBottom: '8px', color: 'var(--text3)' }}>
+            Sin resultados para "{searchInput || filteredMod}"
+          </div>
+          <div style={{ fontSize: '13px' }}>Prueba con otra palabra o limpia los filtros locales</div>
+          <button style={{ marginTop: '16px', padding: '8px 16px', background: 'var(--orange)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '13px', cursor: 'pointer' }}
+            onClick={() => { setSearchInput(''); setFilteredMod(''); }}>
+            Limpiar filtros
+          </button>
+        </div>
+      )}
+
+      {/* ─── Sin datos cargados ─── */}
+      {procesos.length === 0 && !isLoading && (
+        <div style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text4)' }}>
+          <div style={{ fontSize: '32px', marginBottom: '12px' }}>📋</div>
+          <div style={{ fontSize: '15px', fontWeight: '600', marginBottom: '8px', color: 'var(--text3)' }}>No hay procesos cargados</div>
+          <div style={{ fontSize: '13px' }}>Usa los paneles de búsqueda arriba o recarga los vigentes</div>
+          <button style={{ marginTop: '16px', padding: '8px 16px', background: 'var(--purple)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '13px', cursor: 'pointer' }}
+            onClick={handleAutoLoad}>
+            🔄 Cargar procesos vigentes
+          </button>
+        </div>
+      )}
+
+      {/* ─── Tarjetas de procesos ─── */}
+      <div className="card-grid">
+        {filtered.map((p, i) => {
+          // Usar campos normalizados (_) que vienen tanto del backend como del modo offline
+          const dias = diasRestantes(p._fechaCierre || p.fechaCierre || p.fecha_de_cierre_del_proceso || p.fecha_de_cierre);
+          const descripcion = p._descripcion || p.object || p.objeto || p.descripcion_del_proceso || p.descripci_n_del_procedimiento || p.nombre_del_procedimiento || p.descripcion || '';
+          const entidad = p._entidad || p.entidad || p.nombre_entidad || 'Entidad';
+          const departamento = p._departamento || p.departamento_entidad || p.departamento || '';
+          const cuantia = p._cuantia || parseFloat(p.cuantía) || parseFloat(p.precio_base) || 0;
+          const modalidad = p._modalidad || p.modalidad || p.modalidad_de_contratacion || 'N/A';
+
+          return (
+            <div key={i} className="card">
+              <div className="card-header">
+                <div>
+                  <div className="card-title">{highlight(entidad, q)}</div>
+                  <div className="card-subtitle">{highlight(departamento, q)}</div>
+                </div>
+              </div>
+              <div className="card-body" style={{ minHeight: '60px', fontSize: '13px', lineHeight: '1.5' }}>
+                {highlight(descripcion.substring(0, 120) + (descripcion.length > 120 ? '…' : ''), q)}
+              </div>
+              <div style={{ fontSize: '12px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between' }}>
+                <div><strong>Cuantía:</strong> {fmtCOP(cuantia)}</div>
+                <div><strong>Cierre:</strong>{' '}
+                  <span style={{ color: dias !== null && dias < 5 ? 'var(--red)' : dias !== null && dias < 15 ? 'var(--orange)' : 'var(--text3)' }}>
+                    {dias !== null ? `${dias}d` : 'N/A'}
+                  </span>
+                </div>
+              </div>
+              <div style={{ marginBottom: '12px' }}>
+                <span className="badge-pill orange">{modalidad}</span>
+              </div>
+              <div className="process-actions">
+                <button className="action-btn orange" onClick={() => onApply(p)}>⚡ Aplicar</button>
+                <button className="action-btn" onClick={() => onOpenDetailModal(p)}>📋 Detalle</button>
+                {isRealBackend() && (
+                  <button className="action-btn" onClick={() => onOpenAIModal && onOpenAIModal(p)}
+                    style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.2),rgba(249,115,22,0.1))', borderColor: 'rgba(139,92,246,0.5)', color: 'var(--purple)', fontWeight: '600' }}>
+                    🤖 IA
+                  </button>
+                )}
+                <button className="action-btn" title="Compartir por WhatsApp" onClick={() => {
+                  const url = p._url || p.urlSecop || p.url_proceso || 'https://www.secop.gov.co';
+                  const obj = p._descripcion || p.object || p.objeto || p.descripcion_del_proceso || '';
+                  const ent = p._entidad || p.entidad || p.nombre_entidad || '';
+                  const txt = `📋 Proceso SECOP II\n🏛 ${ent}\n📝 ${obj}\n🔗 ${url}`;
+                  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+                }}>💬 WA</button>
+                <button className="action-btn" title="Compartir por email" onClick={() => {
+                  const url = p._url || p.urlSecop || p.url_proceso || 'https://www.secop.gov.co';
+                  const obj = p._descripcion || p.object || p.objeto || p.descripcion_del_proceso || '';
+                  const ent = p._entidad || p.entidad || p.nombre_entidad || '';
+                  const subj = encodeURIComponent(`Proceso SECOP II – ${ent}`);
+                  const body = encodeURIComponent(`Hola,\n\nTe comparto este proceso de contratación:\n\n🏛 Entidad: ${ent}\n📝 Objeto: ${obj}\n🔗 Link: ${url}\n\nSaludos`);
+                  window.location.href = `mailto:?subject=${subj}&body=${body}`;
+                }}>✉️ Email</button>
+                <button className="action-btn" title="Copiar link" onClick={() => {
+                  const url = p._url || p.urlSecop || p.url_proceso || 'https://www.secop.gov.co';
+                  navigator.clipboard.writeText(url).then(() => toastMsg && toastMsg('✅ Link copiado')).catch(() => {});
+                }}>🔗 Copiar</button>
+                <button className="action-btn" onClick={() => {
+                  const url = p._url || p.urlSecop || p.url_proceso || 'https://www.secop.gov.co';
+                  window.open(url, '_blank');
+                }}>↗ SECOP</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ─── Cargar más procesos ─── */}
+      {hasMore && !isLoading && (
+        <div style={{ textAlign: 'center', padding: '24px 0' }}>
+          {isLoadingMore ? (
+            <div style={{ color: 'var(--purple)', display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '14px' }}>
+              <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid var(--purple)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }}></span>
+              Cargando más procesos vigentes…
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: '13px', color: 'var(--text4)', marginBottom: '10px' }}>
+                Mostrando {procesos.length} procesos — hay más disponibles
+              </div>
+              <button
+                style={{ padding: '10px 28px', background: 'var(--purple)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
+                onClick={handleLoadMore}>
+                ⬇ Cargar {PAGE_SIZE} más procesos vigentes
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!hasMore && procesos.length > 0 && !isLoading && (
+        <div style={{ textAlign: 'center', padding: '16px', fontSize: '12px', color: 'var(--text4)' }}>
+          ✓ Todos los procesos vigentes cargados ({procesos.length} en total)
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PageAplicables({ applied, onRemove, config, toastMsg }) {
+  const analysis = loadProcessAnalysis();
+
+  const getProcessKey = (p) => p.entidad + '|' + (p.object || p.objeto);
+
+  const analyzedProcesses = applied.filter(p => analysis[getProcessKey(p)]);
+
+  const handleExportExcel = () => {
+    const ws_data = applied.map((p, idx) => {
+      const ana = analysis[getProcessKey(p)];
+      const dias = diasRestantes(p.fechaCierre || p.fecha_de_cierre_del_proceso || p.fecha_de_cierre);
+      return [
+        idx + 1,
+        p.entidad || p.nombre_entidad || '',
+        p.object || p.objeto || p.descripcion_del_proceso || '',
+        p.modalidad || p.modalidad_de_contratacion || '',
+        fmtCOP(p.cuantía || p.precio_base || 0),
+        p.fechaPublicacion || p.fecha_de_publicacion_del || p.fecha_de_publicacion || '',
+        p.fechaCierre || p.fecha_de_cierre_del_proceso || p.fecha_de_cierre || '',
+        dias || '',
+        ana?.cumplimiento || 'No evaluado',
+        ana?.capacidadFinanciera || '',
+        ana?.requisitosHabilitantes || '',
+        ana?.criteriosEvaluacion || '',
+        ana?.cronograma || '',
+        ana?.analisisRiesgos || '',
+        ana?.documentosHabilitantes || '',
+        ana?.cuestionarioAnexos || '',
+        p.observaciones || '',
+        ana?.resumenEjecutivo || '',
+        p.urlSecop || p.url_proceso || '',
+        ana?.analyzedAt || ''
+      ];
+    });
+
+    ws_data.unshift([
+      'No.', 'Entidad', 'Objeto', 'Modalidad', 'Presupuesto Oficial',
+      'Fecha Publicación', 'Fecha Cierre', 'Días Restantes', 'Cumple Requisitos',
+      'Capacidad Financiera', 'Requisitos Habilitantes', 'Criterios Evaluación',
+      'Cronograma', 'Análisis Riesgos', 'Documentos Habilitantes', 'Cuestionario/Anexos',
+      'Observaciones', 'Resumen Ejecutivo', 'Enlace SECOP II', 'Fecha Análisis'
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Procesos Analizados');
+    XLSX.writeFile(wb, 'procesos_aplicables.xlsx');
+    toastMsg('✅ Exportado a Excel', 'success');
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jspdf.jsPDF();
+    let yPos = 20;
+
+    doc.setFontSize(16);
+    doc.text('Reporte de Procesos SECOP II Analizados', 20, yPos);
+    yPos += 15;
+
+    doc.setFontSize(10);
+    doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-CO')}`, 20, yPos);
+    yPos += 10;
+
+    applied.forEach((p, idx) => {
+      const ana = analysis[getProcessKey(p)];
+      const dias = diasRestantes(p._fechaCierre || p.fechaCierre || p.fecha_de_cierre_del_proceso || p.fecha_de_cierre);
+      const entidad = p._entidad || p.entidad || p.nombre_entidad || 'Entidad';
+      const objeto = (p._descripcion || p.object || p.objeto || p.descripcion_del_proceso || '').substring(0, 80);
+      const modalidad = p._modalidad || p.modalidad || p.modalidad_de_contratacion || 'N/A';
+      const cuantia = fmtCOP(p._cuantia || p.cuantía || p.precio_base || 0);
+      const fechaCierre = p._fechaCierre || p.fechaCierre || p.fecha_de_cierre_del_proceso || p.fecha_de_cierre || '';
+      const estado = p._estado || p.estado_del_proceso || '';
+
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      doc.setFontSize(11);
+      doc.setTextColor(139, 92, 246);
+      doc.text(`${idx + 1}. ${entidad}`, 20, yPos);
+      yPos += 8;
+
+      doc.setTextColor(50, 50, 50);
+      doc.setFontSize(9);
+      doc.text(`Objeto: ${objeto}`, 20, yPos);
+      yPos += 6;
+      doc.text(`Modalidad: ${modalidad} | Cuantía: ${cuantia}`, 20, yPos);
+      yPos += 6;
+      doc.text(`Estado: ${estado || 'N/A'} | Cierre: ${fechaCierre} (${dias || '?'} días) | Cumple: ${ana?.cumplimiento || 'No evaluado'}`, 20, yPos);
+      yPos += 8;
+
+      if (ana?.resumenEjecutivo) {
+        doc.setFontSize(8);
+        doc.setTextColor(80, 80, 80);
+        const lines = doc.splitTextToSize(`Resumen: ${ana.resumenEjecutivo.substring(0, 300)}`, 170);
+        doc.text(lines, 20, yPos);
+        yPos += lines.length * 4 + 4;
+      }
+
+      // Separator line
+      doc.setDrawColor(200, 200, 200);
+      doc.line(20, yPos, 190, yPos);
+      yPos += 6;
+    });
+
+    doc.save('procesos_aplicables.pdf');
+    toastMsg('✅ Exportado a PDF', 'success');
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Procesos Aplicables</h2>
+        <p>Procesos a los que has aplicado o estás considerando</p>
+      </div>
+
+      <div style={{ marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <button className="btn btn-primary" onClick={handleExportExcel} disabled={applied.length === 0}>
+          📊 Exportar a Excel
+        </button>
+        <button className="btn btn-secondary" onClick={handleExportPDF} disabled={applied.length === 0}>
+          📄 Exportar a PDF
+        </button>
+        {applied.length > 0 && (
+          <div style={{ fontSize: '12px', color: 'var(--secondary)' }}>
+            {analyzedProcesses.length} de {applied.length} analizados con IA
+          </div>
+        )}
+      </div>
+
+      {applied.length === 0 && (
+        <div className="alert-banner info">
+          <span className="alert-icon">ℹ️</span>
+          <div className="alert-text">
+            <div className="alert-title">Sin procesos aplicables</div>
+            <div className="alert-desc">Aplica a procesos desde la sección "Procesos SECOP II" para verlos aquí</div>
+          </div>
+        </div>
+      )}
+
+      {applied.length > 0 && analyzedProcesses.length < applied.length && (
+        <div className="alert-banner info">
+          <span className="alert-icon">💡</span>
+          <div className="alert-text">
+            <div className="alert-title">Exportación disponible</div>
+            <div className="alert-desc">Puedes exportar todos los procesos. Los que tengan análisis de IA incluirán más detalle. Para análisis completo, click en cada proceso → "Analizar Pliego IA"</div>
+          </div>
+        </div>
+      )}
+
+      <div className="table-wrapper">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Entidad</th>
+              <th>Objeto</th>
+              <th>Modalidad</th>
+              <th>Cuantía</th>
+              <th>Cierre</th>
+              <th>Días</th>
+              <th>Estado</th>
+              <th>Observaciones</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {applied.map((p, i) => {
+              const entidad = p.entidad || p.nombre_entidad || 'Entidad';
+              const objeto = p.object || p.objeto || p.descripcion_del_proceso || '';
+              const modalidad = p.modalidad || p.modalidad_de_contratacion || 'N/A';
+              const cuantia = p.cuantía || p.precio_base || 0;
+              const fechaCierre = p.fechaCierre || p.fecha_de_cierre_del_proceso || p.fecha_de_cierre || '';
+              const dias = diasRestantes(fechaCierre);
+              const ana = analysis[getProcessKey(p)];
+              return (
+                <tr key={i} style={{ opacity: 1 }}>
+                  <td>{i + 1}</td>
+                  <td>{entidad}</td>
+                  <td style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis' }} title={objeto}>
+                    {objeto.substring(0, 50)}{objeto.length > 50 ? '...' : ''}
+                  </td>
+                  <td><span className="badge-pill">{modalidad}</span></td>
+                  <td>{fmtCOP(cuantia)}</td>
+                  <td>{fechaCierre}</td>
+                  <td>{dias || '?'}</td>
+                  <td>
+                    {ana ? (
+                      <span className="badge-pill green">📊 Analizado</span>
+                    ) : (
+                      <span className="badge-pill">Pendiente</span>
+                    )}
+                  </td>
+                  <td style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {p.observaciones || '-'}
+                  </td>
+                  <td>
+                    <button className="action-btn red btn-small" onClick={() => onRemove(i)}>Eliminar</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function PageFechas({ applied, toastMsg }) {
+  const [filterUpcoming, setFilterUpcoming] = React.useState(false);
+
+  const timeline = applied.flatMap(p => {
+    const items = [];
+    // Fallbacks: campo normalizado → campo _xxx → campo Socrata raw
+    const entidad = p.entidad || p._entidad || p.nombre_entidad || 'Entidad';
+    const objeto  = p.object  || p._descripcion || p.descripcion_del_proceso || p.objeto || '';
+    const fp = p.fechaPublicacion || p._fechaPublicacion || p.fecha_de_publicacion_del || p.fecha_de_publicacion || '';
+    const fc = p.fechaCierre      || p._fechaCierre      || p.fecha_de_cierre_del_proceso || p.fecha_de_cierre || '';
+    const ref = p.referencia || p._referencia || p.referencia_del_proceso || p.numero_del_proceso || '';
+    const enrich = { ...p, entidad, object: objeto, referencia: ref };
+    if (fp) items.push({ proc: enrich, type: 'Publicación', date: fp.slice(0, 10) });
+    if (fc) items.push({ proc: enrich, type: 'Cierre',      date: fc.slice(0, 10) });
+    return items;
+  }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const filtered = filterUpcoming
+    ? timeline.filter(t => {
+        const d = diasRestantes(t.date);
+        return d !== null && d > 0;
+      })
+    : timeline;
+
+  const handleExport = () => {
+    if (timeline.length === 0) { toastMsg('⚠️ No hay fechas para exportar', 'info'); return; }
+    const rows = [['Entidad', 'Referencia', 'Proceso', 'Tipo de Fecha', 'Fecha', 'Días Restantes']];
+    const source = filterUpcoming ? filtered : timeline;
+    source.forEach(t => {
+      const d = diasRestantes(t.date);
+      rows.push([
+        t.proc.entidad,
+        t.proc.referencia || '',
+        (t.proc.object || '').substring(0, 100),
+        t.type,
+        t.date,
+        d !== null ? (d > 0 ? `${d} días` : 'Vencido') : ''
+      ]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{ wch: 40 }, { wch: 20 }, { wch: 60 }, { wch: 15 }, { wch: 14 }, { wch: 15 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Fechas Clave');
+    XLSX.writeFile(wb, 'fechas_clave_jirehai.xlsx');
+    toastMsg('✅ Exportado a Excel', 'success');
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Fechas Clave</h2>
+        <p>Timeline de publicaciones y cierres de tus procesos aplicables</p>
+      </div>
+
+      <div style={{ marginBottom: '20px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <button className={`btn ${filterUpcoming ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setFilterUpcoming(!filterUpcoming)}>
+          {filterUpcoming ? '📅 Solo Próximas' : '📅 Todas las fechas'}
+        </button>
+        <button className="btn btn-primary" onClick={handleExport} disabled={timeline.length === 0}>
+          📊 Exportar Excel
+        </button>
+        <span style={{ fontSize: '13px', color: 'var(--secondary)' }}>
+          {filtered.length} fecha{filtered.length !== 1 ? 's' : ''} · {applied.length} proceso{applied.length !== 1 ? 's' : ''} aplicable{applied.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      {applied.length === 0 && (
+        <div className="empty-state">
+          <div style={{ fontSize: '40px', marginBottom: '12px' }}>📅</div>
+          <div style={{ fontWeight: 600, marginBottom: '8px' }}>Sin procesos aplicables</div>
+          <div style={{ color: 'var(--secondary)', fontSize: '14px' }}>
+            Ve a "Procesos SECOP II", busca licitaciones y haz clic en "Aplicar" para verlas aquí.
+          </div>
+        </div>
+      )}
+
+      {applied.length > 0 && timeline.length === 0 && (
+        <div className="empty-state">
+          <div style={{ fontSize: '40px', marginBottom: '12px' }}>🗓️</div>
+          <div style={{ fontWeight: 600, marginBottom: '8px' }}>Sin fechas registradas</div>
+          <div style={{ color: 'var(--secondary)', fontSize: '14px' }}>
+            Los {applied.length} proceso(s) aplicado(s) no tienen fechas de publicación ni cierre disponibles en SECOP II.
+          </div>
+        </div>
+      )}
+
+      {filtered.length === 0 && timeline.length > 0 && (
+        <div className="empty-state">
+          <div style={{ fontSize: '40px', marginBottom: '12px' }}>✅</div>
+          <div style={{ fontWeight: 600, marginBottom: '8px' }}>Sin fechas próximas</div>
+          <div style={{ color: 'var(--secondary)', fontSize: '14px' }}>
+            Todos los procesos ya cerraron. Haz clic en "Todas las fechas" para ver el historial.
+          </div>
+        </div>
+      )}
+
+      <div className="timeline">
+        {filtered.map((t, i) => {
+          const d = diasRestantes(t.date);
+          let colorClass = 'gray';
+          if (d !== null && d > 0) {
+            if (d < 3) colorClass = 'red';
+            else if (d < 10) colorClass = 'yellow';
+            else colorClass = 'green';
+          }
+
+          return (
+            <div key={i} className={`timeline-item ${colorClass}`}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ fontWeight: 600, marginBottom: '4px', flex: 1 }}>{t.proc.entidad}</div>
+                <span style={{
+                  background: t.type === 'Cierre' ? 'var(--danger)' : 'var(--accent)',
+                  color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', marginLeft: '8px', whiteSpace: 'nowrap'
+                }}>{t.type}</span>
+              </div>
+              {t.proc.referencia && (
+                <div style={{ fontSize: '11px', color: 'var(--accent)', marginBottom: '4px' }}>
+                  🔖 {t.proc.referencia}
+                </div>
+              )}
+              <div style={{ fontSize: '13px', color: 'var(--secondary)', marginBottom: '8px' }}>
+                {(t.proc.object || '').substring(0, 80)}{(t.proc.object || '').length > 80 ? '…' : ''}
+              </div>
+              <div style={{ display: 'flex', gap: '20px', fontSize: '12px' }}>
+                <div>📅 <strong>{t.date}</strong></div>
+                <div style={{ color: d === null || d <= 0 ? '#999' : d < 3 ? 'var(--danger)' : d < 10 ? '#f59e0b' : 'var(--success)' }}>
+                  ⏱ {d !== null ? (d > 0 ? `${d} días restantes` : 'Vencido') : '—'}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PageDocumentos({ docs: initialDocs, onSaveDoc, toastMsg }) {
+  const [docs, setDocs] = React.useState(initialDocs);
+
+  const handleUpdateDoc = (id, field, value) => {
+    const updated = docs.map(d => d.id === id ? { ...d, [field]: value } : d);
+    setDocs(updated);
+    saveDocs(updated);
+  };
+
+  const getStatus = (doc) => {
+    if (!doc.fechaVencimiento) return 'Sin Registrar';
+    const hoy = new Date();
+    const vence = new Date(doc.fechaVencimiento);
+    if (vence < hoy) return 'Vencido';
+    const diff = Math.ceil((vence - hoy) / (1000 * 60 * 60 * 24));
+    if (diff <= 10 && doc.maxValidity <= 30) return 'Por Vencer';
+    if (diff <= 60 && doc.maxValidity === 365) return 'Por Vencer';
+    return 'Vigente';
+  };
+
+  const handleExport = () => {
+    const ws_data = docs.map(d => [
+      d.nombre,
+      d.fechaVencimiento || 'Sin vencimiento',
+      getStatus(d),
+      d.notas || ''
+    ]);
+    ws_data.unshift(['Documento', 'Vencimiento', 'Estado', 'Notas']);
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Documentos');
+    XLSX.writeFile(wb, 'documentos.xlsx');
+    toastMsg('✅ Exportado a Excel', 'success');
+  };
+
+  const expiring = docs.filter(d => getStatus(d) === 'Por Vencer').length;
+  const expired = docs.filter(d => getStatus(d) === 'Vencido').length;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Mis Documentos</h2>
+        <p>Gestiona tus documentos habilitantes y su vigencia</p>
+      </div>
+
+      {(expiring > 0 || expired > 0) && (
+        <div className="alert-banner">
+          <span className="alert-icon">⚠️</span>
+          <div className="alert-text">
+            <div className="alert-title">Documentos con vencimiento próximo</div>
+            <div className="alert-desc">{expiring} por vencer, {expired} vencidos</div>
+          </div>
+        </div>
+      )}
+
+      <button className="btn btn-primary" onClick={handleExport} style={{ marginBottom: '20px' }}>
+        📊 Exportar Estado
+      </button>
+
+      {docs.map(doc => {
+        const status = getStatus(doc);
+        const statusClass = status.toLowerCase().replace(' ', '-');
+
+        return (
+          <div key={doc.id} className={`doc-slot ${statusClass}`}>
+            <div className="doc-header">
+              <div className="doc-name">{doc.nombre}</div>
+              <div className={`doc-status ${statusClass}`}>{status}</div>
+            </div>
+            <div className="doc-desc">{doc.descripcion}</div>
+            <div className="doc-fields">
+              <div>
+                <label className="input-label">Fecha de Vencimiento</label>
+                <input
+                  type="date"
+                  className="input-field"
+                  value={doc.fechaVencimiento}
+                  onChange={(e) => handleUpdateDoc(doc.id, 'fechaVencimiento', e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="input-label">Notas</label>
+              <textarea
+                className="textarea-field"
+                value={doc.notas}
+                onChange={(e) => handleUpdateDoc(doc.id, 'notas', e.target.value)}
+                rows="2"
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PageFormularios({ config, toastMsg }) {
+  const [activeForm, setActiveForm] = React.useState(null);
+  const [formData, setFormData] = React.useState({});
+
+  const forms = [
+    { id: 'secop', icon: '💻', title: 'Formulario Electrónico SECOP II', desc: 'Datos de registro en plataforma' },
+    { id: 'oferta', icon: '💰', title: 'Formulario de Oferta Económica', desc: 'Ítems, cantidades y precios' },
+    { id: 'experiencia', icon: '📜', title: 'Formato Experiencia del Proveedor', desc: 'Historial de contratos' },
+    { id: 'financiera', icon: '📊', title: 'Capacidad Financiera y Organizacional', desc: 'Ratios financieros' },
+    { id: 'persona', icon: '📋', title: 'Constancia Persona Natural', desc: 'Declaración jurada' },
+    { id: 'esal', icon: '🏛', title: 'Indicadores ESAL', desc: 'Instituciones sin ánimo de lucro' }
+  ];
+
+  const handleExportForm = (formType) => {
+    if (formType === 'persona') {
+      const doc = new jspdf.jsPDF();
+      doc.text('Constancia Persona Natural', 10, 10);
+      doc.text(`Nombre: ${config.empresa.nombre}`, 10, 30);
+      doc.text(`NIT: ${config.empresa.nit}`, 10, 40);
+      doc.save('constancia_persona_natural.pdf');
+      toastMsg('✅ PDF exportado', 'success');
+    } else {
+      const ws = XLSX.utils.json_to_sheet([formData[formType] || {}]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Formulario');
+      XLSX.writeFile(wb, `formulario_${formType}.xlsx`);
+      toastMsg('✅ Excel exportado', 'success');
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Formularios SECOP</h2>
+        <p>Crea y exporta formularios pre-completados</p>
+      </div>
+
+      <div className="card-grid">
+        {forms.map(form => (
+          <div key={form.id} className="card">
+            <div className="card-header">
+              <div>
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>{form.icon}</div>
+                <div className="card-title">{form.title}</div>
+              </div>
+            </div>
+            <div className="card-body">{form.desc}</div>
+            <button className="btn btn-primary" onClick={() => setActiveForm(form.id)}>
+              Abrir Formulario
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {activeForm && (
+        <div className="modal-overlay open" onClick={() => setActiveForm(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">{forms.find(f => f.id === activeForm)?.title}</h3>
+              <button className="modal-close" onClick={() => setActiveForm(null)}>✕</button>
+            </div>
+            <div className="modal-body">
+              {activeForm === 'secop' && (
+                <>
+                  <CField label="Usuario SECOP II" value={formData.secopUser || ''}
+                    onChange={(v) => setFormData({ ...formData, secopUser: v })} />
+                  <CField label="Contraseña" type="password" value={formData.secopPass || ''}
+                    onChange={(v) => setFormData({ ...formData, secopPass: v })} />
+                </>
+              )}
+              {activeForm === 'oferta' && (
+                <>
+                  <CField label="Ítem 1" value={formData.item1 || ''}
+                    onChange={(v) => setFormData({ ...formData, item1: v })} />
+                  <CField label="Cantidad" value={formData.qty1 || ''}
+                    onChange={(v) => setFormData({ ...formData, qty1: v })} />
+                  <CField label="Precio Unitario" value={formData.price1 || ''}
+                    onChange={(v) => setFormData({ ...formData, price1: v })} />
+                </>
+              )}
+              {activeForm === 'experiencia' && (
+                <>
+                  <CField label="Contrato 1" value={formData.contract1 || ''}
+                    onChange={(v) => setFormData({ ...formData, contract1: v })} />
+                  <CField label="Valor" value={formData.contractVal1 || ''}
+                    onChange={(v) => setFormData({ ...formData, contractVal1: v })} />
+                </>
+              )}
+              {activeForm === 'financiera' && (
+                <>
+                  <CField label="Activos Totales" value={config.capacidad.activos} disabled />
+                  <CField label="Patrimonio" value={config.capacidad.patrimonio} disabled />
+                  <CField label="Razón de Liquidez" value={(config.capacidad.activos / (config.capacidad.activos * 0.4)).toFixed(2)} disabled />
+                </>
+              )}
+              {activeForm === 'persona' && (
+                <CTextarea label="Declaración Jurada" value={`Yo, ${config.empresa.nombre}, identificado con NIT ${config.empresa.nit}, bajo la gravedad del juramento, certifico...`} disabled rows={6} />
+              )}
+              {activeForm === 'esal' && (
+                <>
+                  <CField label="Razón Social" value={config.empresa.nombre} disabled />
+                  <CField label="Actividad Misional" value={config.empresa.objeto} disabled />
+                </>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setActiveForm(null)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={() => {
+                handleExportForm(activeForm);
+                setActiveForm(null);
+              }}>Exportar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PageNotificaciones({ config, onConfigUpdate, toastMsg }) {
+  const [notifHist, setNotifHist] = React.useState(loadNotifHist());
+  const [notif, setNotif] = React.useState(config.notif);
+
+  const handleToggle = (field) => {
+    const updated = { ...notif, [field]: !notif[field] };
+    setNotif(updated);
+    const cfg = { ...config, notif: updated };
+    onConfigUpdate(cfg);
+  };
+
+  const handleSimulate = () => {
+    const newNotif = {
+      id: Date.now(),
+      icon: '🔔',
+      title: 'Nuevo proceso disponible',
+      desc: 'Licitación Pública en Antioquia - Infraestructura',
+      timestamp: new Date().toLocaleString(),
+      type: 'info'
+    };
+    const hist = [newNotif, ...notifHist].slice(0, 20);
+    setNotifHist(hist);
+    saveNotifHist(hist);
+    toastMsg('✅ Notificación simulada', 'success');
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Notificaciones</h2>
+        <p>Configura cómo deseas recibir alertas sobre procesos</p>
+      </div>
+
+      <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>Preferencias</h3>
+
+      <div className="toggle-switch">
+        <div>
+          <div className="input-label">Activar Notificaciones por Email</div>
+          <div style={{ fontSize: '12px', color: 'var(--secondary)' }}>Recibe alertas en tu correo</div>
+        </div>
+        <input
+          type="checkbox"
+          className="toggle-input"
+          checked={notif.email}
+          onChange={() => handleToggle('email')}
+        />
+      </div>
+
+      <CField label="Email" value={config.empresa.email} disabled />
+
+      <CSelect label="Intervalo de Escaneo" value={notif.scan}
+        onChange={(v) => {
+          const updated = { ...notif, scan: v };
+          setNotif(updated);
+          const cfg = { ...config, notif: updated };
+          onConfigUpdate(cfg);
+        }}
+        options={['1h', '2h', '4h', '8h', '24h']} />
+
+      <div style={{ marginTop: '24px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>Tipos de Notificaciones</h3>
+
+        <div className="toggle-switch">
+          <div>
+            <div className="input-label">Procesos Nuevos</div>
+          </div>
+          <input type="checkbox" className="toggle-input" defaultChecked />
+        </div>
+
+        <div className="toggle-switch">
+          <div>
+            <div className="input-label">Cierres Próximos (3 días)</div>
+          </div>
+          <input type="checkbox" className="toggle-input" defaultChecked />
+        </div>
+
+        <div className="toggle-switch">
+          <div>
+            <div className="input-label">Documentos por Vencer</div>
+          </div>
+          <input type="checkbox" className="toggle-input" defaultChecked />
+        </div>
+
+        <div className="toggle-switch">
+          <div>
+            <div className="input-label">Procesos con mis UNSPSC</div>
+          </div>
+          <input type="checkbox" className="toggle-input" defaultChecked />
+        </div>
+      </div>
+
+      <button className="btn btn-primary" onClick={handleSimulate} style={{ marginTop: '20px' }}>
+        🔔 Simular Escaneo
+      </button>
+
+      <h3 style={{ fontSize: '16px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>Historial (últimas 20)</h3>
+
+      {notifHist.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '30px', color: 'var(--secondary)' }}>
+          No hay notificaciones aún
+        </div>
+      ) : (
+        notifHist.map(n => (
+          <div key={n.id} style={{
+            background: 'rgba(31, 31, 35, 0.5)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '12px',
+            display: 'flex',
+            gap: '12px'
+          }}>
+            <span style={{ fontSize: '20px' }}>{n.icon}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600, marginBottom: '4px' }}>{n.title}</div>
+              <div style={{ fontSize: '12px', color: 'var(--secondary)' }}>{n.desc}</div>
+              <div style={{ fontSize: '11px', color: 'var(--secondary)', marginTop: '8px' }}>{n.timestamp}</div>
+            </div>
+            <span className="badge-pill">{n.type}</span>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// IdlePanel — Panel inicial con carga de documentos + botón iniciar análisis
+// ══════════════════════════════════════════════════════════════════════════════
+// IdlePanel: mantiene archivos en memoria (staging) y los pasa al padre al iniciar
+function IdlePanel({ onStart, toastMsg }) {
+  const [staged,   setStaged]   = React.useState([]);   // File objects (en memoria)
+  const [dragOver, setDragOver] = React.useState(false);
+  const fileInputRef = React.useRef();
+  const ACCEPTED = '.pdf,.xlsx,.xls,.docx,.doc,.pptx,.png,.jpg,.jpeg,.tif,.tiff,.zip';
+
+  const addFiles = (files) => {
+    const arr = Array.from(files || []);
+    if (!arr.length) return;
+    setStaged(prev => {
+      const names = new Set(prev.map(f => f.name));
+      return [...prev, ...arr.filter(f => !names.has(f.name))];
+    });
+  };
+
+  const iconFor = (name) => {
+    const ext = (name || '').toLowerCase().split('.').pop();
+    return { pdf: '📄', xlsx: '📊', xls: '📊', docx: '📝', doc: '📝', pptx: '📑', zip: '🗜️' }[ext] || '📎';
+  };
+
+  const fmtSize = (bytes) => bytes > 1048576
+    ? (bytes / 1048576).toFixed(1) + ' MB'
+    : Math.round(bytes / 1024) + ' KB';
+
+  return (
+    <div>
+      {/* Instrucción */}
+      <div style={{ fontSize: '11px', color: 'var(--text4)', marginBottom: '10px', lineHeight: '1.6',
+        padding: '8px 12px', background: 'rgba(249,115,22,0.08)', borderRadius: '8px', border: '1px solid rgba(249,115,22,0.2)' }}>
+        <strong style={{ color: 'var(--orange)' }}>📌 Importante:</strong> El portal SECOP II protege sus documentos con autenticación.
+        Para obtener el análisis completo con cantidades, valores y marcas, descarga los archivos desde la{' '}
+        <strong>Invitación Pública</strong> del proceso y arrástralos aquí antes de iniciar.
+      </div>
+
+      {/* Drop zone */}
+      <div
+        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={e => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files); }}
+        onClick={() => fileInputRef.current?.click()}
+        style={{
+          border: `2px dashed ${dragOver ? 'var(--purple)' : staged.length ? 'rgba(34,197,94,0.5)' : 'var(--border2)'}`,
+          borderRadius: '10px', padding: staged.length ? '12px 16px' : '24px 16px',
+          textAlign: 'center', cursor: 'pointer',
+          background: dragOver ? 'rgba(139,92,246,0.08)' : staged.length ? 'rgba(34,197,94,0.05)' : 'rgba(255,255,255,0.02)',
+          transition: 'all 0.2s', marginBottom: '12px',
+        }}>
+        <input ref={fileInputRef} type="file" multiple accept={ACCEPTED}
+          style={{ display: 'none' }} onChange={e => addFiles(e.target.files)} />
+
+        {staged.length === 0 ? (
+          <>
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>📂</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text)' }}>
+              Arrastra aquí los documentos del proceso
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '4px' }}>
+              CDP · PAA · Presupuesto Oficial · Estudio Previo · Cotizaciones · Invitación Pública
+            </div>
+            <div style={{ fontSize: '10px', color: 'var(--text4)', marginTop: '6px' }}>
+              PDF · Excel · Word · PowerPoint · imágenes — clic para seleccionar
+            </div>
+          </>
+        ) : (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'flex-start' }}>
+            {staged.map((f, i) => (
+              <div key={i} onClick={e => e.stopPropagation()} style={{
+                display: 'flex', alignItems: 'center', gap: '5px',
+                padding: '4px 8px', background: 'rgba(34,197,94,0.12)',
+                borderRadius: '6px', border: '1px solid rgba(34,197,94,0.25)',
+              }}>
+                <span style={{ fontSize: '13px' }}>{iconFor(f.name)}</span>
+                <span style={{ fontSize: '11px', color: 'var(--text)', maxWidth: '140px',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                <span style={{ fontSize: '10px', color: 'var(--text4)' }}>{fmtSize(f.size)}</span>
+                <button onClick={() => setStaged(p => p.filter((_,j)=>j!==i))} style={{
+                  background:'none', border:'none', cursor:'pointer', color:'var(--text4)', fontSize:'11px', padding:'0 2px',
+                }}>✕</button>
+              </div>
+            ))}
+            <div style={{ fontSize: '11px', color: 'var(--purple)', cursor:'pointer', padding:'4px 8px',
+              background:'rgba(139,92,246,0.1)', borderRadius:'6px', border:'1px solid rgba(139,92,246,0.2)',
+              display:'flex', alignItems:'center' }}>
+              + agregar más
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Botón iniciar */}
+      <div style={{ textAlign: 'center', paddingTop: '4px' }}>
+        <div style={{ fontSize: '11px', color: 'var(--text4)', marginBottom: '12px' }}>
+          {staged.length > 0
+            ? `✅ ${staged.length} archivo(s) listos — se subirán y analizarán al iniciar`
+            : 'Sin documentos: análisis basado en metadatos SECOP II solamente'}
+        </div>
+        <button onClick={() => onStart(staged)} style={{
+          padding: '12px 36px',
+          background: 'linear-gradient(135deg,var(--purple),var(--orange))',
+          border: 'none', borderRadius: '8px', color: '#fff',
+          fontSize: '14px', fontWeight: '700', cursor: 'pointer', letterSpacing: '0.3px',
+        }}>
+          🚀 {staged.length > 0 ? `Analizar con ${staged.length} documento(s)` : 'Iniciar análisis'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AIAnalysisModal — Motor de análisis SECOP II con IA
+// ══════════════════════════════════════════════════════════════════════════════
+function AIAnalysisModal({ process, onClose, toastMsg }) {
+  const [jobId,     setJobId]     = React.useState(null);
+  const [status,    setStatus]    = React.useState('idle'); // idle | running | completed | error
+  const [progress,  setProgress]  = React.useState({ pct: 0, step: '', msg: 'Listo para analizar' });
+  const [result,    setResult]    = React.useState(null);
+  const [activeTab, setActiveTab] = React.useState('resumen');
+  const [errMsg,    setErrMsg]    = React.useState('');
+  const pollRef = React.useRef(null);
+
+  const referencia = process._referencia || process.referencia_del_proceso || process.numero_del_proceso || '';
+  const entidad    = process._entidad    || process.nombre_entidad || process.entidad || '';
+  const objeto     = process._descripcion|| process.descripcion_del_proceso || process.object || process.objeto || '';
+  const cuantia    = process._cuantia    || parseFloat(process.precio_base) || 0;
+  const fechaCierre= process._fechaCierre|| process.fecha_de_cierre_del_proceso || '';
+
+  // Cleanup on unmount
+  React.useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
+
+  // ── Cierre protegido ──────────────────────────────────────────────────────
+  const handleClose = () => {
+    // Ya no bloqueamos el cierre, solo avisamos
+    if (status === 'running') {
+      toastMsg('ℹ️ El análisis continúa en segundo plano. Puedes volver a abrir esta ventana luego.', 'info');
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+    }
+    onClose();
+  };
+
+  // stagedFiles: array de File objects subidos por el usuario en IdlePanel
+  const handleStart = async (stagedFiles = []) => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+    setStatus('running');
+    setErrMsg('');
+    setResult(null);
+    setProgress({ pct: 1, step: 'init', msg: 'Conectando con el motor de IA...' });
+    try {
+      console.log('[JIREHAI-AI] Iniciando análisis para proceso:', referencia);
+      const resp = await window.Api.analyzeProcess(process);
+      const jid = resp && resp.job_id;
+      if (!jid) throw new Error('El servidor no devolvió un identificador de proceso (Job ID)');
+      console.log('[JIREHAI-AI] Análisis iniciado. Job ID:', jid);
+      setJobId(jid);
+
+      // ── Subir archivos staged si los hay ────────────────────────────
+      if (stagedFiles && stagedFiles.length > 0) {
+        setProgress({ pct: 2, step: 'init', msg: `Subiendo ${stagedFiles.length} documento(s)...` });
+        try {
+          const form = new FormData();
+          stagedFiles.forEach(f => form.append('docs', f));
+          const token = localStorage.getItem('jrh_token');
+          const API_BASE = window.JIREHAI_API_BASE || 'http://localhost:3001';
+          const upResp = await fetch(`${API_BASE}/api/ai/upload-docs/${jid}`, {
+            method: 'POST',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            body: form,
+          });
+          if (upResp.ok) {
+            const upData = await upResp.json();
+            console.log(`[JIREHAI-AI] ${upData.files_uploaded} archivo(s) subidos al servidor`);
+            setProgress({ pct: 3, step: 'init', msg: `${upData.files_uploaded} doc(s) cargados — iniciando análisis...` });
+          }
+        } catch (upErr) {
+          console.warn('[JIREHAI-AI] Error subiendo archivos:', upErr.message);
+          // No fallar el análisis si la subida falla — continuar igual
+        }
+      }
+
+      startPolling(jid);
+    } catch (e) {
+      console.error('[JIREHAI-AI] Fallo al iniciar:', e);
+      setStatus('error');
+      setErrMsg('Error al iniciar: ' + e.message);
+    }
+  };
+
+  const startPolling = (jid) => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    console.log('[JIREHAI-AI] Monitor de progreso activado para:', jid);
+    let retries = 0;
+    const interval = setInterval(async () => {
+      try {
+        const s = await window.Api.getAIStatus(jid);
+        console.log(`[JIREHAI-AI] Actualización: ${s.progress_pct}% (${s.status})`);
+        
+        if (s.status === 'completed' || s.progress_pct === 100) {
+          console.log('[JIREHAI-AI] ¡Análisis completado! Descargando resultados...');
+          clearInterval(interval);
+          pollRef.current = null;
+          loadResult(jid);
+          return;
+        }
+        setProgress({
+          pct:  s.progress_pct ?? 0,
+          step: s.progress_step || '',
+          msg:  s.progress_msg  || 'Procesando...',
+        });
+        if (s.status === 'error') {
+          clearInterval(interval);
+          pollRef.current = null;
+          setStatus('error');
+          setErrMsg(s.error_msg || 'Error reportado por el motor de IA');
+        }
+      } catch (e) {
+        console.warn('[JIREHAI-AI] Error en sondeo:', e.message);
+        if (++retries > 12) { // 30 segundos de fallos de red
+          clearInterval(interval); 
+          setStatus('error'); 
+          setErrMsg('Se perdió la conexión con el servidor. Reintente.'); 
+        }
+      }
+    }, 2500);
+    pollRef.current = interval;
+  };
+
+  const loadResult = async (jid) => {
+    setStatus('loading_result');
+    try {
+      const r = await window.Api.getAIResult(jid);
+      setResult(r.data);
+      setStatus('completed');
+      setActiveTab('resumen');
+      toastMsg('✅ Análisis completado', 'success');
+    } catch (e) {
+      setStatus('error');
+      setErrMsg('Error cargando resultado: ' + e.message);
+    }
+  };
+
+  // Verificar si ya hay un job corriendo o terminado al abrir
+  React.useEffect(() => {
+    if (status === 'idle') {
+      // Opcional: buscar si este proceso ya tiene un análisis reciente
+    }
+  }, []);
+
+  const handleDelete = async () => {
+    if (!jobId) return;
+    try { await window.Api.deleteAIJob(jobId); } catch {}
+    setJobId(null); setStatus('idle'); setResult(null);
+    setProgress({ pct: 0, step: '', msg: 'Listo para analizar' });
+  };
+
+  // ── Helpers de renderizado ───────────────────────────────────────────────
+
+  const STEP_LABELS = {
+    init: 'Iniciando', download: 'Descargando documentos', parse: 'Extrayendo texto',
+    ocr: 'Aplicando OCR', legal: 'Análisis jurídico', financial: 'Análisis financiero',
+    products: 'Extrayendo productos', risks: 'Análisis de riesgos', export: 'Generando reportes', complete: 'Completado'
+  };
+
+  const RISK_COLORS = { BAJO: '#22c55e', MEDIO: '#f59e0b', ALTO: '#f97316', CRÍTICO: '#ef4444' };
+
+  function RiskBadge({ nivel }) {
+    return (
+      <span style={{ padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: '700',
+        background: (RISK_COLORS[nivel] || '#71717a') + '22', color: RISK_COLORS[nivel] || '#71717a',
+        border: `1px solid ${(RISK_COLORS[nivel] || '#71717a')}44` }}>
+        {nivel || 'N/A'}
+      </span>
+    );
+  }
+
+  function Section({ title, children }) {
+    return (
+      <div style={{ marginBottom: '18px' }}>
+        <h4 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em',
+          color: 'var(--text4)', marginBottom: '10px', paddingBottom: '6px', borderBottom: '1px solid var(--border2)' }}>
+          {title}
+        </h4>
+        {children}
+      </div>
+    );
+  }
+
+  function InfoRow({ label, value }) {
+    if (!value) return null;
+    return (
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', lineHeight: '1.5' }}>
+        <span style={{ color: 'var(--text4)', minWidth: '140px', flexShrink: 0 }}>{label}:</span>
+        <span style={{ color: 'var(--text)' }}>{value}</span>
+      </div>
+    );
+  }
+
+  function TagList({ items, color = 'var(--purple)' }) {
+    if (!items || !items.length) return <span style={{ color: 'var(--text4)', fontSize: '12px' }}>No detectados</span>;
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+        {items.map((item, i) => (
+          <span key={i} style={{ padding: '3px 10px', borderRadius: '99px', fontSize: '12px',
+            background: color + '22', color, border: `1px solid ${color}44` }}>
+            {typeof item === 'string' ? item : (item.descripcion || item.nombre || JSON.stringify(item))}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  function FuenteBadge({ fuente }) {
+    if (!fuente || (!fuente.documento && !fuente.pagina)) return null;
+    const docName = fuente.documento ? fuente.documento.split('/').pop().split('\\').pop() : '';
+    const short = docName.length > 28 ? docName.slice(0, 25) + '…' : docName;
+    return (
+      <span title={`${docName} — página ${fuente.pagina || '?'}`}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', marginTop: '4px',
+          padding: '2px 7px', borderRadius: '99px', fontSize: '10px', fontWeight: '500',
+          background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
+          color: 'var(--text4)', cursor: 'default', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+        📄 {short}{fuente.pagina ? ` p.${fuente.pagina}` : ''}
+      </span>
+    );
+  }
+
+  // ── Tabs de resultado ────────────────────────────────────────────────────
+
+  function TabResumen() {
+    const pi = result?.process_info || {};
+    const legal = result?.legal || {};
+    return (
+      <div>
+        <Section title="Información del análisis">
+          <InfoRow label="Documentos descargados" value={pi.documentos_descargados ?? result?.documents?.length ?? '—'} />
+          <InfoRow label="Documentos parseados"   value={pi.documentos_parseados ?? '—'} />
+          <InfoRow label="Texto extraído"          value={pi.texto_extraido_chars ? `${(pi.texto_extraido_chars/1000).toFixed(1)}K caracteres` : '—'} />
+          <InfoRow label="Fecha análisis"          value={pi.fecha_analisis ? new Date(pi.fecha_analisis).toLocaleString('es-CO') : '—'} />
+        </Section>
+
+        {result?.documents?.length > 0 && (
+          <Section title={`Documentos (${result.documents.length})`}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {result.documents.map((doc, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '8px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '12px' }}>
+                  <span style={{ color: 'var(--text)' }}>📄 {doc.filename || 'Documento'}</span>
+                  <div style={{ display: 'flex', gap: '8px', color: 'var(--text4)' }}>
+                    {doc.page_count > 0 && <span>{doc.page_count}p</span>}
+                    {doc.size_kb > 0 && <span>{doc.size_kb.toFixed(0)}KB</span>}
+                    {doc.is_scanned && <span style={{ color: 'var(--orange)' }}>OCR</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {legal.objeto_contrato && (
+          <Section title="Objeto del contrato">
+            <p style={{ fontSize: '13px', color: 'var(--text)', lineHeight: '1.7' }}>{legal.objeto_contrato}</p>
+          </Section>
+        )}
+
+        {legal.tipo_contrato && (
+          <Section title="Tipo de contrato">
+            <TagList items={[legal.tipo_contrato]} color="var(--purple)" />
+          </Section>
+        )}
+      </div>
+    );
+  }
+
+  function TabJuridico() {
+    const legal = result?.legal || {};
+    const rh = legal.requisitos_habilitantes || {};
+    const criterios = legal.criterios_seleccion || [];
+    const cronograma = legal.cronograma || [];
+    return (
+      <div>
+        {rh.juridica?.length > 0 && (
+          <Section title="Requisitos jurídicos">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {rh.juridica.map((r, i) => (
+                <div key={i} style={{ padding: '8px 10px', background: 'rgba(139,92,246,0.06)', borderRadius: '6px',
+                  fontSize: '12px', borderLeft: '3px solid var(--purple)', color: 'var(--text)' }}>
+                  {typeof r === 'string' ? r : (r.descripcion || r.requisito || JSON.stringify(r))}
+                  {typeof r === 'object' && r.fuente && <><br/><FuenteBadge fuente={r.fuente} /></>}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {rh.financiera?.length > 0 && (
+          <Section title="Capacidad financiera habilitante">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {rh.financiera.map((r, i) => (
+                <div key={i} style={{ padding: '8px 10px', background: 'rgba(34,197,94,0.06)', borderRadius: '6px',
+                  fontSize: '12px', borderLeft: '3px solid var(--green)', color: 'var(--text)' }}>
+                  {typeof r === 'string' ? r : (r.descripcion || r.indicador || JSON.stringify(r))}
+                  {typeof r === 'object' && r.fuente && <><br/><FuenteBadge fuente={r.fuente} /></>}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {rh.tecnica?.length > 0 && (
+          <Section title="Capacidad técnica / experiencia">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {rh.tecnica.map((r, i) => (
+                <div key={i} style={{ padding: '8px 10px', background: 'rgba(249,115,22,0.06)', borderRadius: '6px',
+                  fontSize: '12px', borderLeft: '3px solid var(--orange)', color: 'var(--text)' }}>
+                  {typeof r === 'string' ? r : (r.descripcion || r.requisito || JSON.stringify(r))}
+                  {typeof r === 'object' && r.fuente && <><br/><FuenteBadge fuente={r.fuente} /></>}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {criterios.length > 0 && (
+          <Section title="Criterios de selección">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {criterios.map((c, i) => (
+                <div key={i} style={{ padding: '8px 10px',
+                  background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--text)' }}>{typeof c === 'string' ? c : (c.criterio || c.nombre || JSON.stringify(c))}</span>
+                    {c.puntaje !== undefined && <span style={{ color: 'var(--purple)', fontWeight: '700' }}>{c.puntaje} pts</span>}
+                  </div>
+                  {typeof c === 'object' && c.fuente && <FuenteBadge fuente={c.fuente} />}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {cronograma.length > 0 && (
+          <Section title="Cronograma">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {cronograma.map((ev, i) => (
+                <div key={i} style={{ padding: '7px 10px',
+                  background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '12px' }}>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <span style={{ color: 'var(--purple)', minWidth: '100px', flexShrink: 0 }}>
+                      {ev.fecha ? String(ev.fecha).slice(0, 10) : '—'}
+                    </span>
+                    <span style={{ color: 'var(--text)' }}>{ev.evento || ev.actividad || JSON.stringify(ev)}</span>
+                  </div>
+                  {ev.fuente && <div style={{ paddingLeft: '112px' }}><FuenteBadge fuente={ev.fuente} /></div>}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {!rh.juridica?.length && !rh.financiera?.length && !rh.tecnica?.length && !criterios.length && !cronograma.length && (
+          <p style={{ fontSize: '13px', color: 'var(--text4)', textAlign: 'center', padding: '24px' }}>
+            No se encontraron requisitos jurídicos estructurados en los documentos analizados.
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  function TabFinanciero() {
+    const fin = result?.financial || {};
+    const indices = fin.indices || fin.indicadores || [];
+    return (
+      <div>
+        <Section title="Indicadores exigidos">
+          {indices.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {indices.map((ind, i) => (
+                <div key={i} style={{ padding: '9px 12px', background: 'rgba(34,197,94,0.06)', borderRadius: '6px',
+                  borderLeft: '3px solid var(--green)', fontSize: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ color: 'var(--text)', fontWeight: '500' }}>
+                      {typeof ind === 'string' ? ind : (ind.nombre || ind.indicador || ind.descripcion || JSON.stringify(ind))}
+                    </span>
+                    {ind.valor_minimo !== undefined && (
+                      <span style={{ color: 'var(--green)', fontWeight: '700', textAlign: 'right' }}>≥ {ind.valor_minimo}</span>
+                    )}
+                    {ind.formula && (
+                      <span style={{ color: 'var(--text4)', fontSize: '11px' }}>{ind.formula}</span>
+                    )}
+                  </div>
+                  {typeof ind === 'object' && ind.fuente && <FuenteBadge fuente={ind.fuente} />}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ fontSize: '13px', color: 'var(--text4)' }}>No se detectaron indicadores financieros específicos.</p>
+          )}
+        </Section>
+
+        {(fin.patrimonio_minimo || fin.capital_trabajo || fin.volumen_facturacion) && (
+          <Section title="Montos mínimos">
+            <InfoRow label="Patrimonio mínimo"     value={fin.patrimonio_minimo   ? fmtCOP(parseFloat(fin.patrimonio_minimo))   : null} />
+            <InfoRow label="Capital de trabajo"    value={fin.capital_trabajo     ? fmtCOP(parseFloat(fin.capital_trabajo))     : null} />
+            <InfoRow label="Volumen facturación"   value={fin.volumen_facturacion ? fmtCOP(parseFloat(fin.volumen_facturacion)) : null} />
+          </Section>
+        )}
+
+        {fin.estados_financieros_requeridos && (
+          <Section title="Documentos financieros requeridos">
+            <TagList items={Array.isArray(fin.estados_financieros_requeridos) ? fin.estados_financieros_requeridos : [fin.estados_financieros_requeridos]} />
+          </Section>
+        )}
+
+        {!indices.length && !fin.patrimonio_minimo && !fin.capital_trabajo && (
+          <p style={{ fontSize: '13px', color: 'var(--text4)', textAlign: 'center', padding: '24px' }}>
+            No se detectaron requisitos financieros cuantitativos.
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  function TabProductos() {
+    const prod = result?.products || {};
+    const items = prod.items || prod.productos || [];
+    return (
+      <div>
+        {prod.categoria_principal && (
+          <Section title="Categoría principal">
+            <TagList items={[prod.categoria_principal]} color="var(--orange)" />
+          </Section>
+        )}
+        {prod.unspsc_sugerido && (
+          <Section title="Código UNSPSC sugerido">
+            <TagList items={Array.isArray(prod.unspsc_sugerido) ? prod.unspsc_sugerido : [prod.unspsc_sugerido]} color="var(--purple)" />
+          </Section>
+        )}
+        {items.length > 0 ? (
+          <Section title={`Ítems detectados (${items.length})`}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {items.map((item, i) => (
+                <div key={i} style={{ padding: '10px 12px', background: 'rgba(249,115,22,0.06)', borderRadius: '8px',
+                  borderLeft: '3px solid var(--orange)', fontSize: '12px' }}>
+                  <div style={{ fontWeight: '600', color: 'var(--text)', marginBottom: '4px' }}>
+                    {item.descripcion || item.nombre || item.item || `Ítem ${i+1}`}
+                  </div>
+                  <div style={{ display: 'flex', gap: '16px', color: 'var(--text4)', flexWrap: 'wrap' }}>
+                    {item.cantidad   && <span>Cant: <strong style={{ color: 'var(--text)' }}>{item.cantidad} {item.unidad || ''}</strong></span>}
+                    {item.precio_unitario && <span>Precio: <strong style={{ color: 'var(--green)' }}>{fmtCOP(parseFloat(item.precio_unitario))}</strong></span>}
+                    {item.especificaciones && <span style={{ color: 'var(--text3)' }}>{item.especificaciones}</span>}
+                  </div>
+                  {item.fuente && <FuenteBadge fuente={item.fuente} />}
+                </div>
+              ))}
+            </div>
+          </Section>
+        ) : (
+          <p style={{ fontSize: '13px', color: 'var(--text4)', textAlign: 'center', padding: '24px' }}>
+            No se detectaron ítems de producto/servicio con especificaciones cuantificadas.
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  function TabRiesgos() {
+    const rsk = result?.risks || {};
+    const nivel = rsk.nivel_riesgo_global || rsk.nivel_riesgo || null;
+    const score = rsk.score_riesgo ?? null;
+    const factores = rsk.factores_direccionamiento || rsk.factores || [];
+    const restrictivos = rsk.requisitos_restrictivos || rsk.restrictivos || [];
+    const alertas = rsk.alertas || [];
+    return (
+      <div>
+        {(nivel || score !== null) && (
+          <Section title="Nivel de riesgo global">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px',
+              background: `${RISK_COLORS[nivel] || '#71717a'}11`, borderRadius: '8px',
+              border: `1px solid ${RISK_COLORS[nivel] || '#71717a'}33` }}>
+              <RiskBadge nivel={nivel} />
+              {score !== null && (
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '11px', color: 'var(--text4)' }}>
+                    <span>Score de riesgo</span><span style={{ color: RISK_COLORS[nivel] || '#71717a', fontWeight: '700' }}>{score}/100</span>
+                  </div>
+                  <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '99px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${score}%`, background: RISK_COLORS[nivel] || '#71717a',
+                      borderRadius: '99px', transition: 'width 0.5s' }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </Section>
+        )}
+        {alertas.length > 0 && (
+          <Section title="Alertas principales">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {alertas.map((a, i) => (
+                <div key={i} style={{ padding: '8px 12px', background: 'rgba(239,68,68,0.08)', borderRadius: '6px',
+                  borderLeft: '3px solid var(--red)', fontSize: '12px', color: 'var(--text)' }}>
+                  ⚠️ {typeof a === 'string' ? a : (a.descripcion || a.alerta || JSON.stringify(a))}
+                  {typeof a === 'object' && a.fuente && <><br/><FuenteBadge fuente={a.fuente} /></>}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {factores.length > 0 && (
+          <Section title="Factores de direccionamiento">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {factores.map((f, i) => (
+                <div key={i} style={{ padding: '8px 12px', background: 'rgba(249,115,22,0.08)', borderRadius: '6px',
+                  borderLeft: '3px solid var(--orange)', fontSize: '12px', color: 'var(--text)' }}>
+                  🔍 {typeof f === 'string' ? f : (f.descripcion || f.factor || JSON.stringify(f))}
+                  {typeof f === 'object' && f.fuente && <><br/><FuenteBadge fuente={f.fuente} /></>}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {restrictivos.length > 0 && (
+          <Section title="Requisitos restrictivos">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {restrictivos.map((r, i) => (
+                <div key={i} style={{ padding: '8px 12px', background: 'rgba(139,92,246,0.08)', borderRadius: '6px',
+                  borderLeft: '3px solid var(--purple)', fontSize: '12px', color: 'var(--text)' }}>
+                  🔒 {typeof r === 'string' ? r : (r.descripcion || r.requisito || JSON.stringify(r))}
+                  {typeof r === 'object' && r.fuente && <><br/><FuenteBadge fuente={r.fuente} /></>}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+        {!nivel && !factores.length && !alertas.length && !restrictivos.length && (
+          <p style={{ fontSize: '13px', color: 'var(--text4)', textAlign: 'center', padding: '24px' }}>
+            No se detectaron riesgos relevantes en los documentos analizados.
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  function TabDescargar() {
+    const ref = referencia || 'secop';
+
+    const principal = [
+      { key: 'informe_xlsx', label: 'Informe completo',      icon: '📊', ext: '.xlsx',
+        desc: '7 hojas: Resumen, Cronograma, Requisitos, Financiero, Productos+Cantidades, Riesgos, Documentos',
+        highlight: true },
+      { key: 'informe_pdf',  label: 'Informe completo PDF',  icon: '📋', ext: '.pdf',
+        desc: 'PDF unificado listo para imprimir con todo el análisis',
+        highlight: true },
+    ];
+
+    const secundario = [
+      { key: 'json',     label: 'Datos crudos (JSON)',      icon: '📦', ext: '.json', desc: 'Todos los datos estructurados' },
+      { key: 'md',       label: 'Resumen ejecutivo',        icon: '📄', ext: '.md',   desc: 'Markdown — resumen rápido' },
+      { key: 'legal',    label: 'Análisis jurídico',        icon: '⚖️',  ext: '.md',   desc: 'Requisitos habilitantes y criterios' },
+      { key: 'risks',    label: 'Reporte de riesgos',       icon: '⚠️', ext: '.md',   desc: 'Indicadores de direccionamiento' },
+      { key: 'products', label: 'Ítems y especificaciones', icon: '🏷️', ext: '.json', desc: 'Productos, cantidades y marcas' },
+    ];
+
+    const renderLink = ({ key, label, icon, ext, desc, highlight }) => (
+      <a key={key}
+        href={window.Api?.getAIExportUrl(jobId, key)}
+        download={`${ref}_${key}${ext}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: highlight ? '13px 16px' : '10px 14px',
+          background: highlight ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.04)',
+          borderRadius: '8px',
+          border: highlight ? '1px solid rgba(139,92,246,0.4)' : '1px solid var(--border2)',
+          textDecoration: 'none', transition: 'all 0.15s',
+          marginBottom: highlight ? '4px' : '0',
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,92,246,0.18)'}
+        onMouseLeave={e => e.currentTarget.style.background = highlight ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.04)'}>
+        <div>
+          <div style={{ fontSize: highlight ? '14px' : '13px', fontWeight: highlight ? '700' : '500', color: 'var(--text)' }}>
+            {icon} {label}
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '2px' }}>{desc}</div>
+        </div>
+        <span style={{ fontSize: '12px', color: highlight ? 'var(--purple)' : 'var(--text4)', fontWeight: '600', marginLeft: '12px', whiteSpace: 'nowrap' }}>
+          ⬇ {ext}
+        </span>
+      </a>
+    );
+
+    return (
+      <div>
+        <Section title="📥 Informes unificados">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+            {principal.map(renderLink)}
+          </div>
+        </Section>
+        <Section title="Archivos individuales">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {secundario.map(renderLink)}
+          </div>
+        </Section>
+      </div>
+    );
+  }
+
+  // ── Render principal ─────────────────────────────────────────────────────
+
+  const TABS = [
+    { key: 'resumen',   label: 'Resumen'    },
+    { key: 'juridico',  label: 'Jurídico'   },
+    { key: 'financiero',label: 'Financiero' },
+    { key: 'productos', label: 'Productos'  },
+    { key: 'riesgos',   label: 'Riesgos'    },
+    ...(status === 'completed' ? [{ key: 'descargar', label: '⬇ Descargar' }] : []),
+  ];
+
+  return (
+    <>
+      {/* Header */}
+      <div className="modal-header" style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.12),rgba(249,115,22,0.06))', borderBottom: '1px solid var(--border2)' }}>
+        <div>
+          <h3 className="modal-title" style={{ background: 'linear-gradient(135deg,var(--purple),var(--orange))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            🤖 Análisis IA — SECOP II
+          </h3>
+          <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '2px' }}>
+            {entidad} {referencia && `· Ref ${referencia}`}
+          </div>
+        </div>
+        <button className="modal-close" onClick={handleClose} title={status === 'running' ? 'Análisis en progreso (haz clic para confirmar cierre)' : 'Cerrar'}>✕</button>
+      </div>
+
+      <div className="modal-body" style={{ fontSize: '13px', lineHeight: '1.7', paddingTop: '16px' }}>
+
+        {/* Proceso info */}
+        <div style={{ padding: '10px 14px', background: 'rgba(139,92,246,0.07)', borderRadius: '8px', marginBottom: '18px', fontSize: '12px' }}>
+          <div style={{ fontWeight: '600', color: 'var(--text)', marginBottom: '3px' }}>
+            {objeto.substring(0, 160)}{objeto.length > 160 ? '…' : ''}
+          </div>
+          <div style={{ display: 'flex', gap: '18px', color: 'var(--text4)', flexWrap: 'wrap', marginTop: '4px' }}>
+            {cuantia > 0 && <span>💰 {fmtCOP(cuantia)}</span>}
+            {fechaCierre && <span>📅 Cierre: {String(fechaCierre).slice(0,10)}</span>}
+          </div>
+        </div>
+
+        {/* Estado / Progreso */}
+        {status === 'idle' && (
+          <IdlePanel onStart={handleStart} toastMsg={toastMsg} />
+        )}
+
+        {status === 'running' && (
+          <div style={{ padding: '20px 16px', background: 'rgba(139,92,246,0.06)', borderRadius: '10px', border: '1px solid rgba(139,92,246,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+              <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid var(--purple)',
+                borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite', flexShrink: 0 }} />
+              <span style={{ fontWeight: '600', color: 'var(--purple)' }}>
+                {STEP_LABELS[progress.step] || 'Procesando'}
+              </span>
+              <span style={{ marginLeft: 'auto', fontWeight: '700', color: 'var(--text)', fontSize: '14px' }}>
+                {progress.pct}%
+              </span>
+            </div>
+            {/* Progress bar */}
+            <div style={{ height: '8px', background: 'rgba(255,255,255,0.08)', borderRadius: '99px', overflow: 'hidden', marginBottom: '10px' }}>
+              <div style={{ height: '100%', width: `${progress.pct}%`,
+                background: 'linear-gradient(90deg,var(--purple),var(--orange))', borderRadius: '99px',
+                transition: 'width 0.6s ease' }} />
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text4)', marginBottom: '10px' }}>{progress.msg}</div>
+            
+            <button onClick={() => startPolling(jobId)} 
+              style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border2)', 
+                borderRadius: '6px', color: 'var(--text)', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              🔄 Re-sincronizar avance
+            </button>
+
+            {/* Step dots */}
+            <div style={{ display: 'flex', gap: '4px', marginTop: '12px', flexWrap: 'wrap' }}>
+              {['download','parse','ocr','legal','financial','products','risks','export'].map(s => (
+                <span key={s} style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '10px',
+                  background: progress.pct >= { download:10, parse:36, ocr:49, legal:58, financial:69, products:76, risks:83, export:91 }[s] ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.06)',
+                  color: progress.pct >= { download:10, parse:36, ocr:49, legal:58, financial:69, products:76, risks:83, export:91 }[s] ? 'var(--purple)' : 'var(--text4)' }}>
+                  {STEP_LABELS[s]}
+                </span>
+              ))}
+            </div>
+            {/* Línea de diagnóstico — muestra Job ID para verificar que el polling funciona */}
+            {jobId && (
+              <div style={{ marginTop: '10px', fontSize: '10px', color: 'var(--text4)', fontFamily: 'monospace', opacity: 0.6 }}>
+                Job: {jobId} · Abre F12 → Consola para ver el log detallado
+              </div>
+            )}
+          </div>
+        )}
+
+        {status === 'loading_result' && (
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div style={{ display: 'inline-block', width: '40px', height: '40px', border: '3px solid var(--purple)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '20px' }} />
+            <div style={{ fontWeight: '600', color: 'var(--text)' }}>Cargando resultados finales...</div>
+            <div style={{ fontSize: '12px', color: 'var(--text4)', marginTop: '8px' }}>Esto puede tardar unos segundos dependiendo del tamaño de los documentos</div>
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div style={{ padding: '18px', background: 'rgba(239,68,68,0.08)', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.3)', marginBottom: '16px' }}>
+            <div style={{ fontWeight: '600', color: 'var(--red)', marginBottom: '6px' }}>❌ Error en el análisis</div>
+            <div style={{ fontSize: '12px', color: 'var(--text4)', marginBottom: '14px', wordBreak: 'break-word' }}>{errMsg}</div>
+            <button onClick={handleStart}
+              style={{ padding: '8px 18px', background: 'var(--orange)', border: 'none', borderRadius: '6px',
+                color: '#fff', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
+              🔄 Reintentar
+            </button>
+          </div>
+        )}
+
+        {/* Resultados con tabs */}
+        {status === 'completed' && result && (
+          <>
+            {/* Risk badge summary */}
+            {result.risks?.nivel_riesgo_global && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px',
+                padding: '8px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '12px' }}>
+                <span style={{ color: 'var(--text4)' }}>Riesgo global:</span>
+                <RiskBadge nivel={result.risks.nivel_riesgo_global} />
+                {result.risks.score_riesgo !== undefined && (
+                  <span style={{ color: 'var(--text4)' }}>· Score: <strong style={{ color: 'var(--text)' }}>{result.risks.score_riesgo}/100</strong></span>
+                )}
+                <span style={{ marginLeft: 'auto', color: 'var(--green)', fontWeight: '600', fontSize: '11px' }}>✅ Análisis completado</span>
+              </div>
+            )}
+
+            {/* Tabs */}
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '14px', borderBottom: '1px solid var(--border2)', paddingBottom: '0' }}>
+              {TABS.map(({ key, label }) => (
+                <button key={key} onClick={() => setActiveTab(key)}
+                  style={{ padding: '7px 14px', border: 'none', borderRadius: '6px 6px 0 0', cursor: 'pointer',
+                    fontSize: '12px', fontWeight: '600', transition: 'all 0.15s',
+                    background: activeTab === key ? 'rgba(139,92,246,0.2)' : 'transparent',
+                    color: activeTab === key ? 'var(--purple)' : 'var(--text4)',
+                    borderBottom: activeTab === key ? '2px solid var(--purple)' : '2px solid transparent' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ minHeight: '200px' }}>
+              {activeTab === 'resumen'    && <TabResumen />}
+              {activeTab === 'juridico'   && <TabJuridico />}
+              {activeTab === 'financiero' && <TabFinanciero />}
+              {activeTab === 'productos'  && <TabProductos />}
+              {activeTab === 'riesgos'    && <TabRiesgos />}
+              {activeTab === 'descargar'  && <TabDescargar />}
+            </div>
+
+            {/* Footer actions */}
+            <div style={{ marginTop: '18px', paddingTop: '14px', borderTop: '1px solid var(--border2)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <button onClick={handleDelete}
+                style={{ padding: '7px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: '6px', color: 'var(--red)', fontSize: '12px', cursor: 'pointer', fontFamily: 'Inter,sans-serif' }}>
+                🗑 Eliminar análisis
+              </button>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <button title="Compartir por WhatsApp" onClick={() => {
+                  const url = process._url || process.urlSecop || process.url_proceso || 'https://www.secop.gov.co';
+                  const txt = `📋 Informe IA – Proceso SECOP II\n🏛 ${entidad}\n📝 ${objeto.slice(0,120)}\n💰 ${cuantia ? fmtCOP(cuantia) : ''}\n🔗 ${url}`;
+                  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+                }} style={{ padding: '7px 12px', background: 'rgba(37,211,102,0.12)', border: '1px solid rgba(37,211,102,0.3)',
+                  borderRadius: '6px', color: '#25d366', fontSize: '12px', cursor: 'pointer', fontFamily: 'Inter,sans-serif' }}>
+                  💬 WhatsApp
+                </button>
+                <button title="Compartir por email" onClick={() => {
+                  const url = process._url || process.urlSecop || process.url_proceso || 'https://www.secop.gov.co';
+                  const subj = encodeURIComponent(`Análisis IA SECOP II – ${entidad}`);
+                  const body = encodeURIComponent(`Hola,\n\nComparto el informe de análisis IA del siguiente proceso:\n\n🏛 Entidad: ${entidad}\n📝 Objeto: ${objeto.slice(0,200)}\n💰 Cuantía: ${cuantia ? fmtCOP(cuantia) : 'N/A'}\n📅 Cierre: ${fechaCierre ? String(fechaCierre).slice(0,10) : 'N/A'}\n🔗 SECOP II: ${url}\n\nSaludos`);
+                  window.location.href = `mailto:?subject=${subj}&body=${body}`;
+                }} style={{ padding: '7px 12px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)',
+                  borderRadius: '6px', color: '#60a5fa', fontSize: '12px', cursor: 'pointer', fontFamily: 'Inter,sans-serif' }}>
+                  ✉️ Email
+                </button>
+                <button title="Copiar link al proceso" onClick={() => {
+                  const url = process._url || process.urlSecop || process.url_proceso || 'https://www.secop.gov.co';
+                  navigator.clipboard.writeText(url).then(() => toastMsg && toastMsg('✅ Link copiado')).catch(() => {});
+                }} style={{ padding: '7px 12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: '6px', color: 'var(--text3)', fontSize: '12px', cursor: 'pointer', fontFamily: 'Inter,sans-serif' }}>
+                  🔗 Copiar link
+                </button>
+                <button title="Abrir en SECOP II" onClick={() => {
+                  const url = process._url || process.urlSecop || process.url_proceso || 'https://www.secop.gov.co';
+                  window.open(url, '_blank');
+                }} style={{ padding: '7px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '6px', color: 'var(--text4)', fontSize: '12px', cursor: 'pointer', fontFamily: 'Inter,sans-serif' }}>
+                  ↗ SECOP II
+                </button>
+                <button onClick={handleStart}
+                  style={{ padding: '7px 14px', background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)',
+                    borderRadius: '6px', color: 'var(--purple)', fontSize: '12px', cursor: 'pointer', fontFamily: 'Inter,sans-serif' }}>
+                  🔄 Re-analizar
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+function DetailModal({ process, onClose, onApply, config, toastMsg }) {
+  const procKey = (process._entidad || process.entidad || process.nombre_entidad || '') + '|' + (process._descripcion || process.object || process.objeto || process.descripcion_del_proceso || '');
+  const [analysis, setAnalysis] = React.useState(getProcessAnalysis(procKey) || {});
+  const [loading, setLoading] = React.useState(false);
+  const [progressStep, setProgressStep] = React.useState('');
+  const [analysisSource, setAnalysisSource] = React.useState('');
+
+  const entidad = process._entidad || process.entidad || process.nombre_entidad || 'Entidad';
+  const objeto = process._descripcion || process.object || process.objeto || process.descripcion_del_proceso || process.descripci_n_del_procedimiento || process.nombre_del_procedimiento || process.descripcion || '';
+  const modalidad = process._modalidad || process.modalidad || process.modalidad_de_contratacion || 'N/A';
+  const cuantia = process._cuantia || parseFloat(process.cuantía) || parseFloat(process.precio_base) || 0;
+  const fechaCierre = process._fechaCierre || process.fechaCierre || process.fecha_de_cierre_del_proceso || process.fecha_de_cierre || '';
+  const fechaPublicacion = process._fechaPublicacion || process.fechaPublicacion || process.fecha_de_publicacion || '';
+  const urlSecop = process._url || process.urlSecop || process.url_proceso || '';
+  const referencia = process._referencia || process.referencia || process.referencia_del_proceso || process.numero_del_proceso || '';
+
+  const updateAnalysis = (field, value) => setAnalysis(prev => ({ ...prev, [field]: value }));
+
+  const handleSaveAnalysis = () => {
+    setProcessAnalysis(procKey, { ...analysis, savedAt: new Date().toISOString() });
+    toastMsg('✅ Análisis guardado', 'success');
+  };
+
+  // ─── ANÁLISIS REAL: descarga pliegos, convierte a MD, extrae info ───
+  const handleAnalyzePliego = async () => {
+    setLoading(true);
+    setProgressStep('📥 Buscando documentos del proceso en SECOP II...');
+    try {
+      let result;
+
+      if (isRealBackend()) {
+        // Backend: descarga PDFs reales → parsea → analiza con IA
+        setProgressStep('📥 Descargando pliegos de SECOP II...');
+        await new Promise(r => setTimeout(r, 400));
+        setProgressStep('📄 Convirtiendo documentos a texto...');
+        result = await window.Api.analyzePliego(process, referencia);
+        setProgressStep('🤖 Analizando contenido con IA...');
+        await new Promise(r => setTimeout(r, 300));
+      } else {
+        // Modo offline: análisis basado en metadatos disponibles
+        setProgressStep('⚙️ Generando análisis con los datos disponibles...');
+        await new Promise(r => setTimeout(r, 800));
+        const m = modalidad;
+        const _diasRest = (() => { if (!fechaCierre) return ''; const d = Math.ceil((new Date(fechaCierre) - Date.now()) / 86400000); return d > 0 ? `${d} días` : 'Vencido'; })();
+        result = {
+          success: true,
+          analysis: {
+            numeroProceso:          referencia || '',
+            resumenEjecutivo:       `Proceso de ${m} convocado por ${entidad}. Objeto: ${objeto.substring(0, 120)}. Cuantía estimada: ${fmtCOP(cuantia)}. Cierre: ${fechaCierre ? fechaCierre.slice(0,10) : 'Ver SECOP II'}${_diasRest ? ` (${_diasRest})` : ''}.`,
+            requisitosHabilitantes: 'RUT actualizado, Cámara de Comercio vigente, Certificados de experiencia comprobable, Paz y salvo parafiscales, Garantía de seriedad de la oferta.',
+            criteriosEvaluacion:    'Propuesta económica (precio), Experiencia específica del proponente, Capacidad técnica y organizacional, Capacidad residual de contratación.',
+            analisisRiesgos:        'Verificar objeto del contrato frente a las capacidades de la empresa. Revisar requisitos habilitantes en el pliego completo publicado en SECOP II antes de presentar propuesta.',
+            documentosHabilitantes: 'RUT actualizado, Cámara de Comercio vigente (< 30 días), Certificados de experiencia, Estados financieros con dictamen, Garantía de seriedad, Registro único de proponentes (RUP).',
+            cuestionarioAnexos:     'Revisar los formularios y anexos específicos publicados en el pliego de condiciones en SECOP II.',
+            cronograma:             `Publicación: ${fechaPublicacion ? fechaPublicacion.slice(0,10) : 'Ver SECOP II'} | Cierre propuestas: ${fechaCierre ? fechaCierre.slice(0,10) : 'Ver SECOP II'} | Días restantes: ${_diasRest || 'N/A'}`,
+            capacidadFinanciera:    'Índices financieros según pliego: Capital de trabajo, Índice de liquidez, Nivel de endeudamiento, Rentabilidad. Verificar valores mínimos exigidos.',
+            cuantiaTotal:           fmtCOP(cuantia),
+            fechaCierre:            fechaCierre ? fechaCierre.slice(0, 10) : '',
+            diasRestantes:          _diasRest,
+            urlSecop:               urlSecop,
+            cumplimiento:           'Parcial',
+            analyzedAt:             new Date().toISOString(),
+            pdfSource:              'metadata_only'
+          },
+          meta: { usedOpenAI: false, documentsFound: 0 }
+        };
+      }
+
+      if (result.success) {
+        const ana = result.analysis;
+        setAnalysis(ana);
+        // Guardar inmediatamente en localStorage
+        setProcessAnalysis(procKey, ana);
+
+        const src = result.meta?.usedOpenAI ? '🤖 Análisis con IA sobre pliegos reales'
+          : result.meta?.documentsFound > 0 ? '📄 Análisis por extracción de texto del pliego'
+          : '⚙️ Análisis basado en metadatos del proceso';
+        setAnalysisSource(src);
+        setProgressStep('');
+        toastMsg('✅ Análisis del pliego completado', 'success');
+      }
+    } catch (err) {
+      console.error('Error analizando pliego:', err);
+      toastMsg('❌ Error al analizar el pliego: ' + err.message, 'error');
+      setProgressStep('');
+    }
+    setLoading(false);
+  };
+
+  const dias = diasRestantes(fechaCierre);
+  const isAnalyzed = Object.keys(analysis).length > 2;
+
+  return (
+    <>
+      <div className="modal-header">
+        <h3 className="modal-title">📋 Análisis del Pliego</h3>
+        <button className="modal-close" onClick={onClose}>✕</button>
+      </div>
+      <div className="modal-body" style={{ fontSize: '13px', lineHeight: '1.8' }}>
+
+        {/* Info del proceso */}
+        <div style={{ marginBottom: '16px', padding: '12px', background: 'rgba(139,92,246,0.08)', borderRadius: '8px', fontSize: '13px' }}>
+          <div style={{ fontWeight: '700', fontSize: '14px', marginBottom: '6px', color: 'var(--purple)' }}>{entidad}</div>
+          <div style={{ marginBottom: '4px' }}><strong>Objeto:</strong> {objeto.substring(0, 200)}</div>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '6px', fontSize: '12px', color: 'var(--text3)' }}>
+            <span><strong>Modalidad:</strong> {modalidad}</span>
+            <span><strong>Cuantía:</strong> {fmtCOP(cuantia)}</span>
+            <span><strong>Cierre:</strong> {fechaCierre} {dias !== null ? `(${dias}d)` : ''}</span>
+            {referencia && <span><strong>Ref:</strong> {referencia}</span>}
+          </div>
+          {urlSecop && (
+            <div style={{ marginTop: '6px' }}>
+              <a href={urlSecop} target="_blank" rel="noopener noreferrer"
+                style={{ color: 'var(--purple)', fontSize: '12px', textDecoration: 'underline' }}>
+                🔗 Ver proceso en SECOP II
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Botón principal de análisis */}
+        <div style={{ marginBottom: '20px', padding: '14px', background: loading ? 'rgba(139,92,246,0.06)' : isAnalyzed ? 'rgba(16,185,129,0.06)' : 'rgba(249,115,22,0.06)', border: `1px solid ${loading ? 'rgba(139,92,246,0.3)' : isAnalyzed ? 'rgba(16,185,129,0.3)' : 'rgba(249,115,22,0.3)'}`, borderRadius: '8px' }}>
+          {loading ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--purple)' }}>
+              <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid var(--purple)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite', flexShrink: 0 }}></span>
+              <span style={{ fontSize: '13px', fontWeight: '500' }}>{progressStep}</span>
+            </div>
+          ) : isAnalyzed ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontWeight: '600', color: '#10b981', fontSize: '13px' }}>✅ Pliego analizado</div>
+                {analysisSource && <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '2px' }}>{analysisSource}</div>}
+                {analysis.analyzedAt && <div style={{ fontSize: '11px', color: 'var(--text4)' }}>{new Date(analysis.analyzedAt).toLocaleString('es-CO')}</div>}
+              </div>
+              <button onClick={handleAnalyzePliego} disabled={loading}
+                style={{ padding: '7px 14px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '6px', color: '#10b981', fontSize: '12px', cursor: 'pointer' }}>
+                🔄 Re-analizar
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontWeight: '600', color: 'var(--orange)', fontSize: '13px' }}>📄 Analizar pliego de condiciones</div>
+                <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '2px' }}>Descarga y extrae la información clave del proceso automáticamente</div>
+              </div>
+              <button onClick={handleAnalyzePliego} disabled={loading}
+                style={{ padding: '9px 18px', background: 'var(--orange)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+                🤖 Analizar Pliego
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Campos del análisis — editables */}
+        {[
+          { key: 'resumenEjecutivo',      label: '💼 Resumen Ejecutivo',             rows: 3 },
+          { key: 'requisitosHabilitantes',label: '📌 Requisitos Habilitantes',        rows: 3 },
+          { key: 'criteriosEvaluacion',   label: '🏆 Criterios de Evaluación',        rows: 3 },
+          { key: 'capacidadFinanciera',   label: '💰 Capacidad Financiera',           rows: 2 },
+          { key: 'documentosHabilitantes',label: '✅ Documentos Habilitantes',        rows: 3 },
+          { key: 'cuestionarioAnexos',    label: '📋 Cuestionario y Anexos',          rows: 2 },
+          { key: 'cronograma',            label: '📅 Cronograma del Proceso',         rows: 2 },
+          { key: 'analisisRiesgos',       label: '⚠️ Análisis de Riesgos',            rows: 3 },
+        ].map(({ key, label, rows }) => (
+          <div key={key}>
+            <h4 style={{ marginTop: '18px', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '6px', fontSize: '13px' }}>{label}</h4>
+            <textarea
+              className="textarea-field"
+              value={analysis[key] || ''}
+              onChange={e => updateAnalysis(key, e.target.value)}
+              rows={rows}
+              placeholder={loading ? 'Analizando...' : `${label}...`}
+            />
+          </div>
+        ))}
+
+        <h4 style={{ marginTop: '18px', marginBottom: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '6px', fontSize: '13px' }}>✅ Evaluación de Cumplimiento</h4>
+        <select className="select-field" value={analysis.cumplimiento || ''} onChange={e => updateAnalysis('cumplimiento', e.target.value)}>
+          <option value="">-- Seleccionar --</option>
+          <option value="Sí">✅ Sí — Cumple todos los requisitos</option>
+          <option value="Parcial">🟡 Parcial — Cumple algunos requisitos</option>
+          <option value="No">❌ No — No cumple los requisitos</option>
+        </select>
+      </div>
+
+      <div className="modal-footer" style={{ gap: '10px' }}>
+        <button className="btn btn-secondary" onClick={onClose}>Cerrar</button>
+        <button className="btn btn-primary" onClick={handleSaveAnalysis} disabled={loading}>
+          💾 Guardar Análisis
+        </button>
+        <button className="btn btn-primary" onClick={() => { onApply(process); handleSaveAnalysis(); onClose(); }}
+          style={{ background: 'var(--orange)' }}>
+          ⚡ Aplicar y Guardar
+        </button>
+      </div>
+    </>
+  );
+}
+
+// ============================================================================
+// SUBSCRIPTION COMPONENTS
+// ============================================================================
+
+/** Upgrade / payment modal */
+function UpgradeModal({ subStatus, onClose, onCheckoutSuccess }) {
+  const [loading, setLoading] = React.useState(null); // plan string being processed
+  const [error, setError] = React.useState('');
+
+  const plans = [
+    { id: 'profesional', label: 'Profesional', price: '$99.900/mes', analyses: 30, color: 'var(--purple)' },
+    { id: 'empresarial', label: 'Empresarial', price: '$249.900/mes', analyses: 100, color: 'var(--orange)' },
+  ];
+
+  async function handleUpgrade(planId) {
+    setError(''); setLoading(planId);
+    try {
+      const token = localStorage.getItem('jrh_token');
+      if (!token || token === 'offline_mode_token') {
+        setError('Debes estar conectado al servidor para procesar pagos.');
+        setLoading(null); return;
+      }
+      const resp = await fetch('/api/wompi/create-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ plan: planId })
+      });
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error || 'Error al crear enlace de pago');
+      if (result.url) {
+        window.location.href = result.url; // redirect to Wompi Checkout
+      } else {
+        setError('No se pudo iniciar el pago. Verifica la configuración de Wompi.');
+      }
+    } catch(e) {
+      setError(e.message || 'Error al crear la sesión de pago');
+    }
+    setLoading(null);
+  }
+
+  const isExpired = subStatus && (subStatus.trialExpired || subStatus.expired);
+  const isTrialWarning = subStatus && subStatus.trialDaysLeft !== undefined && subStatus.trialDaysLeft <= 1;
+  const isPlanWarning = subStatus && subStatus.planDaysLeft !== undefined && subStatus.planDaysLeft <= 3;
+
+  let titleText = '⚡ Actualiza tu plan';
+  let subText = 'Elige el plan que mejor se adapte a tu empresa';
+  if (subStatus?.trialExpired) {
+    titleText = '⏰ Prueba gratuita terminada';
+    subText = 'Tu período de 3 días finalizó. Suscríbete para continuar usando JIREHAI.';
+  } else if (subStatus?.expired) {
+    titleText = '🔄 Renueva tu suscripción';
+    subText = 'Tu plan venció. Renueva ahora para seguir sin interrupciones.';
+  } else if (isTrialWarning) {
+    titleText = `⚠️ Quedan ${subStatus.trialDaysLeft} día(s) de prueba`;
+    subText = 'Suscríbete ahora para no perder acceso.';
+  } else if (isPlanWarning) {
+    titleText = `⚠️ Tu plan vence en ${subStatus.planDaysLeft} día(s)`;
+    subText = 'Renueva ahora para mantener acceso sin interrupción.';
+  }
+
+  return (
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}
+      onClick={isExpired ? undefined : onClose}>
+      <div style={{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:20,padding:32,maxWidth:520,width:'100%',boxShadow:'0 24px 80px rgba(0,0,0,0.5)'}}
+        onClick={e=>e.stopPropagation()}>
+        <div style={{textAlign:'center',marginBottom:24}}>
+          <div style={{fontSize:22,fontWeight:800,marginBottom:8}}>{titleText}</div>
+          <div style={{color:'var(--text3)',fontSize:13,lineHeight:1.5}}>{subText}</div>
+        </div>
+        {error && <div style={{color:'var(--red)',fontSize:13,marginBottom:16,padding:'10px 14px',background:'rgba(239,68,68,0.1)',borderRadius:8,textAlign:'center'}}>{error}</div>}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20}}>
+          {plans.map(plan => (
+            <div key={plan.id} style={{border:`1px solid ${plan.color}33`,borderRadius:12,padding:20,background:`${plan.color}0d`,textAlign:'center',transition:'transform 0.2s'}}
+              onMouseEnter={e=>e.currentTarget.style.transform='scale(1.02)'}
+              onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
+              <div style={{fontSize:16,fontWeight:700,color:plan.color,marginBottom:4}}>{plan.label}</div>
+              <div style={{fontSize:22,fontWeight:800,marginBottom:4}}>{plan.price}</div>
+              <div style={{fontSize:12,color:'var(--text3)',marginBottom:16}}>{plan.analyses} análisis/día</div>
+              <button
+                onClick={() => handleUpgrade(plan.id)}
+                disabled={!!loading}
+                style={{width:'100%',padding:'10px',borderRadius:8,background:plan.color,border:'none',color:'#fff',fontWeight:700,fontSize:13,cursor:'pointer',opacity:loading?0.6:1,fontFamily:'Inter,sans-serif'}}>
+                {loading === plan.id ? 'Redirigiendo...' : `Contratar ${plan.label}`}
+              </button>
+            </div>
+          ))}
+        </div>
+        <div style={{textAlign:'center',fontSize:11,color:'var(--text4)',marginBottom:16}}>
+          🔒 Pago seguro via Wompi · Transacciones en COP · Cancela en cualquier momento
+        </div>
+        {!isExpired && (
+          <button onClick={onClose} style={{width:'100%',padding:'9px',background:'transparent',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text3)',fontSize:13,cursor:'pointer',fontFamily:'Inter,sans-serif'}}>
+            Más tarde
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Sidebar subscription status strip */
+function SubscriptionStrip({ subStatus, onUpgradeClick }) {
+  if (!subStatus) return null;
+  const { plan, trialDaysLeft, planDaysLeft, allowed, role } = subStatus;
+  if (role === 'admin') return null; // admin no muestra strip
+
+  let bgColor, textColor, label, cta = null;
+
+  if (!allowed) {
+    bgColor = 'rgba(239,68,68,0.15)'; textColor = 'var(--red)';
+    label = subStatus.trialExpired ? '⏰ Prueba terminada' : '⚠️ Suscripción vencida';
+    cta = 'Renovar ahora →';
+  } else if (trialDaysLeft !== undefined) {
+    if (trialDaysLeft <= 1) { bgColor = 'rgba(239,68,68,0.12)'; textColor = 'var(--red)'; }
+    else if (trialDaysLeft <= 2) { bgColor = 'rgba(249,115,22,0.12)'; textColor = 'var(--orange)'; }
+    else { bgColor = 'rgba(34,197,94,0.10)'; textColor = 'var(--green)'; }
+    label = `🎁 Prueba: ${trialDaysLeft} día(s)`;
+    if (trialDaysLeft <= 2) cta = 'Suscribirse →';
+  } else if (planDaysLeft !== undefined) {
+    if (planDaysLeft <= 3) { bgColor = 'rgba(249,115,22,0.12)'; textColor = 'var(--orange)'; }
+    else { bgColor = 'rgba(139,92,246,0.10)'; textColor = 'var(--purple)'; }
+    label = planDaysLeft <= 3 ? `⚠️ Vence en ${planDaysLeft}d` : `✅ Plan ${plan}`;
+    if (planDaysLeft <= 3) cta = 'Renovar →';
+  } else {
+    bgColor = 'rgba(139,92,246,0.10)'; textColor = 'var(--purple)';
+    label = `✅ Plan ${plan || 'activo'}`;
+  }
+
+  return (
+    <div style={{margin:'8px 12px',borderRadius:8,padding:'8px 12px',background:bgColor,border:`1px solid ${textColor}33`}}>
+      <div style={{fontSize:11,fontWeight:700,color:textColor,marginBottom:cta?4:0}}>{label}</div>
+      {cta && (
+        <div style={{fontSize:11,color:textColor,cursor:'pointer',textDecoration:'underline'}} onClick={onUpgradeClick}>{cta}</div>
+      )}
+    </div>
+  );
+}
+
+/** Daily usage mini-bar in sidebar */
+function DailyUsageStrip({ subStatus }) {
+  if (!subStatus || !subStatus.dailyUsage) return null;
+  const { analysesUsed, dailyLimit, remaining } = subStatus.dailyUsage;
+  if (!isFinite(dailyLimit)) return null; // admin no necesita ver esto
+  const pct = Math.min(100, Math.round((analysesUsed / dailyLimit) * 100));
+  const color = pct >= 90 ? 'var(--red)' : pct >= 60 ? 'var(--orange)' : 'var(--green)';
+  return (
+    <div style={{margin:'4px 12px 8px',padding:'8px 12px',background:'rgba(31,31,35,0.6)',borderRadius:8,border:'1px solid var(--border)'}}>
+      <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--text4)',marginBottom:4}}>
+        <span>Análisis hoy</span>
+        <span style={{color}}>{analysesUsed}/{dailyLimit}</span>
+      </div>
+      <div style={{height:4,background:'var(--border2)',borderRadius:2,overflow:'hidden'}}>
+        <div style={{height:'100%',width:`${pct}%`,background:color,transition:'width 0.5s',borderRadius:2}}/>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN APP
+// ============================================================================
+
+function App() {
+  const [currentPage, setCurrentPage] = React.useState('dashboard');
+  const [config, setConfig] = React.useState(loadConfig());
+  const [applied, setApplied] = React.useState(loadApplied());
+  const [procData, setProcData] = React.useState(loadProcData());
+  const [docs, setDocs] = React.useState(loadDocs());
+  const [toasts, setToasts] = React.useState([]);
+  const [detailModal, setDetailModal] = React.useState(null);
+  const [aiModal, setAiModal] = React.useState(null);
+  const [user, setUser] = React.useState(() => { try { return JSON.parse(localStorage.getItem('jrh_user')); } catch { return null; } });
+  const [backendOk, setBackendOk] = React.useState(false);
+  const [subStatus, setSubStatus] = React.useState(null);
+  const [showUpgrade, setShowUpgrade] = React.useState(false);
+  const [resetToken, setResetToken] = React.useState(() => {
+    const p = new URLSearchParams(window.location.search);
+    return p.get('reset_token') || null;
+  });
+
+  React.useEffect(() => {
+    // Handle payment result query params
+    const p = new URLSearchParams(window.location.search);
+    const payment = p.get('payment');
+    if (payment === 'success') {
+      setTimeout(() => showToast('🎉 ¡Pago exitoso! Tu suscripción está activa.', 'success'), 500);
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (payment === 'cancelled') {
+      setTimeout(() => showToast('ℹ️ Pago cancelado — puedes intentarlo de nuevo cuando quieras.', 'info'), 500);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (window.Api) {
+      window.Api.health().then(() => setBackendOk(true)).catch(() => setBackendOk(false));
+    }
+  }, []);
+
+  // Load subscription status whenever user is logged in and backend is up
+  React.useEffect(() => {
+    if (!user || !backendOk || localStorage.getItem('jrh_token') === 'offline_mode_token') return;
+    window.Api.getSubscriptionStatus().then(s => {
+      setSubStatus(s);
+      if (!s.allowed) setShowUpgrade(true);
+    }).catch(() => {});
+  }, [user, backendOk]);
+
+  const showToast = (msg, type = 'info') => {
+    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    const id = Date.now();
+    const toast = { id, msg, type, icon: icons[type] };
+    setToasts(prev => [...prev, toast]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
+  };
+
+  const handleConfigUpdate = (newCfg) => {
+    setConfig(newCfg);
+    saveConfig(newCfg);
+    showToast('✅ Configuración guardada', 'success');
+  };
+
+  const handleApply = (proc) => {
+    // Los campos _xxx vienen pre-normalizados del backend o del modo offline.
+    // Los campos sin _ son fallback por compatibilidad con datos en caché.
+    const normalized = {
+      ...proc,  // conservar todos los campos originales (incluye los _xxx)
+      entidad:          proc._entidad || proc.entidad || proc.nombre_entidad || 'Entidad',
+      object:           proc._descripcion || proc.descripcion_del_proceso || proc.descripci_n_del_procedimiento || proc.nombre_del_procedimiento || proc.object || proc.objeto || proc.descripcion || '',
+      modalidad:        proc._modalidad || proc.modalidad_de_contratacion || proc.modalidad || 'N/A',
+      cuantía:          proc._cuantia || parseFloat(proc.precio_base) || parseFloat(proc.cuantia_proceso) || parseFloat(proc.cuantía) || 0,
+      fechaPublicacion: proc._fechaPublicacion || proc.fecha_de_publicacion_del || proc.fecha_de_publicacion || proc.fechaPublicacion || '',
+      fechaCierre:      proc._fechaCierre || proc.fecha_de_cierre_del_proceso || proc.fecha_de_cierre || proc.fechaCierre || '',
+      departamento:     proc._departamento || proc.departamento_entidad || proc.departamento || proc.ciudad || '',
+      urlSecop:         proc._url || proc.url_proceso || proc.urlproceso || proc.urlSecop || '',
+      referencia:       proc._referencia || proc.referencia_del_proceso || proc.numero_del_proceso || proc.id_del_proceso || proc.id || '',
+    };
+    const key = normalized.entidad + '|' + normalized.object;
+    if (!applied.find(a => (a.entidad + '|' + (a.object || a.objeto)) === key)) {
+      const newApplied = [...applied, normalized];
+      setApplied(newApplied);
+      saveApplied(newApplied);
+      showToast('✅ Proceso añadido — abre "Detalle" para analizar el pliego', 'success');
+    } else {
+      showToast('⚠️ Ya has aplicado a este proceso', 'info');
+    }
+  };
+
+  const handleRemoveApplied = (idx) => {
+    const newApplied = applied.filter((_, i) => i !== idx);
+    setApplied(newApplied);
+    saveApplied(newApplied);
+    showToast('✅ Proceso removido', 'success');
+  };
+
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
+    { id: 'config', label: 'Configuración', icon: '⚙️' },
+    { id: 'procesos', label: 'Procesos SECOP II', icon: '🔍' },
+    { id: 'aplicables', label: 'Procesos Aplicables', icon: '✓', badge: applied.length },
+    { id: 'fechas', label: 'Fechas Clave', icon: '📅' },
+    { id: 'documentos', label: 'Mis Documentos', icon: '📁', badge: docs.filter(d => d.fechaVencimiento === '').length },
+    { id: 'formularios', label: 'Formularios SECOP', icon: '📋' },
+    { id: 'notif', label: 'Notificaciones', icon: '🔔' },
+    ...(user?.role === 'admin' ? [{ id: 'admin-panel', label: 'Panel Admin', icon: '🔐' }] : [])
+  ];
+
+  if (!user) {
+    // Show password reset screen if URL has reset_token
+    if (resetToken) {
+      return <ResetPasswordScreen token={resetToken} onDone={() => {
+        setResetToken(null);
+        window.history.replaceState({}, '', window.location.pathname);
+      }}/>;
+    }
+    return <LoginScreen onLogin={(u) => setUser(u)}/>;
+  }
+
+  return (
+    <>
+      {showUpgrade && (
+        <UpgradeModal
+          subStatus={subStatus}
+          onClose={() => setShowUpgrade(false)}
+          onCheckoutSuccess={() => { setShowUpgrade(false); window.location.reload(); }}
+        />
+      )}
+      <div className="container">
+        <div className="sidebar">
+          <div className="sidebar-header">
+            <h1>JIREHAI</h1>
+          </div>
+          {navItems.map(item => (
+            <div
+              key={item.id}
+              className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+              onClick={() => {
+                if (item.id === 'admin-panel') {
+                  window.location.href = '/admin.html';
+                } else {
+                  setCurrentPage(item.id);
+                }
+              }}
+            >
+              <div className="nav-item-text">
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </div>
+              {item.badge ? <div className={`badge ${item.badge > 0 ? 'red' : ''}`}>{item.badge}</div> : null}
+            </div>
+          ))}
+          <SubscriptionStrip subStatus={subStatus} onUpgradeClick={() => setShowUpgrade(true)} />
+          <DailyUsageStrip subStatus={subStatus} />
+          <div style={{marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '16px', paddingLeft: '20px', paddingRight: '20px'}}>
+            <div style={{fontSize: '12px', color: 'var(--text3)', marginBottom: '12px'}}>
+              <div style={{fontWeight: '600', marginBottom: '4px'}}>{user?.name || 'Usuario'}</div>
+              <div style={{fontSize: '11px', color: 'var(--text4)', display:'flex', gap:6, alignItems:'center'}}>
+                <span>{user?.plan || 'plan'}</span>
+                {user?.role !== 'admin' && <span style={{cursor:'pointer',color:'var(--purple)',textDecoration:'underline'}} onClick={()=>setShowUpgrade(true)}>⬆ Mejorar</span>}
+              </div>
+            </div>
+            <div style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', marginBottom: '12px'}}>
+              <span style={{width: '8px', height: '8px', borderRadius: '50%', backgroundColor: backendOk ? 'var(--green)' : 'var(--orange)'}}></span>
+              <span style={{color: 'var(--text4)'}}>{backendOk ? 'Backend conectado' : 'Modo local'}</span>
+            </div>
+            <button onClick={() => { window.Api?.logout?.() || (localStorage.clear(), window.location.reload()); }} style={{width: '100%', padding: '8px', background: 'rgba(249, 115, 22, 0.1)', border: '1px solid var(--orange)', borderRadius: '6px', color: 'var(--orange)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s'}} onMouseEnter={(e) => e.target.style.background = 'rgba(249, 115, 22, 0.2)'} onMouseLeave={(e) => e.target.style.background = 'rgba(249, 115, 22, 0.1)'}>
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+
+        <div className="content">
+          <div className={`page ${currentPage === 'dashboard' ? 'active' : ''}`}>
+            <PageDashboard config={config} applied={applied} procData={procData} />
+          </div>
+
+          <div className={`page ${currentPage === 'config' ? 'active' : ''}`}>
+            <PageConfiguracion config={config} onConfigUpdate={handleConfigUpdate} />
+          </div>
+
+          <div className={`page ${currentPage === 'procesos' ? 'active' : ''}`}>
+            <PageProcesos config={config} procData={procData} onApply={handleApply} onOpenDetailModal={setDetailModal} onOpenAIModal={setAiModal} />
+          </div>
+
+          <div className={`page ${currentPage === 'aplicables' ? 'active' : ''}`}>
+            <PageAplicables applied={applied} onRemove={handleRemoveApplied} config={config} toastMsg={showToast} />
+          </div>
+
+          <div className={`page ${currentPage === 'fechas' ? 'active' : ''}`}>
+            <PageFechas applied={applied} toastMsg={showToast} />
+          </div>
+
+          <div className={`page ${currentPage === 'documentos' ? 'active' : ''}`}>
+            <PageDocumentos docs={docs} onSaveDoc={() => {}} toastMsg={showToast} />
+          </div>
+
+          <div className={`page ${currentPage === 'formularios' ? 'active' : ''}`}>
+            <PageFormularios config={config} toastMsg={showToast} />
+          </div>
+
+          <div className={`page ${currentPage === 'notif' ? 'active' : ''}`}>
+            <PageNotificaciones config={config} onConfigUpdate={handleConfigUpdate} toastMsg={showToast} />
+          </div>
+        </div>
+      </div>
+
+      {detailModal && (
+        <div className="modal-overlay open" onClick={() => setDetailModal(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxHeight: '90vh', overflow: 'auto' }}>
+            <DetailModal process={detailModal} onClose={() => setDetailModal(null)} onApply={handleApply} config={config} toastMsg={showToast} />
+          </div>
+        </div>
+      )}
+
+      {aiModal && (
+        <div className="modal-overlay open">
+          <div className="modal"
+            style={{ maxHeight: '92vh', overflow: 'auto', maxWidth: '680px', width: '95%' }}>
+            <AIAnalysisModal process={aiModal} onClose={() => setAiModal(null)} toastMsg={showToast} />
+          </div>
+        </div>
+      )}
+
+      <Toast toasts={toasts} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
