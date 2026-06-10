@@ -1,21 +1,19 @@
 FROM node:20-alpine
 
-WORKDIR /app/backend
+WORKDIR /app
 
-# Copia package.json y package-lock si existe
-COPY backend/package*.json ./
+# Copia los package.json para instalar dependencias de workspace
+COPY package.json ./
+COPY backend/package.json ./backend/
 
-# Instala dependencias de producción
+# Instala dependencias de producción para el workspace backend
 RUN npm install --production
 
-# Copia backend y frontend completos
-COPY backend ./backend
-COPY frontend ../frontend
+# Copia el resto de la aplicación
+COPY . ./
 
-# Exponer el puerto que usa el backend
-ENV PORT=3000
-EXPOSE 3000
+# Usamos el mismo puerto que debe configurar Dockploy en env vars
+ENV PORT=8000
+EXPOSE 8000
 
-# Ejecuta la app desde la carpeta backend
-WORKDIR /app/backend
 CMD ["npm", "start"]
