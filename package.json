@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "npm@10",
   "scripts": {
-    "start": "npm --prefix backend start"
+    "start": "node backend/server.js"
   },
   "workspaces": [
     "backend"
