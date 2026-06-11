@@ -321,8 +321,9 @@ function dailyLimitMiddleware(req, res, next) {
 
 /** Precios por plan en centavos de COP */
 const WOMPI_PRICES = {
-  profesional: parseInt(process.env.WOMPI_PRICE_PROFESIONAL || '7900000'),   // $ 79,000 COP
-  empresarial: parseInt(process.env.WOMPI_PRICE_EMPRESARIAL || '14900000'),  // $149,000 COP
+  basico: parseInt(process.env.WOMPI_PRICE_BASICO || '14900000'),
+  profesional: parseInt(process.env.WOMPI_PRICE_PROFESIONAL || '34900000'),
+  empresarial: parseInt(process.env.WOMPI_PRICE_EMPRESARIAL || '89900000'),
 };
 
 /**
@@ -1466,9 +1467,9 @@ app.get('/api/subscriptions/status', authMiddleware, (req, res) => {
 
 // POST /api/wompi/create-link — genera URL de pago en Wompi Checkout
 app.post('/api/wompi/create-link', authMiddleware, async (req, res) => {
-  const { plan } = req.body; // 'profesional' | 'empresarial'
+  const { plan } = req.body; // 'basico' | 'profesional' | 'empresarial'
   if (!plan || !WOMPI_PRICES[plan]) {
-    return res.status(400).json({ error: 'Plan requerido: profesional | empresarial' });
+    return res.status(400).json({ error: 'Plan requerido: basico | profesional | empresarial' });
   }
 
   const publicKey     = process.env.WOMPI_PUBLIC_KEY;
@@ -1523,7 +1524,7 @@ app.post('/api/wompi/webhook', async (req, res) => {
     const parts     = reference.split('-');
     const userId    = parseInt(parts[1]);
     const planRaw   = (parts[2] || '').toLowerCase();
-    const plan      = ['profesional', 'empresarial'].includes(planRaw) ? planRaw : 'profesional';
+    const plan      = ['basico', 'profesional', 'empresarial'].includes(planRaw) ? planRaw : 'basico';
     const priceCOP  = Math.round((tx.amount_in_cents || 0) / 100);
 
     if (!userId || isNaN(userId)) {

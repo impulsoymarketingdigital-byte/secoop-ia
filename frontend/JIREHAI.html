@@ -4370,8 +4370,9 @@ function UpgradeModal({ subStatus, onClose, onCheckoutSuccess }) {
   const [error, setError] = React.useState('');
 
   const plans = [
+    { id: 'basico', label: 'Básico', price: '$149.000/mes', analyses: 90, color: 'var(--orange)' },
     { id: 'profesional', label: 'Profesional', price: '$349.000/mes', analyses: 300, color: 'var(--purple)' },
-    { id: 'empresarial', label: 'Empresarial', price: '$899.000/mes', analyses: 'Ilimitados', color: 'var(--orange)' },
+    { id: 'empresarial', label: 'Empresarial', price: '$899.000/mes', analyses: 'Ilimitados', color: '#ec4899' },
   ];
 
   async function handleUpgrade(planId) {
@@ -4423,14 +4424,14 @@ function UpgradeModal({ subStatus, onClose, onCheckoutSuccess }) {
   return (
     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.8)',zIndex:9998,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}
       onClick={isExpired ? undefined : onClose}>
-      <div style={{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:20,padding:32,maxWidth:520,width:'100%',boxShadow:'0 24px 80px rgba(0,0,0,0.5)'}}
+      <div style={{background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:20,padding:32,maxWidth:720,width:'100%',boxShadow:'0 24px 80px rgba(0,0,0,0.5)'}}
         onClick={e=>e.stopPropagation()}>
         <div style={{textAlign:'center',marginBottom:24}}>
           <div style={{fontSize:22,fontWeight:800,marginBottom:8}}>{titleText}</div>
           <div style={{color:'var(--text3)',fontSize:13,lineHeight:1.5}}>{subText}</div>
         </div>
         {error && <div style={{color:'var(--red)',fontSize:13,marginBottom:16,padding:'10px 14px',background:'rgba(239,68,68,0.1)',borderRadius:8,textAlign:'center'}}>{error}</div>}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3, 1fr)',gap:16,marginBottom:20}}>
           {plans.map(plan => (
             <div key={plan.id} style={{border:`1px solid ${plan.color}33`,borderRadius:12,padding:20,background:`${plan.color}0d`,textAlign:'center',transition:'transform 0.2s'}}
               onMouseEnter={e=>e.currentTarget.style.transform='scale(1.02)'}
