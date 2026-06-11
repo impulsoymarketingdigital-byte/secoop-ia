@@ -17,6 +17,7 @@ const dbModule = require('./db');
 let db; // Se asigna después de initDB()
 
 const app = express();
+app.set('trust proxy', 1); // Necesario para express-rate-limit detrás de proxies como Dokploy
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'jirehai_dev_secret_2025';
 const FRONTEND_URL = process.env.FRONTEND_URL || '*';
