@@ -4451,9 +4451,14 @@ function UpgradeModal({ subStatus, onClose, onCheckoutSuccess }) {
         <div style={{textAlign:'center',fontSize:11,color:'var(--text4)',marginBottom:16}}>
           🔒 Pago seguro via Wompi · Transacciones en COP · Cancela en cualquier momento
         </div>
-        {!isExpired && (
+        {!isExpired ? (
           <button onClick={onClose} style={{width:'100%',padding:'9px',background:'transparent',border:'1px solid var(--border2)',borderRadius:8,color:'var(--text3)',fontSize:13,cursor:'pointer',fontFamily:'Inter,sans-serif'}}>
             Más tarde
+          </button>
+        ) : (
+          <button onClick={() => { window.Api?.logout?.() || (localStorage.clear(), window.location.reload()); }} 
+            style={{width:'100%',padding:'9px',background:'transparent',border:'1px solid var(--orange)',borderRadius:8,color:'var(--orange)',fontSize:13,cursor:'pointer',fontFamily:'Inter,sans-serif',fontWeight:'600'}}>
+            Cerrar Sesión
           </button>
         )}
       </div>
@@ -4569,6 +4574,22 @@ function App() {
     }).catch(() => {});
   }, [user, backendOk]);
 
+  // Listen to global subscription expired event (HTTP 402)
+  React.useEffect(() => {
+    const handleExpired = (e) => {
+      setSubStatus(prev => ({
+        ...prev,
+        allowed: false,
+        expired: e.detail?.code === 'SUBSCRIPTION_EXPIRED',
+        trialExpired: e.detail?.code === 'TRIAL_EXPIRED',
+        reason: e.detail?.error || 'Suscripción expirada'
+      }));
+      setShowUpgrade(true);
+    };
+    window.addEventListener('jrh-subscription-expired', handleExpired);
+    return () => window.removeEventListener('jrh-subscription-expired', handleExpired);
+  }, []);
+
   const showToast = (msg, type = 'info') => {
     const icons = { success: '✅', error: '❌', info: 'ℹ️' };
     const id = Date.now();
@@ -4653,25 +4674,34 @@ function App() {
           <div className="sidebar-header">
             <h1>JIREHAI</h1>
           </div>
-          {navItems.map(item => (
-            <div
-              key={item.id}
-              className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
-              onClick={() => {
-                if (item.id === 'admin-panel') {
-                  window.location.href = '/admin.html';
-                } else {
-                  setCurrentPage(item.id);
-                }
-              }}
-            >
-              <div className="nav-item-text">
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
+          {navItems.map(item => {
+            const isSuspended = subStatus && !subStatus.allowed && item.id !== 'admin-panel';
+            return (
+              <div
+                key={item.id}
+                className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+                style={{
+                  opacity: isSuspended ? 0.5 : 1,
+                  cursor: isSuspended ? 'not-allowed' : 'pointer',
+                  pointerEvents: isSuspended ? 'none' : 'auto'
+                }}
+                onClick={() => {
+                  if (isSuspended) return;
+                  if (item.id === 'admin-panel') {
+                    window.location.href = '/admin.html';
+                  } else {
+                    setCurrentPage(item.id);
+                  }
+                }}
+              >
+                <div className="nav-item-text">
+                  <span>{item.icon}</span>
+                  <span>{item.label}</span>
+                </div>
+                {item.badge ? <div className={`badge ${item.badge > 0 ? 'red' : ''}`}>{item.badge}</div> : null}
               </div>
-              {item.badge ? <div className={`badge ${item.badge > 0 ? 'red' : ''}`}>{item.badge}</div> : null}
-            </div>
-          ))}
+            );
+          })}
           <SubscriptionStrip subStatus={subStatus} onUpgradeClick={() => setShowUpgrade(true)} />
           <DailyUsageStrip subStatus={subStatus} />
           <div style={{marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '16px', paddingLeft: '20px', paddingRight: '20px'}}>

@@ -215,8 +215,13 @@ function getUserSubscriptionStatus(userId) {
     };
   }
 
-  // Sin trial y sin plan pagado → usuario antiguo, se le da acceso (sin corte)
-  return { allowed: true, plan: user.plan || 'basico' };
+  // Sin trial y sin plan pagado → Suspendido, necesita suscribirse
+  return {
+    allowed: false,
+    reason: 'Tu período de prueba de 3 días ha vencido. Suscríbete para continuar.',
+    plan: user.plan || 'basico',
+    trialExpired: true,
+  };
 }
 
 /** Middleware: bloquea acceso a rutas de IA si la suscripción expiró */
@@ -611,7 +616,7 @@ function normalizeSecopRecord(proc) {
 // ═══════════════════════════════════════
 // SECOP II PROXY ROUTES
 // ═══════════════════════════════════════
-app.get('/api/procesos', authMiddleware, async (req, res) => {
+app.get('/api/procesos', authMiddleware, subscriptionMiddleware, async (req, res) => {
   try {
     // ── Asegurar que tengamos el schema descubierto ────────────────────────
     if (!secopSchema.discovered) {
@@ -715,7 +720,7 @@ app.get('/api/procesos', authMiddleware, async (req, res) => {
 // ═══════════════════════════════════════
 // APPLIED PROCESSES ROUTES
 // ═══════════════════════════════════════
-app.get('/api/procesos/applied', authMiddleware, (req, res) => {
+app.get('/api/procesos/applied', authMiddleware, subscriptionMiddleware, (req, res) => {
   const rows = db.prepare('SELECT * FROM applied_processes WHERE user_id = ? ORDER BY applied_at DESC').all(req.user.id);
   const result = rows.map(r => ({
     ...r,
@@ -725,7 +730,7 @@ app.get('/api/procesos/applied', authMiddleware, (req, res) => {
   res.json(result);
 });
 
-app.post('/api/procesos/apply', authMiddleware, (req, res) => {
+app.post('/api/procesos/apply', authMiddleware, subscriptionMiddleware, (req, res) => {
   const { processNumber, processData } = req.body;
   if (!processNumber) return res.status(400).json({ error: 'Número de proceso requerido' });
   try {
@@ -739,7 +744,7 @@ app.post('/api/procesos/apply', authMiddleware, (req, res) => {
   }
 });
 
-app.put('/api/procesos/:processNumber/analysis', authMiddleware, (req, res) => {
+app.put('/api/procesos/:processNumber/analysis', authMiddleware, subscriptionMiddleware, (req, res) => {
   const { analysis, observations, cumple } = req.body;
   db.prepare(`UPDATE applied_processes
               SET analysis_json = ?, observations = ?, cumple = ?, analyzed_at = CURRENT_TIMESTAMP
@@ -845,7 +850,7 @@ function analyzeByExtraction(text, processData) {
   };
 }
 
-app.post('/api/procesos/analyze-pliego', authMiddleware, async (req, res) => {
+app.post('/api/procesos/analyze-pliego', authMiddleware, subscriptionMiddleware, async (req, res) => {
   const { processData, referencia } = req.body;
   if (!processData) return res.status(400).json({ error: 'Datos del proceso requeridos' });
 
@@ -1052,12 +1057,12 @@ JSON a retornar (incluye TODOS estos campos):
 // ═══════════════════════════════════════
 // DOCUMENTS ROUTES
 // ═══════════════════════════════════════
-app.get('/api/documentos', authMiddleware, (req, res) => {
+app.get('/api/documentos', authMiddleware, subscriptionMiddleware, (req, res) => {
   const rows = db.prepare('SELECT * FROM user_documents WHERE user_id = ?').all(req.user.id);
   res.json(rows);
 });
 
-app.put('/api/documentos/:docType', authMiddleware, (req, res) => {
+app.put('/api/documentos/:docType', authMiddleware, subscriptionMiddleware, (req, res) => {
   const { expiryDate, notes } = req.body;
   const exists = db.prepare('SELECT id FROM user_documents WHERE user_id = ? AND doc_type = ?').get(req.user.id, req.params.docType);
   if (exists) {
@@ -1106,7 +1111,7 @@ app.put('/api/notificaciones/settings', authMiddleware, (req, res) => {
 // ═══════════════════════════════════════
 // UNSPSC ROUTES
 // ═══════════════════════════════════════
-app.get('/api/unspsc', authMiddleware, (req, res) => {
+app.get('/api/unspsc', authMiddleware, subscriptionMiddleware, (req, res) => {
   const { search } = req.query;
   let codes;
   if (search) {
@@ -1117,7 +1122,7 @@ app.get('/api/unspsc', authMiddleware, (req, res) => {
   res.json(codes);
 });
 
-app.post('/api/unspsc/suggest', authMiddleware, (req, res) => {
+app.post('/api/unspsc/suggest', authMiddleware, subscriptionMiddleware, (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'Texto requerido' });
   const allCodes = db.prepare('SELECT * FROM unspsc_codes WHERE active = 1').all();
@@ -1847,7 +1852,7 @@ dbModule.initDB().then((database) => {
   db = database;
 
   // Montar AI routes ahora que 'db' está listo
-  const aiRouter = createAIRouter(db, authMiddleware);
+  const aiRouter = createAIRouter(db, authMiddleware, subscriptionMiddleware);
   app.use('/api/ai', aiRouter);
   console.log('🤖 AI SECOP routes montadas en /api/ai');
 

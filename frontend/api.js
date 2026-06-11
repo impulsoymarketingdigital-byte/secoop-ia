@@ -18,6 +18,9 @@ const Api = {
     const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
     if (res.status === 401) { this.clearToken(); window.location.reload(); return; }
     const data = await res.json();
+    if (res.status === 402) {
+      window.dispatchEvent(new CustomEvent('jrh-subscription-expired', { detail: data }));
+    }
     if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
     return data;
   },

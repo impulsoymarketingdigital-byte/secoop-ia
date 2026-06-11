@@ -21,8 +21,12 @@ const multer  = require('multer');
 /**
  * Fábrica del router. Recibe db y authMiddleware del server principal.
  */
-function createAIRouter(db, authMiddleware) {
+function createAIRouter(db, authMiddleware, subscriptionMiddleware) {
   const router = express.Router();
+  router.use(authMiddleware);
+  if (subscriptionMiddleware) {
+    router.use(subscriptionMiddleware);
+  }
   const { createAIService } = require('../services/ai.service');
   const aiSvc = createAIService(db);
 
