@@ -7,19 +7,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #0A0A0B;
-  --bg2: #141415;
-  --bg3: #1F1F23;
-  --orange: #F97316;
-  --purple: #8B5CF6;
-  --green: #22C55E;
+  --bg: #030206;
+  --bg2: #0C0A12;
+  --bg3: #161222;
+  --orange: #66d1fe;
+  --purple: #892be2;
+  --green: #00e676;
   --red: #EF4444;
-  --text: #FFFFFF;
-  --text3: #A1A1A6;
-  --text4: #71717A;
-  --border: #1F1F23;
-  --border2: #27272A;
-  --secondary: #A1A1A6;
+  --text: #F7F7F8;
+  --text3: #7E7A91;
+  --text4: #545066;
+  --border: rgba(137, 43, 226, 0.15);
+  --border2: rgba(102, 209, 254, 0.15);
+  --secondary: #7E7A91;
   --radius-sm: 8px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,9 +38,9 @@ body {
   right: 0;
   bottom: 0;
   background:
-    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 50% 20%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 20% 50%, rgba(137, 43, 226, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(102, 209, 254, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(0, 230, 118, 0.05) 0%, transparent 50%),
     linear-gradient(to bottom, var(--bg), var(--bg));
   z-index: 0;
 }
@@ -216,13 +216,21 @@ body {
   font-family: Inter, sans-serif;
 }
 .btn-primary {
-  background-color: var(--orange);
-  color: var(--bg);
+  background: linear-gradient(135deg, var(--purple) 0%, #7000ff 100%);
+  color: #ffffff;
 }
 .btn-primary:hover {
-  background-color: #F08200;
+  background: linear-gradient(135deg, #9947eb 0%, #7d1eff 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 8px 16px rgba(137, 43, 226, 0.35);
+}
+.btn-orange {
+  background: linear-gradient(135deg, var(--purple) 0%, var(--orange) 100%) !important;
+  color: #ffffff !important;
+}
+.btn-orange:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 16px rgba(102, 209, 254, 0.3) !important;
 }
 .btn-secondary {
   background-color: rgba(31, 31, 35, 0.5);
@@ -369,7 +377,7 @@ body {
   color: var(--purple);
 }
 .badge-pill.orange {
-  background-color: rgba(249, 115, 22, 0.2);
+  background-color: rgba(102, 209, 254, 0.2);
   color: var(--orange);
 }
 .badge-pill.green {
@@ -643,11 +651,11 @@ body {
   transform: translateY(-1px);
 }
 .action-btn.orange {
-  background-color: rgba(249, 115, 22, 0.2);
+  background-color: rgba(102, 209, 254, 0.2);
   color: var(--orange);
 }
 .action-btn.orange:hover {
-  background-color: rgba(249, 115, 22, 0.3);
+  background-color: rgba(102, 209, 254, 0.3);
 }
 .action-btn.red {
   background-color: rgba(239, 68, 68, 0.2);
@@ -702,17 +710,201 @@ body {
 .toggle-input:checked::before {
   left: 22px;
 }
-.auth-overlay{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-.auth-card{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 25px 60px rgba(0,0,0,0.6)}
-.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;justify-content:center}
-.auth-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--orange),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff}
-.auth-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
-.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:24px}
-.auth-tabs{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:4px;margin-bottom:20px;gap:4px}
-.auth-tab{flex:1;padding:8px;text-align:center;border:none;background:transparent;color:var(--text3);font-weight:600;font-size:13px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
-.auth-tab.active{background:var(--orange);color:#fff}
-.auth-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:14px}
-.auth-link{color:var(--orange);text-decoration:none;font-size:12px;display:block;text-align:center;margin-top:14px;cursor:pointer}
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: var(--bg);
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+}
+.auth-sidebar-banner {
+  flex: 1.2;
+  background: linear-gradient(135deg, rgba(137, 43, 226, 0.15) 0%, rgba(102, 209, 254, 0.05) 100%), #030206;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px;
+  position: relative;
+  overflow: hidden;
+}
+.auth-sidebar-banner::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(137, 43, 226, 0.2) 0%, transparent 60%);
+  filter: blur(80px);
+}
+.auth-sidebar-banner::after {
+  content: "";
+  position: absolute;
+  bottom: -20%;
+  right: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(102, 209, 254, 0.1) 0%, transparent 60%);
+  filter: blur(80px);
+}
+.auth-sidebar-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+  mask-image: radial-gradient(circle at center, black, transparent);
+  -webkit-mask-image: radial-gradient(circle at center, black, transparent);
+}
+.auth-sidebar-content {
+  position: relative;
+  z-index: 1;
+}
+.auth-sidebar-title {
+  font-size: 38px;
+  font-weight: 850;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #fff 30%, #a1a1a6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.auth-sidebar-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.auth-sidebar-feature-icon {
+  width: 38px;
+  height: 38px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--purple);
+  flex-shrink: 0;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+}
+.auth-sidebar-feature-text h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.auth-sidebar-feature-text p {
+  font-size: 13px;
+  color: var(--text3);
+  line-height: 1.5;
+}
+.auth-right-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.05) 0%, transparent 50%), var(--bg);
+  position: relative;
+}
+.auth-card {
+  background: rgba(20, 20, 21, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 48px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+.auth-logo-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--orange), var(--purple));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  color: #fff;
+}
+.auth-title {
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.auth-sub {
+  font-size: 13px;
+  color: var(--text3);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.auth-tabs {
+  display: flex;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 20px;
+  gap: 4px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.auth-tab.active {
+  background: var(--orange);
+  color: #fff;
+}
+.auth-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--red);
+  margin-bottom: 14px;
+}
+.auth-link {
+  color: var(--orange);
+  text-decoration: none;
+  font-size: 12px;
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  cursor: pointer;
+}
+@media (max-width: 992px) {
+  .auth-sidebar-banner {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
@@ -1159,42 +1351,99 @@ function LoginScreen({onLogin}) {
     <>
     {showForgot && <ForgotPasswordModal onClose={() => setShowForgot(false)} />}
     <div className="auth-overlay">
-      <div className="auth-card">
-        <div className="auth-logo">
-          <div className="auth-logo-icon">JR</div>
-          <div style={{fontSize:20,fontWeight:800}}>JIREHAI</div>
-        </div>
-        <div className="auth-title">{mode==='login'?'Iniciar Sesión':'Crear Cuenta'}</div>
-        <div className="auth-sub">{mode==='login'?'Bienvenido de nuevo a tu plataforma de licitaciones':'Comienza gratis hoy — 3 días de prueba gratuita'}</div>
-        <div className="auth-tabs">
-          <button className={`auth-tab${mode==='login'?' active':''}`} onClick={()=>{setMode('login');setError('')}}>Iniciar Sesión</button>
-          <button className={`auth-tab${mode==='register'?' active':''}`} onClick={()=>{setMode('register');setError('')}}>Registrarse</button>
-        </div>
-        {error && <div className="auth-error">{error}</div>}
-        <div style={{display:'flex',flexDirection:'column',gap:12}}>
-          {mode==='register' && <CField label="Nombre completo" value={name} onChange={setName} placeholder="Tu nombre o empresa"/>}
-          <CField label="Email" value={email} onChange={setEmail} type="email" placeholder="correo@empresa.com"/>
-          <CField label="Contraseña" value={password} onChange={setPassword} type="password" placeholder="Mínimo 6 caracteres"/>
-        </div>
-        {mode==='login' && (
-          <div style={{textAlign:'right',marginTop:6}}>
-            <span style={{color:'var(--purple)',fontSize:12,cursor:'pointer'}} onClick={()=>setShowForgot(true)}>
-              ¿Olvidaste tu contraseña?
+      
+      {/* Columna Izquierda: Banner tecnológico */}
+      <div className="auth-sidebar-banner">
+        <div className="auth-sidebar-grid"></div>
+        <div className="auth-sidebar-content">
+          <div className="auth-sidebar-feature" style={{ marginBottom: 40 }}>
+            <span style={{ fontSize: 28, fontWeight: 900, background: 'linear-gradient(135deg, var(--purple), var(--orange))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              JIREHAI
+            </span>
+            <span style={{ fontSize: 11, background: 'rgba(139,92,246,0.15)', color: 'var(--purple)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 99, padding: '2px 8px', marginLeft: 8, fontWeight: '700' }}>
+              AI ENGINE v2.5
             </span>
           </div>
-        )}
-        <button className="btn btn-orange" style={{width:'100%',marginTop:16,padding:'11px',fontSize:14}} onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Procesando...' : mode==='login' ? '→ Iniciar Sesión' : '→ Crear Cuenta Gratis'}
-        </button>
-        <div className="auth-link" onClick={()=>{setMode(mode==='login'?'register':'login');setError('')}}>
-          {mode==='login' ? '¿No tienes cuenta? Regístrate gratis' : '¿Ya tienes cuenta? Inicia sesión'}
-        </div>
-        {mode==='register' && (
-          <div style={{textAlign:'center',marginTop:12,fontSize:11,color:'var(--text4)',padding:'8px',background:'rgba(139,92,246,0.1)',borderRadius:6}}>
-            🎁 3 días de prueba gratuita al registrarte
+          
+          <h2 className="auth-sidebar-title">
+            Inteligencia Artificial para Ganar Licitaciones Públicas
+          </h2>
+          <p style={{ color: 'var(--text3)', fontSize: 15, lineHeight: 1.6, marginBottom: 48, maxWidth: 480 }}>
+            Automatiza la descarga completa de procesos de SECOP II, analiza pliegos de condiciones en segundos y evalúa tus requisitos habilitantes de forma instantánea con el poder de la IA.
+          </p>
+
+          <div className="auth-sidebar-feature">
+            <div className="auth-sidebar-feature-icon">🤖</div>
+            <div className="auth-sidebar-feature-text">
+              <h4>Análisis Jurídico y Financiero</h4>
+              <p>Extracción precisa de índices de liquidez, patrimonio mínimo y experiencia requerida directa de los pliegos de condiciones.</p>
+            </div>
           </div>
-        )}
+
+          <div className="auth-sidebar-feature">
+            <div className="auth-sidebar-feature-icon">📦</div>
+            <div className="auth-sidebar-feature-text">
+              <h4>Extracción de Productos e Ítems</h4>
+              <p>Desglose inteligente de bienes, servicios, cantidades y clasificaciones UNSPSC sugeridas para tu propuesta.</p>
+            </div>
+          </div>
+
+          <div className="auth-sidebar-feature">
+            <div className="auth-sidebar-feature-icon">📊</div>
+            <div className="auth-sidebar-feature-text">
+              <h4>Informes Consolidados</h4>
+              <p>Genera y exporta reportes interactivos en Excel y PDF unificados listos para presentar al equipo.</p>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Columna Derecha: Tarjeta de Autenticación */}
+      <div className="auth-right-container">
+        <div className="auth-card">
+          <div className="auth-logo" style={{ marginBottom: 20 }}>
+            <div className="auth-logo-icon">JR</div>
+            <div style={{fontSize:22,fontWeight:900,letterSpacing:'-0.5px'}}>JIREHAI</div>
+          </div>
+          
+          <div className="auth-title" style={{ fontSize: 20, fontWeight: 800 }}>
+            {mode==='login' ? 'Iniciar Sesión' : 'Registrarse'}
+          </div>
+          <div className="auth-sub" style={{ fontSize: 13, color: 'var(--text4)', marginBottom: 24 }}>
+            {mode==='login' ? 'Bienvenido al motor de automatización' : 'Comienza gratis hoy — 3 días de prueba'}
+          </div>
+
+          <div className="auth-tabs" style={{ marginBottom: 20 }}>
+            <button className={`auth-tab${mode==='login'?' active':''}`} onClick={()=>{setMode('login');setError('')}}>Conectarse</button>
+            <button className={`auth-tab${mode==='register'?' active':''}`} onClick={()=>{setMode('register');setError('')}}>Crear Cuenta</button>
+          </div>
+
+          {error && <div className="auth-error">{error}</div>}
+
+          <div style={{display:'flex',flexDirection:'column',gap:12}}>
+            {mode==='register' && <CField label="Nombre completo" value={name} onChange={setName} placeholder="Nombre de tu empresa o tuyo"/>}
+            <CField label="Email corporativo" value={email} onChange={setEmail} type="email" placeholder="correo@tuempresa.com"/>
+            <CField label="Contraseña" value={password} onChange={setPassword} type="password" placeholder="Mínimo 6 caracteres"/>
+          </div>
+
+          {mode==='login' && (
+            <div style={{textAlign:'right',marginTop:8}}>
+              <span style={{color:'var(--purple)',fontSize:12,cursor:'pointer',fontWeight:'500'}} onClick={()=>setShowForgot(true)}>
+                ¿Olvidaste tu contraseña?
+              </span>
+            </div>
+          )}
+
+          <button className="btn btn-orange" style={{width:'100%',marginTop:24,padding:'12px',fontSize:13,justifyContent:'center',fontWeight:'700',background:'linear-gradient(135deg, var(--purple), #7000ff)'}} onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Validando credenciales...' : mode==='login' ? 'Acceder al Sistema' : 'Comenzar Prueba Gratuita'}
+          </button>
+
+          <div className="auth-link" style={{ marginTop: 18, color: 'var(--text4)' }} onClick={()=>{setMode(mode==='login'?'register':'login');setError('')}}>
+            {mode==='login' ? <span>¿No tienes cuenta? <strong style={{color:'var(--purple)'}}>Regístrate gratis</strong></span> : <span>¿Ya tienes cuenta? <strong style={{color:'var(--purple)'}}>Inicia sesión</strong></span>}
+          </div>
+        </div>
+      </div>
+
     </div>
     </>
   );
@@ -1374,8 +1623,50 @@ function PageDashboard({ config, applied, procData }) {
   );
 }
 
-function PageConfiguracion({ config, onConfigUpdate }) {
+function PageConfiguracion({ config, onConfigUpdate, user }) {
   const [cfg, setCfg] = React.useState(config);
+  const [apiKey, setApiKey] = React.useState('');
+  const [generatingKey, setGeneratingKey] = React.useState(false);
+
+  const isEmpresarialOrAdmin = user?.plan === 'empresarial' || user?.role === 'admin';
+
+  const handleGenerateKey = async () => {
+    setGeneratingKey(true);
+    try {
+      const token = localStorage.getItem('jrh_token');
+      const API_BASE = window.JIREHAI_API_BASE || '';
+      const resp = await fetch(`${API_BASE}/api/auth/generate-api-key`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || 'Error al generar la API key');
+      if (data.apiKey) {
+        setApiKey(data.apiKey);
+      } else {
+        throw new Error('Respuesta inválida del servidor');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      setGeneratingKey(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (isEmpresarialOrAdmin) {
+      const token = localStorage.getItem('jrh_token');
+      const API_BASE = window.JIREHAI_API_BASE || '';
+      fetch(`${API_BASE}/api/auth/api-key`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }).then(r => {
+        if (!r.ok) return null;
+        return r.json();
+      }).then(data => {
+        if (data && data.apiKey) setApiKey(data.apiKey);
+      }).catch(() => {});
+    }
+  }, [user]);
 
   const handleUpdate = (field, subfield, value) => {
     const updated = { ...cfg };
@@ -1528,6 +1819,87 @@ function PageConfiguracion({ config, onConfigUpdate }) {
         <CSelect label="Intervalo de Escaneo" value={cfg.notif.scan}
           onChange={(v) => handleUpdate('notif', 'scan', v)}
           options={['1h', '2h', '4h', '8h', '24h']} />
+      </div>
+
+      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '30px', marginBottom: '16px' }}>🔑 Acceso API (Plan Empresarial)</h3>
+      <div style={{ padding: '16px', background: 'rgba(139,92,246,0.05)', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '20px' }}>
+        <div style={{ fontSize: '13px', lineHeight: '1.6', color: 'var(--text3)', marginBottom: '14px' }}>
+          El acceso API te permite conectar tus propios sistemas de software al motor de JIREHAI para realizar búsquedas, descargas de pliegos y análisis automatizados con IA programáticamente.
+        </div>
+        
+        {isEmpresarialOrAdmin ? (
+          <div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              <input
+                type="text"
+                value={apiKey || 'No se ha generado ninguna API Key'}
+                readOnly
+                placeholder="Tu clave de API aparecerá aquí"
+                style={{
+                  flex: 1,
+                  background: 'rgba(20,20,21,0.8)',
+                  border: '1px solid var(--border2)',
+                  borderRadius: '8px',
+                  color: apiKey ? 'var(--green)' : 'var(--text4)',
+                  padding: '10px 14px',
+                  fontSize: '13px',
+                  fontFamily: 'monospace'
+                }}
+              />
+              <button
+                onClick={() => {
+                  if (apiKey) {
+                    navigator.clipboard.writeText(apiKey);
+                    alert('✅ Clave de API copiada al portapapeles');
+                  }
+                }}
+                disabled={!apiKey}
+                className="btn btn-secondary"
+                style={{ padding: '10px 16px' }}
+              >
+                📋 Copiar
+              </button>
+            </div>
+            
+            <button
+              onClick={handleGenerateKey}
+              disabled={generatingKey}
+              className="btn btn-primary"
+              style={{ background: 'var(--purple)', border: 'none', color: '#fff', padding: '10px 16px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+            >
+              {generatingKey ? 'Generando...' : apiKey ? '🔄 Regenerar API Key' : '🔑 Generar API Key'}
+            </button>
+
+            {apiKey && (
+              <div style={{ marginTop: '14px', fontSize: '11px', color: 'var(--text4)', lineHeight: '1.5' }}>
+                <strong>Ejemplo de uso (cURL):</strong>
+                <pre style={{ background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '6px', overflowX: 'auto', marginTop: '6px', fontFamily: 'monospace', color: '#a1a1a6' }}>
+                  {`curl -H "Authorization: Bearer ${apiKey}" \\
+  -H "Content-Type: application/json" \\
+  ${window.location.origin}/api/subscriptions/status`}
+                </pre>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ padding: '12px 16px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: 'var(--red)', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <span>⚠️ El acceso API es una característica exclusiva del plan <strong>Empresarial</strong>.</span>
+            <button
+              onClick={() => {
+                const btnUpgrade = document.querySelector('[onClick*="setShowUpgrade(true)"]') || document.querySelector('[style*="color:var(--purple)"][style*="text-decoration:underline"]');
+                if (btnUpgrade) {
+                  btnUpgrade.click();
+                } else {
+                  alert('Por favor haz clic en "⬆ Mejorar" en la parte inferior izquierda para subir a plan Empresarial.');
+                }
+              }}
+              className="btn btn-small"
+              style={{ background: 'var(--red)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}
+            >
+              Mejorar plan
+            </button>
+          </div>
+        )}
       </div>
 
       <div style={{ marginTop: '30px', display: 'flex', gap: '12px' }}>
@@ -3389,6 +3761,119 @@ function AIAnalysisModal({ process, onClose, toastMsg }) {
     );
   }
 
+  function TabChat() {
+    const [chatMessages, setChatMessages] = React.useState([
+      { role: 'assistant', content: '¡Hola! He analizado el pliego de condiciones de este proceso. ¿Tienes alguna pregunta sobre los requisitos jurídicos, financieros, o técnicos, o sobre cómo preparar tu propuesta?' }
+    ]);
+    const [inputValue, setInputValue] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
+    const messagesEndRef = React.useRef(null);
+
+    React.useEffect(() => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, [chatMessages]);
+
+    const handleSend = async () => {
+      if (!inputValue.trim() || loading) return;
+      const userText = inputValue;
+      setInputValue('');
+      setChatMessages(prev => [...prev, { role: 'user', content: userText }]);
+      setLoading(true);
+
+      try {
+        const token = localStorage.getItem('jrh_token');
+        if (!token || token === 'offline_mode_token') {
+          setChatMessages(prev => [...prev, { role: 'assistant', content: '❌ Error: Debes iniciar sesión con conexión al servidor para usar el chat IA.' }]);
+          setLoading(false);
+          return;
+        }
+
+        const response = await window.Api.chat(userText, referencia);
+        if (response && response.respuesta) {
+          setChatMessages(prev => [...prev, { role: 'assistant', content: response.respuesta }]);
+        } else {
+          throw new Error('Respuesta inválida del servidor');
+        }
+      } catch (err) {
+        console.error('Error al enviar mensaje:', err);
+        setChatMessages(prev => [...prev, { role: 'assistant', content: '❌ Hubo un error de conexión al procesar tu pregunta. Por favor, intenta de nuevo.' }]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '380px', background: 'rgba(20,20,21,0.5)', borderRadius: '12px', border: '1px solid var(--border)', padding: '16px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '4px' }}>
+          {chatMessages.map((msg, idx) => (
+            <div key={idx} style={{
+              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              maxWidth: '85%',
+              padding: '10px 14px',
+              borderRadius: '12px',
+              fontSize: '13px',
+              lineHeight: '1.5',
+              background: msg.role === 'user' ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.04)',
+              border: msg.role === 'user' ? '1px solid rgba(139,92,246,0.3)' : '1px solid var(--border2)',
+              color: 'var(--text)',
+              whiteSpace: 'pre-line'
+            }}>
+              {msg.content}
+            </div>
+          ))}
+          {loading && (
+            <div style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border2)', padding: '10px 14px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid var(--purple)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+              <span style={{ fontSize: '12px', color: 'var(--text4)' }}>Pensando...</span>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input
+            type="text"
+            placeholder="Pregúntale a la IA sobre este pliego..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            disabled={loading}
+            style={{
+              flex: 1,
+              background: 'rgba(31,31,35,0.8)',
+              border: '1px solid var(--border2)',
+              borderRadius: '8px',
+              color: 'var(--text)',
+              padding: '10px 14px',
+              fontSize: '13px',
+              outline: 'none',
+              fontFamily: 'Inter,sans-serif'
+            }}
+          />
+          <button
+            onClick={handleSend}
+            disabled={loading || !inputValue.trim()}
+            style={{
+              background: 'var(--purple)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0 18px',
+              fontSize: '13px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              opacity: (loading || !inputValue.trim()) ? 0.6 : 1,
+              transition: 'opacity 0.2s'
+            }}
+          >
+            Enviar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   function TabDescargar() {
     const ref = referencia || 'secop';
 
@@ -3462,7 +3947,10 @@ function AIAnalysisModal({ process, onClose, toastMsg }) {
     { key: 'financiero',label: 'Financiero' },
     { key: 'productos', label: 'Productos'  },
     { key: 'riesgos',   label: 'Riesgos'    },
-    ...(status === 'completed' ? [{ key: 'descargar', label: '⬇ Descargar' }] : []),
+    ...(status === 'completed' ? [
+      { key: 'chat',      label: '💬 Chat IA' },
+      { key: 'descargar', label: '⬇ Descargar' }
+    ] : []),
   ];
 
   return (
@@ -3599,6 +4087,7 @@ function AIAnalysisModal({ process, onClose, toastMsg }) {
               {activeTab === 'financiero' && <TabFinanciero />}
               {activeTab === 'productos'  && <TabProductos />}
               {activeTab === 'riesgos'    && <TabRiesgos />}
+              {activeTab === 'chat'       && <TabChat />}
               {activeTab === 'descargar'  && <TabDescargar />}
             </div>
 
@@ -3881,8 +4370,8 @@ function UpgradeModal({ subStatus, onClose, onCheckoutSuccess }) {
   const [error, setError] = React.useState('');
 
   const plans = [
-    { id: 'profesional', label: 'Profesional', price: '$99.900/mes', analyses: 30, color: 'var(--purple)' },
-    { id: 'empresarial', label: 'Empresarial', price: '$249.900/mes', analyses: 100, color: 'var(--orange)' },
+    { id: 'profesional', label: 'Profesional', price: '$99.900/mes', analyses: 300, color: 'var(--purple)' },
+    { id: 'empresarial', label: 'Empresarial', price: '$249.900/mes', analyses: 'Ilimitados', color: 'var(--orange)' },
   ];
 
   async function handleUpgrade(planId) {
@@ -3948,7 +4437,7 @@ function UpgradeModal({ subStatus, onClose, onCheckoutSuccess }) {
               onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
               <div style={{fontSize:16,fontWeight:700,color:plan.color,marginBottom:4}}>{plan.label}</div>
               <div style={{fontSize:22,fontWeight:800,marginBottom:4}}>{plan.price}</div>
-              <div style={{fontSize:12,color:'var(--text3)',marginBottom:16}}>{plan.analyses} análisis/día</div>
+              <div style={{fontSize:12,color:'var(--text3)',marginBottom:16}}>{plan.analyses} {typeof plan.analyses === 'number' ? 'procesos/mes' : ''}</div>
               <button
                 onClick={() => handleUpgrade(plan.id)}
                 disabled={!!loading}
@@ -4019,7 +4508,7 @@ function DailyUsageStrip({ subStatus }) {
   return (
     <div style={{margin:'4px 12px 8px',padding:'8px 12px',background:'rgba(31,31,35,0.6)',borderRadius:8,border:'1px solid var(--border)'}}>
       <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--text4)',marginBottom:4}}>
-        <span>Análisis hoy</span>
+        <span>Límite mensual</span>
         <span style={{color}}>{analysesUsed}/{dailyLimit}</span>
       </div>
       <div style={{height:4,background:'var(--border2)',borderRadius:2,overflow:'hidden'}}>
@@ -4200,7 +4689,7 @@ function App() {
                   : (backendOk ? 'Backend conectado' : 'Modo local')}
               </span>
             </div>
-            <button onClick={() => { window.Api?.logout?.() || (localStorage.clear(), window.location.reload()); }} style={{width: '100%', padding: '8px', background: 'rgba(249, 115, 22, 0.1)', border: '1px solid var(--orange)', borderRadius: '6px', color: 'var(--orange)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s'}} onMouseEnter={(e) => e.target.style.background = 'rgba(249, 115, 22, 0.2)'} onMouseLeave={(e) => e.target.style.background = 'rgba(249, 115, 22, 0.1)'}>
+            <button onClick={() => { window.Api?.logout?.() || (localStorage.clear(), window.location.reload()); }} style={{width: '100%', padding: '8px', background: 'rgba(102, 209, 254, 0.1)', border: '1px solid var(--orange)', borderRadius: '6px', color: 'var(--orange)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s'}} onMouseEnter={(e) => e.target.style.background = 'rgba(102, 209, 254, 0.2)'} onMouseLeave={(e) => e.target.style.background = 'rgba(102, 209, 254, 0.1)'}>
               Cerrar Sesión
             </button>
           </div>
@@ -4212,7 +4701,7 @@ function App() {
           </div>
 
           <div className={`page ${currentPage === 'config' ? 'active' : ''}`}>
-            <PageConfiguracion config={config} onConfigUpdate={handleConfigUpdate} />
+            <PageConfiguracion config={config} onConfigUpdate={handleConfigUpdate} user={user} />
           </div>
 
           <div className={`page ${currentPage === 'procesos' ? 'active' : ''}`}>

@@ -3,30 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JIREHAI - Gana más licitaciones con IA | SECOP II</title>
-    <meta name="description" content="JIREHAI analiza automáticamente SECOP II y te ayuda a ganar más contratos públicos con IA. Prueba gratis.">
+    <title>JIREHAI - Automatización y Análisis IA de SECOP II</title>
+    <meta name="description" content="JIREHAI automatiza la descarga completa de pliegos en SECOP II y genera análisis estructurados en tablas con IA. Optimiza tu proceso de licitaciones públicas.">
 
+    <!-- SEO Meta Tags -->
+    <meta property="og:title" content="JIREHAI - Automatización y Análisis IA de SECOP II">
+    <meta property="og:description" content="Automatiza descargas y analiza pliegos de SECOP II con IA avanzada.">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@300;400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --bg-dark: #020004;
+            --card-bg: rgba(13, 11, 20, 0.7);
+            --border-color: rgba(137, 43, 226, 0.15);
+            --border-hover: rgba(102, 209, 254, 0.35);
+            --accent-purple: #892be2;
+            --accent-cyan: #66d1fe;
+            --accent-purple-glow: rgba(137, 43, 226, 0.4);
+            --accent-cyan-glow: rgba(102, 209, 254, 0.3);
+            --text-primary: #F7F7F8;
+            --text-secondary: #7E7A91;
+            --text-dim: #545066;
+            --green: #00e676;
+            --font-display: 'Kumbh Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --transition-speed: 0.3s;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #0A0A0B;
-            --bg2: #111113;
-            --bg3: #18181B;
-            --orange: #F97316;
-            --orange2: #EA580C;
-            --purple: #8B5CF6;
-            --green: #22C55E;
-            --text: #FAFAFA;
-            --text2: #A1A1AA;
         }
 
         html {
@@ -34,156 +46,54 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: var(--font-body);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
             overflow-x: hidden;
-            background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
             min-height: 100vh;
+            line-height: 1.6;
         }
 
-        /* Mesh gradient background */
-        body::before {
-            content: '';
+        /* Background grid overlay */
+        .bg-grid {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background:
-                radial-gradient(circle at 20% 30%, rgba(249, 115, 22, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.08) 0%, transparent 50%);
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            z-index: -2;
             pointer-events: none;
-            z-index: -1;
         }
 
-        /* Navbar */
-        nav {
+        /* Ambient glowing lights */
+        .glow-sphere-1 {
             position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(10, 10, 11, 0.7);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            padding: 1rem 2rem;
+            top: -20%;
+            left: -10%;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-purple-glow) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(100px);
+            pointer-events: none;
         }
 
-        nav.scrolled {
-            background: rgba(10, 10, 11, 0.9);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        nav .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 800;
-            font-size: 0.9rem;
-        }
-
-        nav .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-            list-style: none;
-        }
-
-        nav .nav-links a {
-            color: var(--text2);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.3s ease;
-        }
-
-        nav .nav-links a:hover {
-            color: var(--orange);
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-ghost:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--orange);
-            color: var(--orange);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            gap: 5px;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 2px;
-            background: var(--text);
-            border-radius: 2px;
-            transition: all 0.3s ease;
+        .glow-sphere-2 {
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-cyan-glow) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(120px);
+            pointer-events: none;
         }
 
         .container {
@@ -192,228 +102,384 @@
             padding: 0 2rem;
         }
 
+        /* Header Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(2, 0, 4, 0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--transition-speed) ease;
+            padding: 1.25rem 0;
+        }
+
+        nav.scrolled {
+            background: rgba(2, 0, 4, 0.95);
+            border-bottom: 1px solid rgba(137, 43, 226, 0.25);
+            padding: 0.9rem 0;
+        }
+
+        nav .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 0.95rem;
+            box-shadow: 0 0 15px rgba(137, 43, 226, 0.4);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.65rem 1.4rem;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(137, 43, 226, 0.08);
+            border-color: var(--accent-purple);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(137, 43, 226, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #7000ff 100%);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(137, 43, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(137, 43, 226, 0.5);
+            background: linear-gradient(135deg, #9947eb 0%, #7d1eff 100%);
+        }
+
+        .btn-cyan {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, #0099ff 100%);
+            color: var(--bg-dark);
+            border: none;
+            box-shadow: 0 4px 20px rgba(102, 209, 254, 0.3);
+        }
+
+        .btn-cyan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 209, 254, 0.5);
+        }
+
+        .btn-large {
+            padding: 0.9rem 2.2rem;
+            font-size: 1rem;
+            border-radius: 10px;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all var(--transition-speed) ease;
+        }
+
         /* Hero Section */
         .hero {
-            padding-top: 140px;
-            padding-bottom: 80px;
-            text-align: center;
+            padding-top: 170px;
+            padding-bottom: 100px;
             position: relative;
         }
 
-        .badge {
-            display: inline-block;
-            background: rgba(249, 115, 22, 0.1);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            padding: 0.7rem 1.5rem;
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(137, 43, 226, 0.08);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
             border-radius: 50px;
-            color: var(--orange);
-            font-size: 0.9rem;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-badge span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px var(--accent-purple); }
+            100% { transform: scale(0.9); opacity: 0.6; }
         }
 
         .hero h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 800;
-            line-height: 1.2;
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5.5vw, 4rem);
+            font-weight: 900;
+            line-height: 1.15;
             margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--text) 0%, var(--text2) 100%);
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #b8b3d1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--text2);
-            max-width: 700px;
-            margin: 0 auto 3rem;
-            line-height: 1.6;
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+            max-width: 580px;
         }
 
         .hero-buttons {
             display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 4rem;
+            gap: 1.2rem;
+            margin-bottom: 3.5rem;
             flex-wrap: wrap;
-        }
-
-        .btn-large {
-            padding: 1rem 2rem;
-            font-size: 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-large.primary {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-            color: white;
-        }
-
-        .btn-large.primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(249, 115, 22, 0.4);
-        }
-
-        .btn-large.secondary {
-            background: transparent;
-            color: var(--text);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-large.secondary:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--orange);
-            color: var(--orange);
         }
 
         .hero-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .stat {
-            font-size: 0.95rem;
-            color: var(--text2);
-        }
-
-        .stat strong {
-            color: var(--orange);
-            font-size: 1.1rem;
+        .stat-item strong {
             display: block;
-            margin-bottom: 0.5rem;
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(to right, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .hero-mockup {
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-            height: 400px;
-        }
-
-        .mockup-card {
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border: 1px solid rgba(249, 115, 22, 0.2);
-            border-radius: 12px;
-            padding: 2rem;
-            position: absolute;
-            width: 90%;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-        }
-
-        .mockup-card:nth-child(1) {
-            top: 20px;
-            left: 5%;
-            animation: float 4s ease-in-out infinite;
-        }
-
-        .mockup-card:nth-child(2) {
-            top: 80px;
-            right: 5%;
-            animation: float 4s ease-in-out 1s infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .mockup-header {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .mockup-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(249, 115, 22, 0.3);
-        }
-
-        .mockup-title {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--orange);
-        }
-
-        .mockup-text {
+        .stat-item span {
             font-size: 0.85rem;
-            color: var(--text2);
-            line-height: 1.4;
+            color: var(--text-secondary);
         }
 
-        /* Social Proof */
+        /* Hero Mockup SVG Container */
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-visual::after {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            background: radial-gradient(circle, rgba(137, 43, 226, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(40px);
+        }
+
+        .visual-svg {
+            width: 100%;
+            max-width: 480px;
+            filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.5));
+            animation: float-svg 6s ease-in-out infinite;
+        }
+
+        @keyframes float-svg {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+        }
+
+        /* Social Proof Chips */
         .social-proof {
             padding: 3rem 0;
+            background: rgba(2, 0, 4, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .social-proof-title {
-            color: var(--text2);
-            font-size: 0.95rem;
-            margin-bottom: 2rem;
-            font-weight: 500;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.8rem;
+            font-weight: 600;
         }
 
         .company-logos {
             display: flex;
             justify-content: center;
-            gap: 2rem;
+            gap: 1.5rem;
             flex-wrap: wrap;
             align-items: center;
         }
 
         .company-chip {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 0.65rem 1.5rem;
             border-radius: 50px;
-            color: var(--text2);
+            color: var(--text-secondary);
             font-size: 0.9rem;
             font-weight: 500;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .company-chip:hover {
+            background: rgba(137, 43, 226, 0.05);
+            border-color: rgba(137, 43, 226, 0.2);
+            color: var(--text-primary);
+        }
+
+        /* Section Global Settings */
+        .section-header {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto 4.5rem;
+        }
+
+        .section-tag {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 2.7rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
         }
 
         /* Features Section */
         .features {
-            padding: 6rem 0;
-        }
-
-        .section-title {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 4rem;
-            color: var(--text);
+            padding: 100px 0;
+            position: relative;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.2rem;
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 16px;
+            backdrop-filter: blur(24px);
+            transition: all var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .feature-card::before {
@@ -422,354 +488,413 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
             opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
+            transition: opacity var(--transition-speed) ease;
         }
 
         .feature-card:hover {
-            border-color: rgba(249, 115, 22, 0.3);
-            transform: translateY(-5px);
+            border-color: var(--border-hover);
+            transform: translateY(-6px);
+            box-shadow: 0 15px 40px rgba(102, 209, 254, 0.08);
         }
 
         .feature-card:hover::before {
             opacity: 1;
         }
 
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+        .feature-icon-wrapper {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            background: rgba(137, 43, 226, 0.06);
+            border: 1px solid rgba(137, 43, 226, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.8rem;
+            transition: all var(--transition-speed) ease;
+            color: var(--accent-cyan);
+        }
+
+        .feature-card:hover .feature-icon-wrapper {
+            background: rgba(102, 209, 254, 0.1);
+            border-color: var(--accent-cyan);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(102, 209, 254, 0.2);
         }
 
         .feature-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.8rem;
-            color: var(--text);
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.9rem;
+            color: var(--text-primary);
         }
 
         .feature-card p {
-            color: var(--text2);
-            line-height: 1.6;
+            color: var(--text-secondary);
             font-size: 0.95rem;
+            line-height: 1.6;
         }
 
-        /* How it Works */
+        /* How It Works Section */
         .how-it-works {
-            padding: 6rem 0;
-            background: rgba(255, 255, 255, 0.02);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 100px 0;
+            background: rgba(10, 8, 18, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            position: relative;
         }
 
-        .steps-grid {
+        .steps-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 3rem;
-            margin-top: 4rem;
+            position: relative;
+            margin-top: 2rem;
         }
 
-        .step {
+        .step-item {
+            position: relative;
             text-align: center;
+            z-index: 2;
         }
 
-        .step-number {
-            font-size: 4rem;
+        .step-badge {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 2px solid var(--accent-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-family: var(--font-display);
+            font-size: 1.4rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(137, 43, 226, 0.3);
+            transition: all var(--transition-speed) ease;
         }
 
-        .step h3 {
-            font-size: 1.3rem;
+        .step-item:hover .step-badge {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 25px rgba(102, 209, 254, 0.5);
+            transform: scale(1.1);
+        }
+
+        .step-item h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
             margin-bottom: 0.8rem;
-            color: var(--text);
         }
 
-        .step p {
-            color: var(--text2);
-            line-height: 1.6;
-        }
-
-        /* Stats Section */
-        .stats {
-            padding: 6rem 0;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .stats-card {
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border: 1px solid rgba(249, 115, 22, 0.2);
-            padding: 2.5rem;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stats-number {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--orange);
-            margin-bottom: 0.5rem;
-        }
-
-        .stats-label {
-            color: var(--text2);
+        .step-item p {
+            color: var(--text-secondary);
             font-size: 0.95rem;
+            line-height: 1.6;
+            padding: 0 1rem;
+        }
+
+        /* Connecting line for steps */
+        .steps-line {
+            position: absolute;
+            top: 28px;
+            left: 10%;
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(137, 43, 226, 0.1) 0%, rgba(137, 43, 226, 0.6) 50%, rgba(102, 209, 254, 0.1) 100%);
+            z-index: 1;
         }
 
         /* Pricing Section */
         .pricing {
-            padding: 6rem 0;
-            background: rgba(255, 255, 255, 0.01);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 100px 0;
+            position: relative;
         }
 
         .pricing-toggle {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 1rem;
-            margin-bottom: 3rem;
-            flex-wrap: wrap;
+            margin-bottom: 3.5rem;
         }
 
         .toggle-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text2);
-            padding: 0.7rem 1.5rem;
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 0.65rem 1.4rem;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
+            transition: all var(--transition-speed) ease;
+            font-family: var(--font-body);
         }
 
         .toggle-btn.active {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-            color: white;
-            border-color: var(--orange);
+            background: var(--accent-purple);
+            color: #ffffff;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(137, 43, 226, 0.35);
         }
 
-        .pricing-cards {
+        .discount-badge {
+            background: rgba(0, 230, 118, 0.1);
+            color: var(--green);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            margin-left: 0.3rem;
+            font-weight: 700;
+            border: 1px solid rgba(0, 230, 118, 0.2);
+        }
+
+        .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.2rem;
+            align-items: stretch;
         }
 
         .pricing-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 2.5rem;
-            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 3rem 2.2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(24px);
+            transition: all var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
             position: relative;
-            transition: all 0.3s ease;
         }
 
         .pricing-card.featured {
-            border-color: var(--orange);
-            background: rgba(249, 115, 22, 0.05);
-            transform: scale(1.05);
+            border-color: var(--accent-purple);
+            background: rgba(18, 10, 30, 0.7);
+            transform: scale(1.03);
+            box-shadow: 0 10px 40px rgba(137, 43, 226, 0.1);
+        }
+
+        .pricing-card.featured::after {
+            content: 'POPULAR ⭐';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #7000ff 100%);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(137, 43, 226, 0.4);
+        }
+
+        .pricing-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-8px);
         }
 
         .pricing-card.featured:hover {
-            box-shadow: 0 20px 50px rgba(249, 115, 22, 0.2);
+            box-shadow: 0 20px 45px rgba(137, 43, 226, 0.2);
         }
 
-        .pricing-badge {
-            display: inline-block;
-            background: rgba(249, 115, 22, 0.2);
-            color: var(--orange);
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .pricing-badge.discount {
-            background: rgba(34, 197, 94, 0.2);
-            color: var(--green);
-        }
-
-        .pricing-name {
+        .plan-name {
+            font-family: var(--font-display);
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text);
+            margin-bottom: 0.4rem;
         }
 
-        .pricing-price {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+        .plan-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            min-height: 40px;
+        }
+
+        .plan-price-wrapper {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .plan-currency {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-right: 0.2rem;
+        }
+
+        .plan-price {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .plan-price.gradient {
+            background: linear-gradient(135deg, #ffffff 50%, var(--accent-cyan) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
         }
 
-        .pricing-period {
-            color: var(--text2);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
+        .plan-period {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-left: 0.5rem;
         }
 
-        .pricing-features {
+        .pricing-btn-wrapper {
+            margin-bottom: 2.2rem;
+        }
+
+        .features-list {
             list-style: none;
-            margin-bottom: 2rem;
+            margin-top: auto;
         }
 
-        .pricing-features li {
-            padding: 0.6rem 0;
-            color: var(--text2);
+        .features-list li {
+            padding: 0.65rem 0;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
         }
 
-        .pricing-features li::before {
-            content: '✓';
-            color: var(--green);
-            font-weight: 800;
-            font-size: 1.1rem;
+        .features-list li::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent-cyan);
+            box-shadow: 0 0 8px var(--accent-cyan);
         }
 
-        .pricing-features li.disabled {
-            opacity: 0.5;
-        }
-
-        .pricing-features li.disabled::before {
-            content: '✕';
-            color: var(--text2);
-        }
-
-        .pricing-btn {
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 8px;
+        .features-list li.bold {
+            color: var(--text-primary);
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-        }
-
-        .pricing-btn.primary {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-            color: white;
-        }
-
-        .pricing-btn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
-        }
-
-        .pricing-btn.secondary {
-            background: transparent;
-            color: var(--text);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .pricing-btn.secondary:hover {
-            border-color: var(--orange);
-            color: var(--orange);
         }
 
         .pricing-note {
             text-align: center;
-            color: var(--text2);
-            font-size: 0.9rem;
-            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-top: 3rem;
         }
 
-        /* Testimonials */
+        /* Testimonials Section */
         .testimonials {
-            padding: 6rem 0;
-            background: rgba(255, 255, 255, 0.01);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 100px 0;
+            background: rgba(10, 8, 18, 0.2);
+            position: relative;
         }
 
         .testimonials-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.2rem;
         }
 
         .testimonial-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 16px;
+            backdrop-filter: blur(24px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
 
         .testimonial-card:hover {
-            border-color: rgba(249, 115, 22, 0.3);
-            background: rgba(249, 115, 22, 0.05);
+            border-color: var(--border-hover);
         }
 
-        .testimonial-text {
-            color: var(--text2);
-            margin-bottom: 1.5rem;
+        .testimonial-quote {
+            color: var(--text-primary);
+            font-size: 1.05rem;
             line-height: 1.6;
-            font-style: italic;
+            margin-bottom: 2rem;
+            position: relative;
         }
 
-        .testimonial-author {
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 0.3rem;
+        .testimonial-quote::before {
+            content: '“';
+            position: absolute;
+            top: -20px;
+            left: -15px;
+            font-size: 4rem;
+            color: rgba(137, 43, 226, 0.15);
+            font-family: serif;
         }
 
-        .testimonial-role {
-            color: var(--text2);
-            font-size: 0.85rem;
+        .testimonial-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: auto;
         }
 
-        .testimonial-rating {
-            color: var(--orange);
+        .user-avatar-placeholder {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 700;
             font-size: 0.95rem;
-            margin-top: 0.5rem;
         }
 
-        /* FAQ */
+        .user-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* FAQ Section */
         .faq {
-            padding: 6rem 0;
-            background: rgba(255, 255, 255, 0.02);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 100px 0;
+            position: relative;
         }
 
-        .faq-container {
-            max-width: 700px;
-            margin: 4rem auto 0;
+        .faq-list {
+            max-width: 760px;
+            margin: 0 auto;
         }
 
         .faq-item {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin-bottom: 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all var(--transition-speed) ease;
         }
 
-        .faq-item.active {
-            border-color: rgba(249, 115, 22, 0.3);
-            background: rgba(249, 115, 22, 0.05);
+        .faq-item:hover {
+            border-color: rgba(102, 209, 254, 0.25);
         }
 
         .faq-question {
@@ -778,167 +903,282 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
+            font-size: 1.05rem;
             font-weight: 600;
-            color: var(--text);
-            transition: color 0.3s ease;
+            color: var(--text-primary);
+            user-select: none;
+            transition: color var(--transition-speed) ease;
         }
 
         .faq-question:hover {
-            color: var(--orange);
+            color: var(--accent-cyan);
         }
 
-        .faq-toggle {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--orange);
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
+        .faq-icon {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            transition: transform var(--transition-speed) ease;
         }
 
-        .faq-item.active .faq-toggle {
+        .faq-item.active {
+            border-color: var(--accent-purple);
+            background: rgba(18, 10, 30, 0.4);
+        }
+
+        .faq-item.active .faq-icon {
             transform: rotate(180deg);
+            color: var(--accent-cyan);
         }
 
         .faq-answer {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
-            color: var(--text2);
-            line-height: 1.6;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
         }
 
         .faq-item.active .faq-answer {
-            max-height: 500px;
+            max-height: 300px;
             padding: 0 1.5rem 1.5rem;
         }
 
-        /* CTA Final */
-        .cta-final {
-            padding: 6rem 0;
+        /* Final CTA */
+        .final-cta {
+            padding: 120px 0;
+            position: relative;
             text-align: center;
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border-top: 1px solid rgba(249, 115, 22, 0.2);
-            border-bottom: 1px solid rgba(249, 115, 22, 0.2);
-            border-radius: 16px;
-            margin: 4rem 0;
         }
 
-        .cta-final h2 {
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
-            font-weight: 700;
-            margin-bottom: 1rem;
+        .cta-card {
+            background: radial-gradient(circle at 50% 50%, rgba(137, 43, 226, 0.15) 0%, rgba(13, 11, 20, 0.8) 80%);
+            border: 1px solid var(--border-color);
+            padding: 5rem 2rem;
+            border-radius: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
         }
 
-        .cta-final p {
-            color: var(--text2);
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
+        .cta-card::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-size: 20px 20px;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            z-index: -1;
+        }
+
+        .cta-card h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-card p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
             max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
         }
 
         /* Footer */
         footer {
-            background: var(--bg2);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 4rem 0 2rem;
+            background: #010002;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+            padding: 5rem 0 3rem;
+            position: relative;
+            z-index: 5;
         }
 
-        .footer-content {
+        .footer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
+            grid-template-columns: 1.5fr repeat(3, 1fr);
+            gap: 4rem;
+            margin-bottom: 4rem;
         }
 
-        .footer-section h4 {
+        .footer-logo-section p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1.2rem;
+            line-height: 1.7;
+            max-width: 280px;
+        }
+
+        .footer-column h4 {
+            font-family: var(--font-display);
             font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text);
         }
 
-        .footer-section ul {
+        .footer-column ul {
             list-style: none;
         }
 
-        .footer-section ul li {
-            margin-bottom: 0.7rem;
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
         }
 
-        .footer-section ul li a {
-            color: var(--text2);
+        .footer-column ul li a {
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.3s ease;
+            transition: color var(--transition-speed) ease;
         }
 
-        .footer-section ul li a:hover {
-            color: var(--orange);
+        .footer-column ul li a:hover {
+            color: var(--accent-cyan);
         }
 
         .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text2);
-            font-size: 0.85rem;
-        }
-
-        .footer-links {
             display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-dim);
+            font-size: 0.85rem;
             flex-wrap: wrap;
+            gap: 1.5rem;
         }
 
-        .footer-links a {
-            color: var(--text2);
+        .footer-bottom-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-bottom-links a {
+            color: var(--text-dim);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
+            transition: color var(--transition-speed) ease;
         }
 
-        .footer-links a:hover {
-            color: var(--orange);
+        .footer-bottom-links a:hover {
+            color: var(--accent-cyan);
         }
 
-        .footer-links a.admin-link {
-            font-size: 0.7rem;
+        .admin-trigger {
             opacity: 0.3;
+            transition: opacity var(--transition-speed) ease;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav .nav-links {
-                display: none;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                width: 100%;
-                background: rgba(10, 10, 11, 0.95);
-                flex-direction: column;
-                gap: 0;
-                padding: 1rem 0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 0;
+        .admin-trigger:hover {
+            opacity: 1;
+            color: var(--accent-purple);
+        }
+
+        /* Responsive Layouts */
+        @media (max-width: 992px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 3.5rem;
+                text-align: center;
             }
 
-            nav .nav-links.active {
+            .hero h1 {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-subtitle {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+                max-width: 480px;
+                margin: 0 auto;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .steps-line {
+                display: none;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 0;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(2, 0, 4, 0.98);
+                flex-direction: column;
+                gap: 0;
+                padding: 1.5rem 0;
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .nav-links.active {
                 display: flex;
             }
 
-            nav .nav-links li {
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            .nav-links li {
+                width: 100%;
+                text-align: center;
             }
 
-            nav .nav-links a {
+            .nav-links a {
                 display: block;
+                padding: 0.9rem 0;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+
+            .nav-buttons.active {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
                 padding: 1rem 2rem;
             }
 
@@ -947,7 +1187,7 @@
             }
 
             .hamburger.active span:nth-child(1) {
-                transform: rotate(45deg) translate(10px, 10px);
+                transform: rotate(45deg) translate(6px, 6px);
             }
 
             .hamburger.active span:nth-child(2) {
@@ -955,125 +1195,213 @@
             }
 
             .hamburger.active span:nth-child(3) {
-                transform: rotate(-45deg) translate(7px, -7px);
+                transform: rotate(-45deg) translate(5px, -5px);
             }
 
-            .hero-buttons {
-                flex-direction: column;
-            }
-
-            .btn-large {
-                width: 100%;
-            }
-
-            .pricing-card.featured {
-                transform: scale(1);
-            }
-
-            .footer-content {
+            .footer-grid {
                 grid-template-columns: 1fr;
+                gap: 2.5rem;
                 text-align: center;
+            }
+
+            .footer-logo-section p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                justify-content: center;
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+
+    <div class="bg-grid"></div>
+    <div class="glow-sphere-1"></div>
+    <div class="glow-sphere-2"></div>
+
+    <!-- Header Navigation -->
     <nav>
-        <div class="container">
-            <div class="logo">
+        <div class="container nav-container">
+            <a class="logo" href="#">
                 <div class="logo-icon">JR</div>
                 JIREHAI
-            </div>
+            </a>
 
-            <ul class="nav-links">
+            <ul class="nav-links" id="navLinks">
                 <li><a href="#features">Características</a></li>
-                <li><a href="#how-it-works">Cómo funciona</a></li>
-                <li><a href="#pricing">Precios</a></li>
-                <li><a href="#contact">Contacto</a></li>
+                <li><a href="#how-it-works">Funcionamiento</a></li>
+                <li><a href="#pricing">Planes</a></li>
+                <li><a href="#faq">FAQ</a></li>
             </ul>
 
             <div class="nav-buttons">
-                <button class="btn-ghost" onclick="window.location.href='./JIREHAI.html'">Iniciar Sesión</button>
-                <button class="btn-primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Gratis</button>
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                <a class="btn btn-ghost" href="./JIREHAI.html">Iniciar Sesión</a>
+                <a class="btn btn-primary" href="./JIREHAI.html">Comenzar Gratis</a>
+            </div>
+
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <div class="badge">✦ Potenciado por IA · Datos oficiales SECOP II</div>
-
-            <h1>Gana más licitaciones con Inteligencia Artificial</h1>
-
-            <p class="hero-subtitle">
-                JIREHAI analiza automáticamente los procesos de contratación de SECOP II, evalúa si cumples los requisitos y te ayuda a presentar propuestas ganadoras.
-            </p>
-
-            <div class="hero-buttons">
-                <button class="btn-large primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Gratis →</button>
-                <button class="btn-large secondary">Ver demostración</button>
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span></span> Potenciado por IA · Conexión SECOP II Oficial
+                </div>
+                <h1>Descarga y Analiza Procesos Públicos con IA</h1>
+                <p class="hero-subtitle">
+                    JIREHAI se conecta a SECOP II, descarga automáticamente el 100% de los pliegos y anexos sin restricciones, y genera informes analíticos en tablas estructuradas en segundos.
+                </p>
+                <div class="hero-buttons">
+                    <a class="btn btn-large btn-cyan" href="./JIREHAI.html">Comenzar Gratis →</a>
+                    <a class="btn btn-large btn-ghost" href="#how-it-works">Ver Demostración</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <strong>500k+</strong>
+                        <span>Documentos Procesados</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>98.7%</strong>
+                        <span>Precisión del Parser IA</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>10x</strong>
+                        <span>Velocidad de Licitación</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="hero-stats">
-                <div class="stat">
-                    <strong>200+</strong>
-                    Procesos analizados diario
-                </div>
-                <div class="stat">
-                    <strong>98%</strong>
-                    Precisión en análisis
-                </div>
-                <div class="stat">
-                    <strong>3x</strong>
-                    Más propuestas exitosas
-                </div>
-            </div>
+            <div class="hero-visual">
+                <!-- Premium Custom Hero SVG Illustration representing AI Core and Document Scraping -->
+                <svg class="visual-svg" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Glow & Core Background -->
+                    <circle cx="250" cy="250" r="180" fill="url(#bgGrad)" opacity="0.15"/>
+                    <circle cx="250" cy="250" r="120" stroke="url(#accentGrad)" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.4"/>
+                    <circle cx="250" cy="250" r="60" fill="url(#coreGrad)" filter="drop-shadow(0 0 25px rgba(137,43,226,0.6))"/>
+                    <path d="M250 220L275 265H225L250 220Z" fill="#ffffff" opacity="0.9"/>
+                    
+                    <!-- Radar Circle Scan Pulse -->
+                    <circle cx="250" cy="250" r="210" stroke="#66d1fe" stroke-width="1" opacity="0.2">
+                        <animate attributeName="r" values="60;230" dur="4s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.8;0" dur="4s" repeatCount="indefinite"/>
+                    </circle>
 
-            <div class="hero-mockup">
-                <div class="mockup-card">
-                    <div class="mockup-header">
-                        <div class="mockup-dot"></div>
-                        <div class="mockup-dot"></div>
-                        <div class="mockup-dot"></div>
-                    </div>
-                    <div class="mockup-title">Proceso SECOP II - ID 2024-001</div>
-                    <div class="mockup-text">
-                        Búsqueda de Consultoría en Sistemas de Información. Presupuesto: $50M. Cierre: 15 May
-                    </div>
-                </div>
-                <div class="mockup-card">
-                    <div class="mockup-header">
-                        <div class="mockup-dot"></div>
-                        <div class="mockup-dot"></div>
-                        <div class="mockup-dot"></div>
-                    </div>
-                    <div class="mockup-title">✓ Análisis: Cumples requisitos</div>
-                    <div class="mockup-text">
-                        Tu empresa tiene capacidad financiera. Análisis completado en 2 min.
-                    </div>
-                </div>
+                    <!-- Network Nodes & Links -->
+                    <!-- Floating File 1: PDF -->
+                    <g transform="translate(100, 110)" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.3))">
+                        <rect x="0" y="0" width="70" height="90" rx="8" fill="#130f24" stroke="url(#purpleStroke)" stroke-width="1.5"/>
+                        <text x="12" y="32" fill="#892be2" font-family="'Inter', sans-serif" font-weight="700" font-size="11">PLIEGO</text>
+                        <rect x="12" y="45" width="46" height="3" rx="1.5" fill="#545066"/>
+                        <rect x="12" y="55" width="34" height="3" rx="1.5" fill="#545066"/>
+                        <rect x="12" y="65" width="40" height="3" rx="1.5" fill="#545066"/>
+                        <circle cx="52" cy="18" r="6" fill="#00e676"/>
+                        <path d="M50 18L52 20L55 16" stroke="#130f24" stroke-width="1.2"/>
+                    </g>
+                    <!-- Floating File 2: ZIP -->
+                    <g transform="translate(330, 80)" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.3))">
+                        <rect x="0" y="0" width="75" height="90" rx="8" fill="#0b1724" stroke="url(#cyanStroke)" stroke-width="1.5"/>
+                        <text x="12" y="32" fill="#66d1fe" font-family="'Inter', sans-serif" font-weight="700" font-size="11">ANEXOS</text>
+                        <rect x="12" y="45" width="50" height="3" rx="1.5" fill="#00d2ff" opacity="0.5"/>
+                        <rect x="12" y="55" width="50" height="3" rx="1.5" fill="#00d2ff" opacity="0.3"/>
+                        <rect x="12" y="65" width="30" height="3" rx="1.5" fill="#00d2ff" opacity="0.4"/>
+                        <rect x="42" y="62" width="22" height="15" rx="3" fill="#66d1fe"/>
+                        <text x="47" y="73" fill="#020004" font-family="'Inter', sans-serif" font-weight="800" font-size="9">ZIP</text>
+                    </g>
+                    <!-- Floating Card 3: Metrics Table -->
+                    <g transform="translate(290, 310)" filter="drop-shadow(0 12px 24px rgba(137,43,226,0.15))">
+                        <rect x="0" y="0" width="150" height="100" rx="12" fill="#110c1c" stroke="url(#purpleStroke)" stroke-width="1.5" opacity="0.95"/>
+                        <text x="15" y="25" fill="#F7F7F8" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Requisitos IA</text>
+                        <line x1="15" y1="38" x2="135" y2="38" stroke="rgba(255,255,255,0.06)"/>
+                        
+                        <text x="15" y="55" fill="#7E7A91" font-family="'Inter', sans-serif" font-size="9">Financiero:</text>
+                        <text x="80" y="55" fill="#00e676" font-family="'Inter', sans-serif" font-weight="700" font-size="9">CUMPLE (100%)</text>
+                        
+                        <text x="15" y="72" fill="#7E7A91" font-family="'Inter', sans-serif" font-size="9">Técnico:</text>
+                        <text x="80" y="72" fill="#00e676" font-family="'Inter', sans-serif" font-weight="700" font-size="9">CUMPLE (92%)</text>
+
+                        <text x="15" y="88" fill="#7E7A91" font-family="'Inter', sans-serif" font-size="9">Riesgo Pliegos:</text>
+                        <text x="80" y="88" fill="#66d1fe" font-family="'Inter', sans-serif" font-weight="700" font-size="9">BAJO</text>
+                    </g>
+                    <!-- Floating Card 4: Programmatic API Key -->
+                    <g transform="translate(60, 290)" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.3))">
+                        <rect x="0" y="0" width="120" height="75" rx="10" fill="#0b1724" stroke="url(#cyanStroke)" stroke-width="1" opacity="0.9"/>
+                        <text x="12" y="22" fill="#66d1fe" font-family="'Inter', sans-serif" font-weight="700" font-size="10">&lt;/&gt; Acceso API</text>
+                        <rect x="12" y="35" width="96" height="18" rx="4" fill="#020004" stroke="rgba(102,209,254,0.2)"/>
+                        <text x="18" y="47" fill="#7E7A91" font-family="monospace" font-size="8">jk_live_90f23a...</text>
+                        <circle cx="94" cy="44" r="3" fill="#00e676"/>
+                    </g>
+
+                    <!-- Network Connections -->
+                    <line x1="250" y1="250" x2="135" y2="200" stroke="url(#linkGrad)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <line x1="250" y1="250" x2="330" y2="170" stroke="url(#linkGrad)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <line x1="250" y1="250" x2="290" y2="360" stroke="url(#linkGrad)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <line x1="250" y1="250" x2="180" y2="328" stroke="url(#linkGrad)" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+                    <!-- Scanner Line effect -->
+                    <line x1="70" y1="200" x2="430" y2="200" stroke="rgba(102,209,254,0.7)" stroke-width="2" filter="drop-shadow(0 0 8px #66d1fe)">
+                        <animate attributeName="y1" values="100;400;100" dur="6s" repeatCount="indefinite"/>
+                        <animate attributeName="y2" values="100;400;100" dur="6s" repeatCount="indefinite"/>
+                    </line>
+
+                    <!-- Gradients -->
+                    <defs>
+                        <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#892be2"/>
+                            <stop offset="100%" stop-color="#020004" stop-opacity="0"/>
+                        </radialGradient>
+                        <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#892be2"/>
+                            <stop offset="100%" stop-color="#66d1fe"/>
+                        </linearGradient>
+                        <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#892be2"/>
+                            <stop offset="50%" stop-color="#7000ff"/>
+                            <stop offset="100%" stop-color="#66d1fe"/>
+                        </linearGradient>
+                        <linearGradient id="purpleStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#892be2" stop-opacity="0.6"/>
+                            <stop offset="100%" stop-color="#892be2" stop-opacity="0.1"/>
+                        </linearGradient>
+                        <linearGradient id="cyanStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#66d1fe" stop-opacity="0.6"/>
+                            <stop offset="100%" stop-color="#66d1fe" stop-opacity="0.1"/>
+                        </linearGradient>
+                        <linearGradient id="linkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#892be2" stop-opacity="0.5"/>
+                            <stop offset="100%" stop-color="#66d1fe" stop-opacity="0.5"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
         </div>
     </section>
 
-    <!-- Social Proof -->
+    <!-- Social Proof Section -->
     <section class="social-proof">
         <div class="container">
-            <p class="social-proof-title">Confiado por empresas en toda Colombia</p>
+            <p class="social-proof-title">Confiado por empresas licitadoras en Colombia</p>
             <div class="company-logos">
-                <div class="company-chip">Construcciones ABC</div>
-                <div class="company-chip">Consultores Plus</div>
-                <div class="company-chip">Tech Services</div>
-                <div class="company-chip">Innovar SAS</div>
-                <div class="company-chip">Soluciones Totales</div>
-                <div class="company-chip">Premier Group</div>
+                <div class="company-chip">Infraestructuras de Colombia</div>
+                <div class="company-chip">TechConsulting SAS</div>
+                <div class="company-chip">Sistemas Sostenibles</div>
+                <div class="company-chip">Construcciones Andinas</div>
+                <div class="company-chip">Insumos Médicos del Valle</div>
+                <div class="company-chip">Logística Integrada</div>
             </div>
         </div>
     </section>
@@ -1081,43 +1409,111 @@
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="container">
-            <h2 class="section-title">Todo lo que necesitas para ganar contratos</h2>
+            <div class="section-header">
+                <span class="section-tag">TECNOLOGÍA AVANZADA</span>
+                <h2 class="section-title">Automatiza y Domina tus Propuestas en SECOP II</h2>
+                <p class="section-subtitle">
+                    JIREHAI integra descarga masiva, parser de documentos inteligente y chat conversacional con IA para acelerar tus flujos comerciales.
+                </p>
+            </div>
 
             <div class="features-grid">
+                <!-- Feature 1 -->
                 <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3>Búsqueda Inteligente</h3>
-                    <p>Conecta directamente con SECOP II y filtra procesos por tus códigos UNSPSC, modalidad y capacidad financiera</p>
+                    <div class="feature-icon-wrapper">
+                        <!-- Custom Cloud Download SVG Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </div>
+                    <h3>Descargas Automatizadas</h3>
+                    <p>
+                        Dado el ID o URL del proceso en SECOP II, nuestro sistema extrae y descarga la totalidad de los archivos adjuntos (Excel, Word, PDFs, ZIPs, imágenes) de forma masiva y sin límites.
+                    </p>
                 </div>
 
+                <!-- Feature 2 -->
                 <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3>Análisis IA de Pliegos</h3>
-                    <p>Lee automáticamente los pliegos de condiciones y te dice si cumples los requisitos técnicos y financieros</p>
+                    <div class="feature-icon-wrapper">
+                        <!-- Custom Table Parser SVG Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3h18v18H3Z"/>
+                            <path d="M3 9h18"/>
+                            <path d="M3 15h18"/>
+                            <path d="M9 9v12"/>
+                        </svg>
+                    </div>
+                    <h3>Análisis Estructurado en Tablas</h3>
+                    <p>
+                        La IA extrae automáticamente cronogramas, indicadores financieros exigidos (Liquidez, Endeudamiento) y requisitos técnicos, estructurándolos en tablas limpias de Markdown.
+                    </p>
                 </div>
 
+                <!-- Feature 3 -->
                 <div class="feature-card">
-                    <div class="feature-icon">📅</div>
-                    <h3>Fechas Clave</h3>
-                    <p>Nunca pierdas una fecha límite. Alertas automáticas de cierres, observaciones y presentación de ofertas</p>
+                    <div class="feature-icon-wrapper">
+                        <!-- Custom Chat Sparkle SVG Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            <path d="M12 7v6"/>
+                            <path d="M9 10h6"/>
+                        </svg>
+                    </div>
+                    <h3>Chat IA por Proceso</h3>
+                    <p>
+                        ¿Tienes dudas sobre los pliegos o anexos técnicos? Activa el chat interactivo para formular preguntas específicas a la IA sobre los documentos descargados en el proceso.
+                    </p>
                 </div>
 
+                <!-- Feature 4 -->
                 <div class="feature-card">
-                    <div class="feature-icon">📁</div>
-                    <h3>Gestión de Documentos</h3>
-                    <p>Organiza tu carpeta de documentos y recibe alertas cuando alguno esté por vencer</p>
+                    <div class="feature-icon-wrapper">
+                        <!-- Custom API Access SVG Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="16 18 22 12 16 6"/>
+                            <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                    </div>
+                    <h3>Acceso API Programático</h3>
+                    <p>
+                        Genera tokens desde tu panel de configuración para conectar nuestro scraper y motor IA con tus propios sistemas CRM o flujos corporativos externos.
+                    </p>
                 </div>
 
+                <!-- Feature 5 -->
                 <div class="feature-card">
-                    <div class="feature-icon">📋</div>
-                    <h3>Formularios Asistidos</h3>
-                    <p>Completa automáticamente los formularios de SECOP II con tu información registrada</p>
+                    <div class="feature-icon-wrapper">
+                        <!-- Custom Export SVG Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                    </div>
+                    <h3>Exportación Excel & PDF</h3>
+                    <p>
+                        Descarga el informe consolidado completo y estructurado en formato PDF listo para presentar, o en una hoja de cálculo Excel editable para completar los valores de tu oferta.
+                    </p>
                 </div>
 
+                <!-- Feature 6 -->
                 <div class="feature-card">
-                    <div class="feature-icon">📧</div>
-                    <h3>Alertas Diarias</h3>
-                    <p>Recibe cada día los nuevos procesos que coincidan con tus servicios directamente en tu correo</p>
+                    <div class="feature-icon-wrapper">
+                        <!-- Custom Traceability SVG Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                    </div>
+                    <h3>Trazabilidad de Archivos</h3>
+                    <p>
+                        Cada informe incluye una lista de trazabilidad exacta con nombres de archivos analizados, número de páginas revisadas y enlaces locales directos para abrir los archivos originales con un clic.
+                    </p>
                 </div>
             </div>
         </div>
@@ -1126,54 +1522,31 @@
     <!-- How It Works -->
     <section class="how-it-works" id="how-it-works">
         <div class="container">
-            <h2 class="section-title">Comienza a ganar en 3 pasos</h2>
-
-            <div class="steps-grid">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Configura tu empresa</h3>
-                    <p>Ingresa tu información financiera, códigos UNSPSC y tipo de servicios. El sistema aprende tu perfil.</p>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Descubre oportunidades</h3>
-                    <p>JIREHAI escanea SECOP II y te muestra solo los procesos donde puedes ganar, con análisis de viabilidad.</p>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Presenta y gana</h3>
-                    <p>Usa nuestros formularios asistidos y documentación automatizada para preparar propuestas irresistibles.</p>
-                </div>
+            <div class="section-header">
+                <span class="section-tag">SIMPLICIDAD Y CONTROL</span>
+                <h2 class="section-title">Análisis en Tres Sencillos Pasos</h2>
+                <p class="section-subtitle">Ahorra horas leyendo pliegos tediosos. Deja que JIREHAI procese todo por ti.</p>
             </div>
-        </div>
-    </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="container">
-            <h2 class="section-title">Números que hablan</h2>
-
-            <div class="stats-grid">
-                <div class="stats-card">
-                    <div class="stats-number" data-target="12000">0</div>
-                    <div class="stats-label">Procesos analizados al mes</div>
+            <div class="steps-container">
+                <div class="steps-line"></div>
+                
+                <div class="step-item">
+                    <div class="step-badge">1</div>
+                    <h3>Ingresa el ID del Proceso</h3>
+                    <p>Pega el enlace de SECOP II o escribe el número de referencia del proceso estatal en el buscador.</p>
                 </div>
 
-                <div class="stats-card">
-                    <div class="stats-number" data-target="98">0</div>
-                    <div class="stats-label">% Precisión en análisis</div>
+                <div class="step-item">
+                    <div class="step-badge">2</div>
+                    <h3>Descarga y OCR en Nube</h3>
+                    <p>Nuestro scraper Playwright descarga todos los documentos y la IA aplica OCR a las imágenes y escaneos.</p>
                 </div>
 
-                <div class="stats-card">
-                    <div class="stats-number" data-target="500">0</div>
-                    <div class="stats-label">Empresas activas</div>
-                </div>
-
-                <div class="stats-card">
-                    <div class="stats-number" data-target="3.2">0</div>
-                    <div class="stats-label">x Aumento en propuestas exitosas</div>
+                <div class="step-item">
+                    <div class="step-badge">3</div>
+                    <h3>Obtén Tablas y Chatea</h3>
+                    <p>Obtén el resumen estructurado en 7 secciones y chatea directamente para aclarar dudas sobre los requisitos.</p>
                 </div>
             </div>
         </div>
@@ -1182,356 +1555,333 @@
     <!-- Pricing Section -->
     <section class="pricing" id="pricing">
         <div class="container">
-            <h2 class="section-title">Planes para cada etapa de tu negocio</h2>
+            <div class="section-header">
+                <span class="section-tag">PLANES Y TARIFAS</span>
+                <h2 class="section-title">Elige el Plan para Tu Negocio</h2>
+                <p class="section-subtitle">
+                    Todos los planes incluyen descargas masivas de documentos y análisis detallado de IA en tablas.
+                </p>
+            </div>
 
             <div class="pricing-toggle">
-                <button class="toggle-btn active" data-plan="monthly">Mensual</button>
-                <button class="toggle-btn" data-plan="annual">Anual <span class="discount-label">(Ahorra 20%)</span></button>
+                <button class="toggle-btn active" id="btnMonthly">Mensual</button>
+                <button class="toggle-btn" id="btnAnnual">Anual <span class="discount-badge">Ahorra 20%</span></button>
             </div>
 
-            <div class="pricing-cards">
-                <!-- Básico -->
+            <div class="pricing-grid">
+                <!-- Plan Básico -->
                 <div class="pricing-card">
-                    <div class="pricing-badge">Para empezar</div>
-                    <h3 class="pricing-name">Básico</h3>
-                    <div class="pricing-price" data-monthly="149000" data-annual="119200">$149.000</div>
-                    <p class="pricing-period">COP/mes</p>
-
-                    <ul class="pricing-features">
-                        <li>100 procesos/mes</li>
-                        <li>1 usuario</li>
-                        <li>Alertas por email</li>
-                        <li>Mis Documentos (10 slots)</li>
-                        <li>Formularios básicos (3)</li>
-                        <li class="disabled">Análisis IA de pliegos</li>
-                        <li class="disabled">Exportación Excel/PDF</li>
-                        <li class="disabled">Soporte prioritario</li>
+                    <h3 class="plan-name">Básico</h3>
+                    <p class="plan-desc">Perfecto para empresas individuales y consultores independientes.</p>
+                    <div class="plan-price-wrapper">
+                        <span class="plan-currency">$</span>
+                        <span class="plan-price" id="priceBasic">149.000</span>
+                        <span class="plan-period">/mes</span>
+                    </div>
+                    <div class="pricing-btn-wrapper">
+                        <a class="btn btn-ghost" style="width: 100%;" href="./JIREHAI.html">Comenzar Básico</a>
+                    </div>
+                    <ul class="features-list">
+                        <li class="bold">90 procesos al mes</li>
+                        <li>1 usuario de acceso</li>
+                        <li>Descarga masiva de anexos (ilimitada)</li>
+                        <li>Análisis IA con 7 tablas clave</li>
+                        <li>Exportación en Excel y PDF</li>
+                        <li>Chat IA por proceso habilitado</li>
+                        <li>Soporte estándar por correo</li>
                     </ul>
-
-                    <button class="pricing-btn secondary" onclick="window.location.href='./JIREHAI.html'">Comenzar Básico</button>
                 </div>
 
-                <!-- Profesional -->
+                <!-- Plan Profesional -->
                 <div class="pricing-card featured">
-                    <div class="pricing-badge" style="background: rgba(249, 115, 22, 0.3); color: var(--orange);">Más popular ⭐</div>
-                    <h3 class="pricing-name">Profesional</h3>
-                    <div class="pricing-price" data-monthly="349000" data-annual="279200">$349.000</div>
-                    <p class="pricing-period">COP/mes</p>
-
-                    <ul class="pricing-features">
-                        <li>500 procesos/mes</li>
-                        <li>3 usuarios</li>
-                        <li>Alertas email + Telegram</li>
-                        <li>Mis Documentos (ilimitado)</li>
-                        <li>Todos los formularios SECOP</li>
-                        <li>Análisis IA de pliegos</li>
-                        <li>Exportación Excel/PDF</li>
-                        <li>Chat IA por proceso</li>
+                    <h3 class="plan-name">Profesional</h3>
+                    <p class="plan-desc">Para equipos comerciales que buscan licitar constantemente cada mes.</p>
+                    <div class="plan-price-wrapper">
+                        <span class="plan-currency">$</span>
+                        <span class="plan-price gradient" id="pricePro">349.000</span>
+                        <span class="plan-period">/mes</span>
+                    </div>
+                    <div class="pricing-btn-wrapper">
+                        <a class="btn btn-cyan" style="width: 100%;" href="./JIREHAI.html">Comenzar Profesional</a>
+                    </div>
+                    <ul class="features-list">
+                        <li class="bold">300 procesos al mes</li>
+                        <li>Hasta 3 usuarios concurrentes</li>
+                        <li>Descarga masiva de anexos (ilimitada)</li>
+                        <li>Análisis IA con 7 tablas clave</li>
+                        <li>Exportación en Excel y PDF</li>
+                        <li>Chat IA por proceso habilitado</li>
+                        <li>Soporte prioritario 24h</li>
                     </ul>
-
-                    <button class="pricing-btn primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Profesional</button>
                 </div>
 
-                <!-- Empresarial -->
+                <!-- Plan Empresarial -->
                 <div class="pricing-card">
-                    <div class="pricing-badge">Para equipos</div>
-                    <h3 class="pricing-name">Empresarial</h3>
-                    <div class="pricing-price" data-monthly="899000" data-annual="719200">$899.000</div>
-                    <p class="pricing-period">COP/mes</p>
-
-                    <ul class="pricing-features">
-                        <li>Procesos ilimitados</li>
+                    <h3 class="plan-name">Empresarial</h3>
+                    <p class="plan-desc">Para corporaciones y empresas con altos volúmenes de licitación.</p>
+                    <div class="plan-price-wrapper">
+                        <span class="plan-currency">$</span>
+                        <span class="plan-price" id="priceEnterprise">899.000</span>
+                        <span class="plan-period">/mes</span>
+                    </div>
+                    <div class="pricing-btn-wrapper">
+                        <a class="btn btn-ghost" style="width: 100%;" href="./JIREHAI.html">Contactar Ventas</a>
+                    </div>
+                    <ul class="features-list">
+                        <li class="bold">Procesos ilimitados</li>
                         <li>Usuarios ilimitados</li>
-                        <li>Todas las alertas</li>
-                        <li>API Access</li>
-                        <li>Todo lo del plan Profesional</li>
-                        <li>Soporte dedicado 24/7</li>
-                        <li>Onboarding personalizado</li>
-                        <li>Reportes avanzados</li>
+                        <li>Descarga masiva de anexos (ilimitada)</li>
+                        <li>Análisis IA con 7 tablas clave</li>
+                        <li>Exportación en Excel y PDF</li>
+                        <li>Chat IA por proceso habilitado</li>
+                        <li class="bold">Acceso a API Programática</li>
+                        <li>Onboarding y soporte 24/7</li>
                     </ul>
-
-                    <button class="pricing-btn secondary" onclick="window.location.href='./JIREHAI.html'">Contactar Ventas</button>
                 </div>
             </div>
 
-            <p class="pricing-note">💳 Pago con tarjeta, PSE o transferencia bancaria. Cancela cuando quieras.</p>
+            <p class="pricing-note">💳 Pagos en COP facturados de manera segura a través de PSE, tarjetas y consignación. Cancela en cualquier momento.</p>
         </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- Testimonials Section -->
     <section class="testimonials">
         <div class="container">
-            <h2 class="section-title">Lo que dicen nuestros usuarios</h2>
+            <div class="section-header">
+                <span class="section-tag">TESTIMONIOS</span>
+                <h2 class="section-title">Opiniones de Nuestros Clientes</h2>
+                <p class="section-subtitle">Licitadores públicos que han transformado sus resultados gracias a JIREHAI.</p>
+            </div>
 
             <div class="testimonials-grid">
                 <div class="testimonial-card">
-                    <p class="testimonial-text">
-                        "JIREHAI nos ayudó a identificar 15 procesos relevantes en nuestra primera semana. Ganamos 2 contratos que no habríamos encontrado solos."
+                    <p class="testimonial-quote">
+                        "El sistema de descargas de anexos ZIP nos ha cambiado la vida. Antes tardábamos 40 minutos solo bajando archivos de SECOP II. Con JIREHAI es instantáneo."
                     </p>
-                    <div class="testimonial-author">María González</div>
-                    <div class="testimonial-role">Consultora IT, Bogotá</div>
-                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                    <div class="testimonial-user">
+                        <div class="user-avatar-placeholder">CB</div>
+                        <div class="user-info">
+                            <h4>Catalina Blanco</h4>
+                            <p>Gerente General, Sistemas Sostenibles</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="testimonial-card">
-                    <p class="testimonial-text">
-                        "El análisis automático de pliegos nos ahorra 3 horas por proceso. Ahora presentamos el doble de propuestas con el mismo equipo."
+                    <p class="testimonial-quote">
+                        "Estructurar los requisitos financieros exigidos de liquidez en una tabla limpia nos evita cometer errores eliminatorios. Es una herramienta obligatoria."
                     </p>
-                    <div class="testimonial-author">Carlos Mendez</div>
-                    <div class="testimonial-role">Gerente, Medellín</div>
-                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                    <div class="testimonial-user">
+                        <div class="user-avatar-placeholder">CM</div>
+                        <div class="user-info">
+                            <h4>Carlos Mendoza</h4>
+                            <p>Director Comercial, TechConsulting</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="testimonial-card">
-                    <p class="testimonial-text">
-                        "Las alertas de documentos vencidos son increíbles. Nunca más perdemos una licitación por papeles desactualizados."
+                    <p class="testimonial-quote">
+                        "La API nos permite sincronizar los procesos licitatorios directamente en nuestro CRM. La automatización es robusta y el soporte es excelente."
                     </p>
-                    <div class="testimonial-author">Ana Ríos</div>
-                    <div class="testimonial-role">Directora, Cali</div>
-                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                    <div class="testimonial-user">
+                        <div class="user-avatar-placeholder">AH</div>
+                        <div class="user-info">
+                            <h4>Andrés Hoyos</h4>
+                            <p>Coordinador TI, Premier Group</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ -->
+    <!-- FAQ Section -->
     <section class="faq" id="faq">
         <div class="container">
-            <h2 class="section-title">Preguntas frecuentes</h2>
+            <div class="section-header">
+                <span class="section-tag">RESOLVEMOS TUS DUDAS</span>
+                <h2 class="section-title">Preguntas Frecuentes</h2>
+                <p class="section-subtitle">Preguntas habituales sobre el scraper, el parsing de la IA y el licenciamiento.</p>
+            </div>
 
-            <div class="faq-container">
+            <div class="faq-list">
                 <div class="faq-item">
                     <div class="faq-question">
-                        ¿Necesito conocimientos técnicos para usar JIREHAI?
-                        <span class="faq-toggle">▼</span>
+                        ¿JIREHAI descarga cualquier tipo de archivo adjunto?
+                        <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        No, JIREHAI está diseñado para ser intuitivo y fácil de usar. No necesitas conocimientos técnicos. Solo registra tu empresa, configura tus preferencias, y el sistema hace el trabajo por ti.
+                        Sí, nuestro scraper de Playwright e integraciones de backend están diseñados para identificar y descargar el 100% de los documentos adjuntos en la sección del proceso, incluyendo archivos PDF, Word, Excel (XLSX), presentaciones de PowerPoint (PPTX), imágenes escaneadas, archivos comprimidos en ZIP y extensiones especiales como archivos OCX, almacenándolos directamente para su análisis.
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        ¿Los datos de SECOP II son en tiempo real?
-                        <span class="faq-toggle">▼</span>
+                        ¿Cómo funciona la descompresión automática de ZIPs?
+                        <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        Sí, JIREHAI se sincroniza con SECOP II cada 6 horas para traerte los datos más actualizados. Nuestras alertas diarias incluyen todos los procesos nuevos que coinciden con tu perfil.
+                        Cuando el scraper descarga un archivo ZIP, nuestro pipeline del backend lo extrae de forma automática en una subcarpeta local. Los archivos contenidos en su interior son clasificados, procesados individualmente por el parser y pasados por OCR si son escaneos o imágenes, garantizando que ninguna cláusula pase desapercibida para la IA.
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        ¿Puedo cancelar mi suscripción en cualquier momento?
-                        <span class="faq-toggle">▼</span>
+                        ¿Cómo funciona el Chat IA por proceso?
+                        <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        Absolutamente. No hay contratos de largo plazo ni penalizaciones. Puedes cancelar cuando quieras desde tu panel de control.
+                        Cada vez que analizas un proceso de licitación, se crea una base de conocimiento vectorial indexada con los documentos extraídos. Desde la interfaz puedes abrir una pestaña de Chat de IA y formular preguntas en lenguaje natural sobre las especificaciones técnicas del contrato, las multas, la póliza de cumplimiento o los plazos de entrega.
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        ¿JIREHAI funciona para personas naturales y jurídicas?
-                        <span class="faq-toggle">▼</span>
+                        ¿Qué es la API Access y en qué planes está disponible?
+                        <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        Sí, nuestros planes funcionan para ambas. Tanto personas naturales como empresas pueden registrarse y usar todas nuestras herramientas para participar en licitaciones públicas.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        ¿Cómo funciona el análisis de pliegos con IA?
-                        <span class="faq-toggle">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        Nuestro sistema de IA lee el documento PDF del pliego, identifica los requisitos técnicos y financieros, y los compara con tu perfil de empresa. Te muestra un análisis detallado de si cumples o no los requisitos en cuestión de segundos.
+                        La API Access te proporciona endpoints seguros en el servidor para lanzar scrapers de SECOP II de forma programática y recuperar los metadatos y el análisis estructurado de IA en formato JSON o Markdown. Está disponible para los usuarios del Plan Empresarial y los administradores, quienes pueden autogenerar y revocar tokens directamente desde su panel de Configuración.
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Final CTA -->
-    <section class="cta-final">
+    <!-- Final CTA Section -->
+    <section class="final-cta">
         <div class="container">
-            <h2>¿Listo para ganar más contratos?</h2>
-            <p>Únete a más de 500 empresas que ya usan JIREHAI para identificar y ganar licitaciones en SECOP II.</p>
-            <button class="btn-large primary" onclick="window.location.href='./JIREHAI.html'">Comenzar Gratis — Sin tarjeta de crédito</button>
+            <div class="cta-card">
+                <h2>Comienza a licitar de forma inteligente hoy</h2>
+                <p>Crea tu cuenta gratuita de JIREHAI y realiza tus primeros análisis de SECOP II en segundos.</p>
+                <a class="btn btn-large btn-cyan" href="./JIREHAI.html">Crear Cuenta Gratis</a>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="logo" style="margin-bottom: 1rem;">
+            <div class="footer-grid">
+                <div class="footer-logo-section">
+                    <a class="logo" href="#">
                         <div class="logo-icon">JR</div>
                         JIREHAI
-                    </div>
-                    <p style="color: var(--text2); font-size: 0.9rem; line-height: 1.6;">
-                        La plataforma de IA más inteligente para ganar licitaciones públicas en SECOP II. Análisis automático, alertas y formularios asistidos.
+                    </a>
+                    <p>
+                        La plataforma de IA líder en Colombia para el escaneo, descarga masiva y análisis tabular de licitaciones públicas de SECOP II.
                     </p>
                 </div>
 
-                <div class="footer-section">
-                    <h4>Producto</h4>
+                <div class="footer-column">
+                    <h4>Solución</h4>
                     <ul>
                         <li><a href="#features">Características</a></li>
                         <li><a href="#how-it-works">Cómo funciona</a></li>
-                        <li><a href="#pricing">Precios</a></li>
-                        <li><a href="#">Blog</a></li>
+                        <li><a href="#pricing">Planes y Precios</a></li>
                     </ul>
                 </div>
 
-                <div class="footer-section">
+                <div class="footer-column">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="#">Términos de Servicio</a></li>
-                        <li><a href="#">Política de Privacidad</a></li>
-                        <li><a href="#">Cookies</a></li>
-                        <li><a href="#">Contacto</a></li>
+                        <li><a href="#">Términos de servicio</a></li>
+                        <li><a href="#">Política de privacidad</a></li>
+                        <li><a href="#">Política de cookies</a></li>
                     </ul>
                 </div>
 
-                <div class="footer-section">
-                    <h4>Síguenos</h4>
+                <div class="footer-column">
+                    <h4>Soporte</h4>
                     <ul>
-                        <li><a href="#">LinkedIn</a></li>
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">Facebook</a></li>
-                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#faq">Preguntas frecuentes</a></li>
+                        <li><a href="#">Contacto comercial</a></li>
+                        <li><a href="#">Documentación API</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <div class="footer-links">
-                    <a href="#features">Características</a>
-                    <a href="#pricing">Precios</a>
-                    <a href="#">Blog</a>
-                    <a href="#">Contacto</a>
-                    <a href="#">Términos</a>
+                <p>© 2026 JIREHAI. Todos los derechos reservados.</p>
+                <div class="footer-bottom-links">
                     <a href="#">Privacidad</a>
-                    <a href="./admin.html" class="admin-link">⚙</a>
+                    <a href="#">Términos</a>
+                    <a href="./admin.html" class="admin-trigger">⚙️ Admin</a>
                 </div>
-                <p>© 2025 JIREHAI. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
 
-    <!-- JavaScript -->
+    <!-- JavaScript code -->
     <script>
-        // Navbar scroll effect
+        // Navbar scroll behavior
         const nav = document.querySelector('nav');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
+            if (window.scrollY > 40) {
                 nav.classList.add('scrolled');
             } else {
                 nav.classList.remove('scrolled');
             }
         });
 
-        // Mobile menu toggle
+        // Hamburger mobile menu toggle
         const hamburger = document.getElementById('hamburger');
-        const navLinks = document.querySelector('.nav-links');
+        const navLinks = document.getElementById('navLinks');
 
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
         });
 
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        // Animated counters
-        function animateCounter(element) {
-            const target = parseInt(element.getAttribute('data-target'));
-            const duration = 2000;
-            const start = Date.now();
-
-            function update() {
-                const elapsed = Date.now() - start;
-                const progress = Math.min(elapsed / duration, 1);
-
-                if (target < 10) {
-                    element.textContent = (target * progress).toFixed(1);
-                } else {
-                    element.textContent = Math.floor(target * progress).toLocaleString();
-                }
-
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                }
-            }
-            update();
-        }
-
-        // Intersection Observer for counters
-        const observerOptions = {
-            threshold: 0.5
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const counters = entry.target.querySelectorAll('[data-target]');
-                    counters.forEach(counter => {
-                        animateCounter(counter);
-                    });
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        const statsSection = document.querySelector('.stats');
-        if (statsSection) observer.observe(statsSection);
-
-        // Pricing toggle
-        const toggleButtons = document.querySelectorAll('.toggle-btn');
-        const priceElements = document.querySelectorAll('[data-monthly]');
-
-        toggleButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                toggleButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                const isPlan = btn.getAttribute('data-plan');
-                priceElements.forEach(el => {
-                    if (isPlan === 'annual') {
-                        el.textContent = '$' + parseInt(el.getAttribute('data-annual')).toLocaleString();
-                    } else {
-                        el.textContent = '$' + parseInt(el.getAttribute('data-monthly')).toLocaleString();
-                    }
-                });
-            });
-        });
-
-        // FAQ accordion
+        // FAQ accordion functionality
         const faqItems = document.querySelectorAll('.faq-item');
-
         faqItems.forEach(item => {
             const question = item.querySelector('.faq-question');
             question.addEventListener('click', () => {
-                faqItems.forEach(i => {
-                    if (i !== item) {
-                        i.classList.remove('active');
-                    }
+                const isActive = item.classList.contains('active');
+                
+                // Close other items
+                faqItems.forEach(otherItem => {
+                    otherItem.classList.remove('active');
                 });
-                item.classList.toggle('active');
+
+                // Toggle current item
+                if (!isActive) {
+                    item.classList.add('active');
+                }
             });
+        });
+
+        // Pricing Period Toggle (Mensual vs Anual)
+        const btnMonthly = document.getElementById('btnMonthly');
+        const btnAnnual = document.getElementById('btnAnnual');
+        
+        const priceBasic = document.getElementById('priceBasic');
+        const pricePro = document.getElementById('pricePro');
+        const priceEnterprise = document.getElementById('priceEnterprise');
+
+        const prices = {
+            monthly: { basic: '149.000', pro: '349.000', enterprise: '899.000' },
+            annual: { basic: '119.200', pro: '279.200', enterprise: '719.200' }
+        };
+
+        btnMonthly.addEventListener('click', () => {
+            btnMonthly.classList.add('active');
+            btnAnnual.classList.remove('active');
+            
+            priceBasic.textContent = prices.monthly.basic;
+            pricePro.textContent = prices.monthly.pro;
+            priceEnterprise.textContent = prices.monthly.enterprise;
+        });
+
+        btnAnnual.addEventListener('click', () => {
+            btnAnnual.classList.add('active');
+            btnMonthly.classList.remove('active');
+            
+            priceBasic.textContent = prices.annual.basic;
+            pricePro.textContent = prices.annual.pro;
+            priceEnterprise.textContent = prices.annual.enterprise;
         });
     </script>
 </body>

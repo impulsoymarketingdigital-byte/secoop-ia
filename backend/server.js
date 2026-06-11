@@ -54,6 +54,25 @@ function authMiddleware(req, res, next) {
     req.user = decoded;
     next();
   } catch {
+    // Si no es un JWT válido, busquemos si coincide con alguna API key en user_configs
+    try {
+      const rows = db.prepare("SELECT user_id, config_json FROM user_configs").all();
+      const matched = rows.find(r => {
+        try {
+          const cfg = JSON.parse(r.config_json);
+          return cfg && cfg.apiAccessKey === token;
+        } catch { return false; }
+      });
+      if (matched) {
+        const u = db.prepare('SELECT id, email, role, plan FROM users WHERE id = ?').get(matched.user_id);
+        if (u) {
+          req.user = { id: u.id, email: u.email, role: u.role, plan: u.plan };
+          return next();
+        }
+      }
+    } catch (dbErr) {
+      console.error('Error al validar API Key desde DB:', dbErr.message);
+    }
     return res.status(401).json({ error: 'Token inválido o expirado' });
   }
 }
@@ -142,11 +161,11 @@ function addNotification(userId, type, title, message) {
 // SUSCRIPCIÓN & LÍMITES DE USO
 // ═══════════════════════════════════════
 
-// Límites diarios de análisis IA por plan
-const DAILY_LIMITS = {
-  basico:       5,   // prueba gratuita (3 días)
-  profesional:  30,  // plan pagado mensual
-  empresarial:  100, // plan empresarial
+// Límites mensuales de análisis IA por plan (todos los planes tienen las mismas capacidades del Profesional, varían en cantidad)
+const MONTHLY_LIMITS = {
+  basico:       90,   // plan básico / trial (90 procesos al mes)
+  profesional:  300,  // plan profesional (300 procesos al mes)
+  empresarial:  Infinity, // plan empresarial (procesos ilimitados)
   admin:        Infinity,
 };
 
@@ -223,6 +242,45 @@ function getDailyUsage(userId) {
   return row || { analyses_used: 0, tokens_used: 0 };
 }
 
+/** Devuelve el uso de análisis de IA del ciclo mensual actual para un usuario */
+function getMonthlyUsage(userId) {
+  const user = db.prepare('SELECT plan_expires_at, trial_expires_at FROM users WHERE id = ?').get(userId);
+  if (!user) return { analyses_used: 0, tokens_used: 0, startDate: new Date().toISOString().slice(0, 10) };
+
+  let startDateString;
+  const now = new Date();
+
+  if (user.plan_expires_at) {
+    const exp = new Date(user.plan_expires_at);
+    // El inicio del ciclo mensual es 30 días antes del vencimiento
+    const start = new Date(exp.getTime() - 30 * 24 * 60 * 60 * 1000);
+    if (start > now) {
+      startDateString = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    } else {
+      startDateString = start.toISOString().slice(0, 10);
+    }
+  } else if (user.trial_expires_at) {
+    const exp = new Date(user.trial_expires_at);
+    // El trial dura 3 días, pero contamos los consumos del ciclo mensual desde su creación (30 días antes del vencimiento)
+    const start = new Date(exp.getTime() - 30 * 24 * 60 * 60 * 1000);
+    startDateString = start.toISOString().slice(0, 10);
+  } else {
+    // Fallback: últimos 30 días
+    const start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    startDateString = start.toISOString().slice(0, 10);
+  }
+
+  const row = db.prepare(
+    'SELECT SUM(analyses_used) as total_analyses, SUM(tokens_used) as total_tokens FROM daily_token_usage WHERE user_id = ? AND usage_date >= ?'
+  ).get(userId, startDateString);
+
+  return {
+    analyses_used: row?.total_analyses || 0,
+    tokens_used: row?.total_tokens || 0,
+    startDate: startDateString
+  };
+}
+
 /** Incrementa el contador diario de análisis */
 function incrementDailyUsage(userId, tokenCount = 0) {
   const today = new Date().toISOString().slice(0, 10);
@@ -236,18 +294,18 @@ function incrementDailyUsage(userId, tokenCount = 0) {
   `).run(userId, today, tokenCount);
 }
 
-/** Middleware: verifica que el usuario no superó el límite diario de análisis */
+/** Middleware: verifica que el usuario no superó el límite mensual de análisis */
 function dailyLimitMiddleware(req, res, next) {
   const user = db.prepare('SELECT role, plan FROM users WHERE id = ?').get(req.user.id);
   if (!user || user.role === 'admin') return next();
 
-  const limit = DAILY_LIMITS[user.plan] ?? DAILY_LIMITS.basico;
+  const limit = MONTHLY_LIMITS[user.plan] ?? MONTHLY_LIMITS.basico;
   if (!isFinite(limit)) return next();
 
-  const { analyses_used } = getDailyUsage(req.user.id);
+  const { analyses_used } = getMonthlyUsage(req.user.id);
   if (analyses_used >= limit) {
     return res.status(429).json({
-      error: `Alcanzaste el límite diario de ${limit} análisis para el plan ${user.plan}. Vuelve mañana o actualiza tu plan.`,
+      error: `Alcanzaste el límite mensual de ${limit} análisis para el plan ${user.plan}. Actualiza tu plan para continuar.`,
       code: 'DAILY_LIMIT_EXCEEDED',
       limitReached: true,
       analysesUsed: analyses_used,
@@ -421,6 +479,26 @@ app.get('/api/config', authMiddleware, (req, res) => {
 app.put('/api/config', authMiddleware, (req, res) => {
   saveUserConfig(req.user.id, req.body);
   res.json({ success: true });
+});
+
+// GET /api/auth/api-key — Obtiene la API key del usuario
+app.get('/api/auth/api-key', authMiddleware, (req, res) => {
+  const config = getUserConfig(req.user.id);
+  res.json({ apiKey: config.apiAccessKey || null });
+});
+
+// POST /api/auth/generate-api-key — Genera o regenera la API key
+app.post('/api/auth/generate-api-key', authMiddleware, (req, res) => {
+  const user = db.prepare('SELECT plan, role FROM users WHERE id = ?').get(req.user.id);
+  if (user.plan !== 'empresarial' && user.role !== 'admin') {
+    return res.status(403).json({ error: 'El acceso API es una característica exclusiva del plan Empresarial.' });
+  }
+  const crypto = require('crypto');
+  const newApiKey = 'jrh_api_' + crypto.randomBytes(24).toString('hex');
+  const config = getUserConfig(req.user.id);
+  config.apiAccessKey = newApiKey;
+  saveUserConfig(req.user.id, config);
+  res.json({ apiKey: newApiKey });
 });
 
 // ═══════════════════════════════════════
@@ -1364,12 +1442,12 @@ app.post('/api/ai/chat', authMiddleware, subscriptionMiddleware, dailyLimitMiddl
 // SUBSCRIPTION STATUS
 // ═══════════════════════════════════════
 
-// GET /api/subscriptions/status — estado completo del usuario (trial, plan, límites de hoy)
+// GET /api/subscriptions/status — estado completo del usuario (trial, plan, límites del mes)
 app.get('/api/subscriptions/status', authMiddleware, (req, res) => {
   const status = getUserSubscriptionStatus(req.user.id);
-  const usage  = getDailyUsage(req.user.id);
+  const usage  = getMonthlyUsage(req.user.id);
   const user   = db.prepare('SELECT role, plan FROM users WHERE id = ?').get(req.user.id);
-  const limit  = (user?.role === 'admin') ? Infinity : (DAILY_LIMITS[user?.plan] ?? DAILY_LIMITS.basico);
+  const limit  = (user?.role === 'admin') ? Infinity : (MONTHLY_LIMITS[user?.plan] ?? MONTHLY_LIMITS.basico);
 
   res.json({
     ...status,

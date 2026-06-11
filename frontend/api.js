@@ -149,7 +149,14 @@ const Api = {
     return `${API_BASE}/api/ai/export/${jobId}?format=${format}&token=${token || ''}`;
   },
   /** Comprueba disponibilidad del motor Python */
-  async aiHealth() { return this.fetch('/api/ai/health'); }
+  async aiHealth() { return this.fetch('/api/ai/health'); },
+  /** Chat IA con contexto del proceso */
+  async chat(mensaje, processNumber, contextoAdicional) {
+    return this.fetch('/api/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ mensaje, processNumber, contextoAdicional })
+    });
+  }
 };
 
 window.Api = Api;
