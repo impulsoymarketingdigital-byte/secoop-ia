@@ -969,61 +969,305 @@ def _pdf_html_fallback(data: dict, output_path: Path):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _build_executive_summary(data: dict) -> str:
-    process  = data.get("process_info", {})
-    legal    = data.get("legal", {})
-    financial= data.get("financial", {})
-    risks    = data.get("risks", {})
-    products = data.get("products", {})
-    docs     = data.get("documents", [])
-    now = datetime.now().strftime(DATE_FMT)
+    import re
+    from datetime import datetime
+    
+    process   = data.get("process_info", {}) or {}
+    legal     = data.get("legal", {}) or {}
+    financial = data.get("financial", {}) or {}
+    risks     = data.get("risks", {}) or {}
+    products  = data.get("products", {}) or {}
+    docs      = data.get("documents", []) or []
+    
+    now_str = datetime.now().strftime(DATE_FMT)
+    
+    # ── Helpers ──
+    def check_event_status(date_str: str) -> str:
+        if not date_str:
+            return "N/A"
+        # Intentar extraer formato YYYY-MM-DD
+        m = re.search(r'(\d{4})-(\d{2})-(\d{2})', str(date_str))
+        if m:
+            try:
+                event_date = datetime.strptime(m.group(0), "%Y-%m-%d")
+                today = datetime.now()
+                today = datetime(today.year, today.month, today.day)
+                if event_date < today:
+                    return "🔴 Finalizado / Vencido"
+                elif event_date == today:
+                    return "🟡 Hoy (Límite)"
+                else:
+                    return "🟢 Vigente / Pendiente"
+            except Exception:
+                pass
+        return "⚪ Ver observaciones"
 
-    lines = [
-        "# 📋 Análisis SECOP II — Resumen Ejecutivo", "",
-        f"> **Proceso:** {process.get('referencia','N/A')}  ",
-        f"> **Entidad:** {process.get('entidad','N/A')}  ",
-        f"> **Generado:** {now}  ",
-        f"> **Documentos analizados:** {len(docs)}  ",
-        "", "---", "",
-        "## 🎯 Objeto del Contrato", "",
-        legal.get("objeto_contrato", "_No identificado_"), "",
-        f"**Alcance:** {legal.get('alcance', '_Ver documentos_')}", "",
-        "---", "",
-        "## 📊 Datos Generales", "",
-        "| Campo | Valor |", "|-------|-------|",
-        f"| Modalidad | {legal.get('modalidad_seleccion','N/A')} |",
-        f"| Valor estimado | {legal.get('valor_estimado','N/A')} |",
-        f"| Duración | {legal.get('duracion_contrato','N/A')} |",
-        f"| Lugar | {legal.get('lugar_ejecucion','N/A')} |",
-        f"| Tipo bien/servicio | {products.get('tipo_bien_servicio','N/A')} |",
-        "", "---", "", "## 📦 Productos / Ítems", "",
-    ]
-
-    items = products.get("items", [])
-    if items:
-        lines += ["| # | Descripción | Cantidad | Unidad | Marca |",
-                  "|---|-------------|---------|--------|-------|"]
-        for item in items[:30]:
-            lines.append(
-                f"| {item.get('item','')} | {str(item.get('descripcion',''))[:60]} "
-                f"| {item.get('cantidad','')} | {item.get('unidad','')} "
-                f"| {item.get('marca','') or item.get('brand','')} |"
-            )
-        if len(items) > 30:
-            lines.append(f"| ... | _{len(items)-30} ítems adicionales_ | | | |")
-    else:
-        lines.append("_No se identificaron ítems específicos_")
-
+    # Nivel de riesgo global & Score
     nivel = risks.get("nivel_riesgo_global", "N/A")
     score = risks.get("score_riesgo", 0)
-    em    = {"ALTO":"🔴","MEDIO":"🟡","BAJO":"🟢"}.get(nivel,"⚪")
-    lines += [
-        "", "---", "",
-        f"## {em} Análisis de Riesgos", "",
-        f"**Nivel:** {nivel} (Score: {score}/100)", "",
-        risks.get("resumen_ejecutivo_riesgos",""), "",
-        "", "---", "",
-        f"*JIREHAI AI — {now}. Análisis orientativo.*",
+    risk_emoji = {"ALTO": "🔴", "MEDIO": "🟡", "BAJO": "🟢"}.get(nivel, "⚪")
+
+    # 1. INFORMACIÓN DEL PROCESO & RESUMEN EJECUTIVO
+    lines = [
+        "# ANÁLISIS SECOP II - INFORME COMPLETO",
+        "",
+        "## 1. INFORMACIÓN DEL PROCESO & RESUMEN EJECUTIVO",
+        "",
+        "| Campo | Detalle |",
+        "| :--- | :--- |",
+        f"| **Referencia** | {process.get('referencia', 'N/A')} |",
+        f"| **Entidad Contratante** | {process.get('entidad', 'N/A')} |",
+        f"| **Objeto** | {legal.get('objeto_contrato', 'N/A')} |",
+        f"| **Alcance** | {legal.get('alcance', 'N/A')} |",
+        f"| **Modalidad de Selección** | {legal.get('modalidad_seleccion', 'N/A')} |",
+        f"| **Régimen Jurídico** | {legal.get('regimen_juridico', 'N/A')} |",
+        f"| **Valor Estimado** | {legal.get('valor_estimado', 'N/A')} |",
+        f"| **Duración** | {legal.get('duracion_contrato', 'N/A')} |",
+        f"| **Lugar de Ejecución** | {legal.get('lugar_ejecucion', 'N/A')} |",
+        f"| **Tipo de Bien/Servicio** | {products.get('tipo_bien_servicio', 'N/A')} |",
+        "",
+        "> [!IMPORTANT]",
+        "> **RESULTADO IA - EVALUACIÓN DE RIESGO**  ",
+        f"> * **Nivel de Riesgo Global:** {risk_emoji} {nivel}  ",
+        f"> * **Score de Riesgo:** {score}/100  ",
+        f"> * **Documentos Analizados:** {len(docs)}  ",
+        f"> * **Fecha/Hora de Análisis:** {now_str}  ",
+        "",
+        "### Resumen Ejecutivo de Riesgos",
+        risks.get("resumen_ejecutivo_riesgos", "No se identificaron riesgos significativos o el proceso parece transparente."),
+        "",
+        "---",
+        ""
     ]
+
+    # 2. CRONOGRAMA DEL PROCESO
+    lines += [
+        "## 2. CRONOGRAMA DEL PROCESO",
+        "",
+        "| Actividad / Hito | Fecha y Hora Límite | Estado Actual | Observaciones |",
+        "| :--- | :--- | :--- | :--- |"
+    ]
+    cronograma = legal.get("cronograma", [])
+    if cronograma:
+        for ev in cronograma:
+            fecha = ev.get("fecha") or ev.get("fecha_limite") or "N/A"
+            status = check_event_status(fecha)
+            lines.append(
+                f"| {ev.get('evento', 'Actividad')} | {fecha} | {status} | {ev.get('observaciones', '')} |"
+            )
+    else:
+        lines.append("| No se identificó cronograma estructurado | N/A | N/A | Revisar pliego de condiciones |")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # 3. REQUISITOS HABILITANTES
+    lines += [
+        "## 3. REQUISITOS HABILITANTES",
+        "",
+        "| Tipo | Requisito | Cómo Acreditar / Documento Exigido | Valor Mínimo | Obligatorio |",
+        "| :--- | :--- | :--- | :--- | :--- |"
+    ]
+    req_hab = legal.get("requisitos_habilitantes", {}) or {}
+    has_reqs = False
+    
+    # Jurídicos
+    for req in req_hab.get("juridicos", []):
+        has_reqs = True
+        oblig = "Sí" if req.get("obligatorio", True) else "No"
+        lines.append(f"| Jurídico | {req.get('requisito','')} | {req.get('documento_exigido','')} | N/A | {oblig} |")
+        
+    # Técnicos
+    for req in req_hab.get("tecnicos", []):
+        has_reqs = True
+        oblig = "Sí" if req.get("obligatorio", True) else "No"
+        lines.append(f"| Técnico | {req.get('requisito','')} | {req.get('como_acreditar','')} | N/A | {oblig} |")
+
+    # Organizacionales
+    for req in req_hab.get("organizacionales", []):
+        has_reqs = True
+        oblig = "Sí" if req.get("obligatorio", True) else "No"
+        lines.append(f"| Organizacional | {req.get('requisito','')} | {req.get('como_acreditar','')} | N/A | {oblig} |")
+
+    # Financieros
+    for req in req_hab.get("financieros", []) or financial.get("indicadores_financieros", []):
+        has_reqs = True
+        oblig = "Sí" if req.get("obligatorio", True) else "No"
+        lines.append(f"| Financiero | {req.get('nombre') or req.get('indicador','')} | {req.get('formula','')} | {req.get('valor_minimo','')} | {oblig} |")
+
+    # Experiencia
+    exp = legal.get("experiencia_exigida", {}) or {}
+    if exp.get("tipo_experiencia") or exp.get("años_minimos"):
+        has_reqs = True
+        minimo = f"Años mín: {exp.get('años_minimos', 0)} / Contratos: {exp.get('contratos_similares', 'N/A')}"
+        lines.append(f"| Experiencia | {exp.get('tipo_experiencia','')} | {exp.get('como_acreditar','')} | {minimo} | Sí |")
+
+    if not has_reqs:
+        lines.append("| N/A | No se identificaron requisitos específicos | Ver pliego de condiciones | N/A | N/A |")
+    
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # 4. ANÁLISIS FINANCIERO
+    lines += [
+        "## 4. ANÁLISIS FINANCIERO",
+        "",
+        "| Indicador Financiero | Fórmula | Valor Mínimo Exigido | Valor Proponente | Observaciones |",
+        "| :--- | :--- | :--- | :--- | :--- |"
+    ]
+    inds_fin = financial.get("indicadores_financieros", []) or req_hab.get("financieros", []) or []
+    has_inds = False
+    for ind in inds_fin:
+        has_inds = True
+        lines.append(
+            f"| {ind.get('nombre') or ind.get('indicador','')} | {ind.get('formula','')} | {ind.get('valor_minimo','') or ind.get('valor_requerido','')} | *(Llenar)* | {ind.get('observaciones','')} |"
+        )
+    
+    capital = financial.get("capital_trabajo", {}) or {}
+    if capital and (capital.get("valor_minimo") or capital.get("formula")):
+        has_inds = True
+        lines.append(
+            f"| Capital de Trabajo | {capital.get('formula','')} | {capital.get('valor_minimo','')} | *(Llenar)* | {capital.get('descripcion','')} |"
+        )
+        
+    patr = financial.get("patrimonio_minimo")
+    if patr:
+        has_inds = True
+        lines.append(
+            f"| Patrimonio Mínimo Exigido | N/A | {patr} | *(Llenar)* | Requisito habilitante |"
+        )
+
+    if not has_inds:
+        lines.append("| No se definieron indicadores financieros específicos | N/A | N/A | *(Llenar)* | N/A |")
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # 5. PRODUCTOS, CANTIDADES Y ESPECIFICACIONES TÉCNICAS
+    lines += [
+        "## 5. PRODUCTOS, CANTIDADES Y ESPECIFICACIONES TÉCNICAS",
+        "",
+        "| # | Descripción del Ítem / Especificación Técnica | Cantidad | Unidad | Precio Unitario Est. | Precio Total Est. | Marca/Referencia | Observaciones / Requisitos Especiales |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |"
+    ]
+    items = products.get("items", []) or []
+    if items:
+        for idx, item in enumerate(items, 1):
+            desc = item.get("descripcion") or item.get("item") or "N/A"
+            cant = item.get("cantidad") or "N/A"
+            uni = item.get("unidad") or "N/A"
+            pu = item.get("precio_unitario") or item.get("unit_price") or "N/A"
+            pt = item.get("precio_total") or item.get("total_price") or "N/A"
+            marca = item.get("marca") or item.get("brand") or item.get("referencia") or "N/A"
+            obs = item.get("observaciones") or item.get("especificaciones") or "N/A"
+            lines.append(
+                f"| {idx} | {desc} | {cant} | {uni} | {pu} | {pt} | {marca} | {obs} |"
+            )
+    else:
+        lines.append("| -- | No se listaron ítems individuales en los documentos extraídos | -- | -- | -- | -- | -- | Ver anexos de precios / pliego técnico |")
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # 6. RIESGOS E INDICADORES (NIVEL Y SCORE DE RIESGO)
+    lines += [
+        "## 6. RIESGOS E INDICADORES (NIVEL Y SCORE DE RIESGO)",
+        "",
+        "### 6.1. Indicadores de Posible Direccionamiento",
+        "",
+        "| Tipo de Indicador | Descripción del Factor Detectado | Severidad | Probabilidad | Recomendación |",
+        "| :--- | :--- | :--- | :--- | :--- |"
+    ]
+    dirs = risks.get("indicadores_direccionamiento", []) or []
+    if dirs:
+        for d in dirs:
+            lines.append(
+                f"| {d.get('tipo','')} | {d.get('descripcion','')} | {d.get('severidad','')} | {d.get('probabilidad','N/A')} | {d.get('recomendacion','')} |"
+            )
+    else:
+        lines.append("| No se encontraron indicadores evidentes de direccionamiento | N/A | N/A | N/A | Continuar con monitoreo normal |")
+        
+    lines.append("")
+    lines += [
+        "### 6.2. Clasificación de Riesgos del Proceso",
+        "",
+        "| Tipo de Riesgo | Riesgo Identificado | Probabilidad | Impacto | Mitigación |",
+        "| :--- | :--- | :--- | :--- | :--- |"
+    ]
+    has_risks = False
+    for r in risks.get("riesgos_juridicos", []):
+        has_risks = True
+        lines.append(f"| Jurídico | {r.get('riesgo','')} | {r.get('probabilidad','')} | {r.get('impacto','')} | {r.get('mitigacion','')} |")
+    for r in risks.get("riesgos_financieros", []):
+        has_risks = True
+        lines.append(f"| Financiero | {r.get('riesgo','')} | {r.get('probabilidad','')} | {r.get('impacto','')} | {r.get('mitigacion','')} |")
+    for r in risks.get("riesgos_tecnicos", []):
+        has_risks = True
+        lines.append(f"| Técnico / Operativo | {r.get('riesgo','')} | {r.get('probabilidad','')} | {r.get('impacto','')} | {r.get('mitigacion','')} |")
+        
+    if not has_risks:
+        lines.append("| N/A | No se categorizaron riesgos específicos | N/A | N/A | Seguir las buenas prácticas del sector |")
+
+    lines.append("")
+    lines += [
+        "### 6.3. Requisitos Eliminatorios (Factores Excluyentes)",
+        "",
+        "| Requisito Identificado | Descripción del Impacto Excluyente | Tipo Empresa Afectada |",
+        "| :--- | :--- | :--- |"
+    ]
+    alertas = risks.get("alertas_eliminatorias", []) or []
+    if alertas:
+        for a in alertas:
+            lines.append(
+                f"| {a.get('requisito','')} | {a.get('descripcion','')} | {a.get('aplica_tipo_empresa','Todas')} |"
+            )
+    else:
+        lines.append("| No se detectaron cláusulas restrictivas eliminatorias inusuales | N/A | N/A |")
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # 7. DOCUMENTOS ANALIZADOS (TRAZABILIDAD)
+    lines += [
+        "## 7. DOCUMENTOS ANALIZADOS (TRAZABILIDAD)",
+        "",
+        "| # | Nombre del Archivo | Tipo de Documento | Páginas | Tamaño (KB) | Hipervínculo Local Directo |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- |"
+    ]
+    if docs:
+        for idx, doc in enumerate(docs, 1):
+            fname = doc.get("filename", "")
+            doc_type = doc.get("doc_type", "documento")
+            pages = doc.get("page_count", 0)
+            size = doc.get("size_kb", 0)
+            
+            # Enlaces locales directos
+            # Ruta relativa desde exports/ a docs/ es ../docs/filename
+            rel_link = f"../docs/{fname}"
+            # Ruta absoluta si está disponible
+            abs_path = doc.get("path")
+            if abs_path:
+                abs_path_clean = abs_path.replace("\\", "/")
+                if not abs_path_clean.startswith("/"):
+                    abs_path_clean = "/" + abs_path_clean
+                abs_link = f"file://{abs_path_clean}"
+                links_str = f"[📂 Abrir (Relativo)]({rel_link}) <br> [🖥️ Abrir (Absoluto)]({abs_link})"
+            else:
+                links_str = f"[📂 Abrir (Relativo)]({rel_link})"
+                
+            lines.append(
+                f"| {idx} | {fname} | {doc_type} | {pages} | {size} | {links_str} |"
+            )
+    else:
+        lines.append("| -- | No se descargaron ni analizaron documentos físicos | -- | -- | -- | -- |")
+
+    lines.append("")
+    lines.append(f"*Informe generado automáticamente por JIREHAI AI a las {now_str}.*")
+    
     return "\n".join(lines)
 
 

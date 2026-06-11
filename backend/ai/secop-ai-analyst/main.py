@@ -75,6 +75,110 @@ def progress(step: str, pct: int, msg: str):
     emit({"type": "progress", "step": step, "pct": pct, "msg": msg})
 
 
+def save_consolidated_markdown(parsed_docs, output_file_path, process_data, downloaded_docs):
+    from parser import table_to_markdown
+    
+    ref = (
+        process_data.get("_referencia") or
+        process_data.get("referencia_del_proceso") or
+        process_data.get("numero_del_proceso") or "N/A"
+    )
+    entidad = (
+        process_data.get("_entidad") or
+        process_data.get("nombre_entidad") or
+        process_data.get("entidad_compradora") or "N/A"
+    )
+    
+    lines = [
+        f"# CONSOLIDADO DE DOCUMENTOS Y TEXTO DE REFERENCIA - PROCESO: {ref}",
+        f"**Entidad Contratante:** {entidad}",
+        f"**Fecha de Consolidación:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        "",
+        "## 1. RESUMEN DE DOCUMENTOS DESCARGADOS Y PROCESADOS",
+        "",
+        "| # | Nombre del Archivo | Tipo de Documento | Páginas | Tamaño (KB) | Creador/Autor | Fecha Creación | Origen |",
+        "|---|---------------------|-------------------|---------|-------------|----------------|----------------|--------|",
+    ]
+    
+    for idx, doc in enumerate(downloaded_docs, 1):
+        filename = doc.get("filename", "")
+        doc_type = doc.get("doc_type", "documento")
+        size_kb = doc.get("size_kb", 0)
+        source = doc.get("source", "desconocido")
+        
+        # Get matching parsed doc info for metadata & pages
+        parsed = next((p for p in parsed_docs if p.get("filename") == filename), None)
+        pages = parsed.get("page_count", 0) if parsed else 0
+        meta = parsed.get("metadata", {}) if parsed else {}
+        
+        author = meta.get("author") or meta.get("creator") or "N/A"
+        created = meta.get("created") or "N/A"
+        if len(created) > 19:
+            created = created[:19].replace("T", " ")
+            
+        lines.append(f"| {idx} | {filename} | {doc_type} | {pages} | {size_kb} | {author} | {created} | {source} |")
+        
+    lines.append("")
+    lines.append("## 2. DETALLE Y CONTENIDO DE LOS DOCUMENTOS")
+    lines.append("")
+    
+    for doc in parsed_docs:
+        filename = doc.get("filename", "")
+        text = doc.get("text", "")
+        tables = doc.get("tables", [])
+        meta = doc.get("metadata", {}) or {}
+        
+        lines.append(f"---")
+        lines.append(f"### DOCUMENTO: {filename}")
+        lines.append(f"* **Tamaño:** {meta.get('size_kb', 0)} KB")
+        lines.append(f"* **Páginas:** {doc.get('page_count', 0)}")
+        lines.append(f"* **Autor/Creador:** {meta.get('author') or 'N/A'}")
+        lines.append(f"* **Fecha de Creación:** {meta.get('created') or 'N/A'}")
+        lines.append("")
+        
+        # Add tables
+        if tables:
+            lines.append("#### TABLAS DETECTADAS EN EL DOCUMENTO")
+            for t_idx, tbl in enumerate(tables, 1):
+                headers = tbl.get("headers", [])
+                data = tbl.get("data", [])
+                src = tbl.get("source", f"tabla_{t_idx}")
+                pg = tbl.get("page")
+                pg_str = f" (Pág. {pg})" if pg else ""
+                lines.append(f"##### {src}{pg_str}")
+                lines.append(table_to_markdown(headers, data))
+                lines.append("")
+        
+        # Add text page by page with markers
+        lines.append("#### CONTENIDO TEXTUAL EXTRAÍDO")
+        pages_list = doc.get("pages", [])
+        if pages_list:
+            for pg in pages_list:
+                pg_num = pg.get("page", 1)
+                pg_text = pg.get("text", "").strip()
+                if pg_text:
+                    lines.append(f"[DOC: {filename} | PG: {pg_num}]")
+                    lines.append(pg_text)
+                    lines.append("")
+        else:
+            if text.strip():
+                lines.append(f"[DOC: {filename} | PG: 1]")
+                lines.append(text.strip())
+                lines.append("")
+            else:
+                lines.append("*(Sin contenido de texto extraído)*")
+                lines.append("")
+                
+    content = "\n".join(lines)
+    
+    # Save file to disk
+    os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+    with open(output_file_path, "w", encoding="utf-8") as f:
+        f.write(content)
+        
+    return content
+
+
 def main():
     global _job_id_str, _output_dir_path
     # ── Leer argumento ────────────────────────────────────────────────────────
@@ -220,6 +324,62 @@ def main():
             pre_scraped_urls=scraped_doc_urls,
         )
         logger.info(f"Documentos descargados: {len(downloaded_docs)}")
+
+        # Descompresión de archivos ZIP y agregación al pipeline
+        import zipfile
+        
+        def get_mime_from_ext(ext):
+            return {
+                ".pdf":  "application/pdf",
+                ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ".xls":  "application/vnd.ms-excel",
+                ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".doc":  "application/msword",
+                ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                ".zip":  "application/zip",
+            }.get(ext.lower(), "application/octet-stream")
+
+        expanded_docs = []
+        for doc in downloaded_docs:
+            expanded_docs.append(doc)
+            file_path = Path(doc.get("path", ""))
+            if file_path.suffix.lower() == ".zip" and file_path.exists():
+                try:
+                    extract_to = file_path.parent / f"extracted_{file_path.stem}"
+                    extract_to.mkdir(exist_ok=True)
+                    logger.info(f"Extracting zip file: {file_path} to {extract_to}")
+                    with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                        zip_ref.extractall(extract_to)
+                    
+                    # Recorrer los archivos extraídos y agregarlos
+                    for root, _, files in os.walk(extract_to):
+                        for file in files:
+                            ext_file_path = Path(root) / file
+                            if ext_file_path.is_file():
+                                ext = ext_file_path.suffix.lower()
+                                doc_type = "documento_comprimido"
+                                if "estudio" in file.lower() or "previo" in file.lower():
+                                    doc_type = "estudio_previo"
+                                elif "invitacion" in file.lower() or "pliego" in file.lower():
+                                    doc_type = "invitacion"
+                                elif "presupuesto" in file.lower():
+                                    doc_type = "presupuesto"
+                                
+                                expanded_docs.append({
+                                    "ok": True,
+                                    "path": str(ext_file_path),
+                                    "filename": ext_file_path.name,
+                                    "size_kb": round(ext_file_path.stat().st_size / 1024, 1),
+                                    "content_type": get_mime_from_ext(ext),
+                                    "url": doc.get("url", ""),
+                                    "doc_type": doc_type,
+                                    "original_name": file,
+                                    "source": f"zip_extract:{file_path.name}",
+                                })
+                                logger.info(f"Added extracted file: {ext_file_path.name}")
+                except Exception as e:
+                    logger.error(f"Error extracting zip file {file_path.name}: {e}")
+        downloaded_docs = expanded_docs
     except Exception as e:
         logger.error(f"Error en descarga: {e}")
         # Continuar sin documentos (puede haber datos del proceso)
@@ -289,9 +449,16 @@ def main():
     progress("ocr", 57, "Texto extraído. Iniciando análisis con IA...")
 
     # ─────────────────────────────────────────────────────────────────────────
-    # PREPARAR TEXTO COMBINADO
+    # PREPARAR TEXTO COMBINADO (CONSOLIDADO EN MARKDOWN MAESTRO)
     # ─────────────────────────────────────────────────────────────────────────
-    combined_text = merge_document_texts(parsed_docs)
+    progress("parse", 49, "Consolidando textos y metadatos en archivo maestro...")
+    consolidated_file = exports_dir / "contexto_consolidado.md"
+    combined_text = save_consolidated_markdown(
+        parsed_docs=parsed_docs,
+        output_file_path=consolidated_file,
+        process_data=process_data,
+        downloaded_docs=downloaded_docs
+    )
     all_tables = extract_tables_summary(parsed_docs)
 
     # Si no hay texto de documentos, usar datos del proceso SECOP
@@ -412,6 +579,7 @@ def main():
                 "doc_type": d.get("doc_type"),
                 "source": d.get("source"),
                 "size_kb": d.get("size_kb"),
+                "path": d.get("path"),  # Añadimos la ruta absoluta ejecutable
                 "page_count": next(
                     (p.get("page_count") for p in parsed_docs if p.get("filename") == d.get("filename")), 0
                 ),

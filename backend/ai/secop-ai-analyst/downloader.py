@@ -26,7 +26,7 @@ TIMEOUT_DOWNLOAD = 30
 TIMEOUT_API      = 12    # Aumentado — datos.gov.co puede ser lento
 MAX_RETRIES = 2
 MAX_FILE_SIZE = 40 * 1024 * 1024  # 40 MB
-MAX_DOCS = 12           # Aumentado para capturar todos los documentos
+MAX_DOCS = 1000           # Aumentado para descargar la totalidad de los documentos
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -34,7 +34,14 @@ HEADERS = {
     "Accept": "application/pdf,application/octet-stream,*/*",
 }
 
-ALLOWED_EXTENSIONS = {".pdf", ".docx", ".doc", ".xlsx", ".xls", ".zip"}
+# Permitir todas las extensiones (Catch-all)
+class AllowAllExtensions:
+    def __contains__(self, item):
+        return True
+    def __iter__(self):
+        return iter([])
+
+ALLOWED_EXTENSIONS = AllowAllExtensions()
 
 # Prioridad de documentos (ESTUDIO PREVIO > INVITACION > CDP > COTIZACION > otros)
 DOC_PRIORITY = {
@@ -544,9 +551,9 @@ def _get_process_url(process_data: dict) -> str:
 def _get_extension(url: str) -> str:
     try:
         path = urlparse(url).path.lower()
-        for ext in ALLOWED_EXTENSIONS:
-            if path.endswith(ext):
-                return ext
+        m = re.search(r'\.([a-zA-Z0-9]{2,5})(?:\?|$)', path)
+        if m:
+            return "." + m.group(1)
     except Exception:
         pass
     return ".pdf"

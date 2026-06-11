@@ -2032,7 +2032,7 @@ function PageProcesos({ config, procData, onApply, onOpenDetailModal, onOpenAIMo
   );
 }
 
-function PageAplicables({ applied, onRemove, config, toastMsg }) {
+function PageAplicables({ applied, onRemove, config, toastMsg, onOpenDetailModal, onOpenAIModal }) {
   const analysis = loadProcessAnalysis();
 
   const getProcessKey = (p) => p.entidad + '|' + (p.object || p.objeto);
@@ -2220,16 +2220,25 @@ function PageAplicables({ applied, onRemove, config, toastMsg }) {
                   <td>{dias || '?'}</td>
                   <td>
                     {ana ? (
-                      <span className="badge-pill green">📊 Analizado</span>
+                      <span className="badge-pill green" style={{ cursor: 'pointer' }} onClick={() => onOpenAIModal && onOpenAIModal(p)} title="Abrir análisis de IA">📊 Analizado</span>
                     ) : (
-                      <span className="badge-pill">Pendiente</span>
+                      <span className="badge-pill" style={{ cursor: 'pointer' }} onClick={() => onOpenAIModal && onOpenAIModal(p)} title="Iniciar análisis de IA">Pendiente</span>
                     )}
                   </td>
                   <td style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {p.observaciones || '-'}
                   </td>
                   <td>
-                    <button className="action-btn red btn-small" onClick={() => onRemove(i)}>Eliminar</button>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <button className="action-btn btn-small" onClick={() => onOpenDetailModal && onOpenDetailModal(p)}>📋 Detalle</button>
+                      {isRealBackend() && (
+                        <button className="action-btn btn-small" onClick={() => onOpenAIModal && onOpenAIModal(p)}
+                          style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.2),rgba(249,115,22,0.1))', borderColor: 'rgba(139,92,246,0.5)', color: 'var(--purple)', fontWeight: '600' }}>
+                          🤖 IA
+                        </button>
+                      )}
+                      <button className="action-btn red btn-small" onClick={() => onRemove(i)}>Eliminar</button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -2888,7 +2897,7 @@ function AIAnalysisModal({ process, onClose, toastMsg }) {
           const form = new FormData();
           stagedFiles.forEach(f => form.append('docs', f));
           const token = localStorage.getItem('jrh_token');
-          const API_BASE = window.JIREHAI_API_BASE || 'http://localhost:3001';
+          const API_BASE = window.JIREHAI_API_BASE || '';
           const upResp = await fetch(`${API_BASE}/api/ai/upload-docs/${jid}`, {
             method: 'POST',
             headers: token ? { 'Authorization': `Bearer ${token}` } : {},
@@ -2968,10 +2977,29 @@ function AIAnalysisModal({ process, onClose, toastMsg }) {
 
   // Verificar si ya hay un job corriendo o terminado al abrir
   React.useEffect(() => {
-    if (status === 'idle') {
-      // Opcional: buscar si este proceso ya tiene un análisis reciente
-    }
-  }, []);
+    const checkExisting = async () => {
+      try {
+        const jobsData = await window.Api.listAIJobs(50);
+        const match = jobsData.jobs.find(j => j.process_ref === referencia);
+        if (match) {
+          console.log('[JIREHAI-AI] Encontrado job existente:', match.job_id, match.status);
+          setJobId(match.job_id);
+          if (match.status === 'completed' || match.has_result) {
+            loadResult(match.job_id);
+          } else if (match.status === 'running') {
+            setStatus('running');
+            startPolling(match.job_id);
+          } else if (match.status === 'error') {
+            setStatus('error');
+            setErrMsg(match.progress_msg || 'Error en análisis anterior');
+          }
+        }
+      } catch (err) {
+        console.warn('[JIREHAI-AI] Error buscando job existente:', err.message);
+      }
+    };
+    checkExisting();
+  }, [referencia]);
 
   const handleDelete = async () => {
     if (!jobId) return;
@@ -3628,7 +3656,7 @@ function AIAnalysisModal({ process, onClose, toastMsg }) {
   );
 }
 
-function DetailModal({ process, onClose, onApply, config, toastMsg }) {
+function DetailModal({ process, onClose, onApply, config, toastMsg, onOpenAIModal }) {
   const procKey = (process._entidad || process.entidad || process.nombre_entidad || '') + '|' + (process._descripcion || process.object || process.objeto || process.descripcion_del_proceso || '');
   const [analysis, setAnalysis] = React.useState(getProcessAnalysis(procKey) || {});
   const [loading, setLoading] = React.useState(false);
@@ -3756,27 +3784,43 @@ function DetailModal({ process, onClose, onApply, config, toastMsg }) {
               <span style={{ fontSize: '13px', fontWeight: '500' }}>{progressStep}</span>
             </div>
           ) : isAnalyzed ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <div>
-                <div style={{ fontWeight: '600', color: '#10b981', fontSize: '13px' }}>✅ Pliego analizado</div>
+                <div style={{ fontWeight: '600', color: '#10b981', fontSize: '13px' }}>✅ Pliego analizado (Metadatos)</div>
                 {analysisSource && <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '2px' }}>{analysisSource}</div>}
                 {analysis.analyzedAt && <div style={{ fontSize: '11px', color: 'var(--text4)' }}>{new Date(analysis.analyzedAt).toLocaleString('es-CO')}</div>}
               </div>
-              <button onClick={handleAnalyzePliego} disabled={loading}
-                style={{ padding: '7px 14px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '6px', color: '#10b981', fontSize: '12px', cursor: 'pointer' }}>
-                🔄 Re-analizar
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {isRealBackend() && (
+                  <button onClick={() => { onClose(); onOpenAIModal && onOpenAIModal(process); }}
+                    style={{ padding: '7px 14px', background: 'linear-gradient(135deg,var(--purple),var(--orange))', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}>
+                    🤖 IA Avanzada (Descargar Excel/PDF)
+                  </button>
+                )}
+                <button onClick={handleAnalyzePliego} disabled={loading}
+                  style={{ padding: '7px 14px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '6px', color: '#10b981', fontSize: '12px', cursor: 'pointer' }}>
+                  🔄 Re-analizar
+                </button>
+              </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <div>
                 <div style={{ fontWeight: '600', color: 'var(--orange)', fontSize: '13px' }}>📄 Analizar pliego de condiciones</div>
                 <div style={{ fontSize: '11px', color: 'var(--text4)', marginTop: '2px' }}>Descarga y extrae la información clave del proceso automáticamente</div>
               </div>
-              <button onClick={handleAnalyzePliego} disabled={loading}
-                style={{ padding: '9px 18px', background: 'var(--orange)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
-                🤖 Analizar Pliego
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {isRealBackend() && (
+                  <button onClick={() => { onClose(); onOpenAIModal && onOpenAIModal(process); }}
+                    style={{ padding: '9px 18px', background: 'linear-gradient(135deg,var(--purple),var(--orange))', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>
+                    🤖 IA Avanzada (Descargar Excel/PDF)
+                  </button>
+                )}
+                <button onClick={handleAnalyzePliego} disabled={loading}
+                  style={{ padding: '9px 18px', background: 'var(--orange)', border: 'none', borderRadius: '6px', color: '#fff', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+                  🤖 Analizar Pliego
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -4149,8 +4193,12 @@ function App() {
               </div>
             </div>
             <div style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', marginBottom: '12px'}}>
-              <span style={{width: '8px', height: '8px', borderRadius: '50%', backgroundColor: backendOk ? 'var(--green)' : 'var(--orange)'}}></span>
-              <span style={{color: 'var(--text4)'}}>{backendOk ? 'Backend conectado' : 'Modo local'}</span>
+              <span style={{width: '8px', height: '8px', borderRadius: '50%', backgroundColor: (backendOk && localStorage.getItem('jrh_token') !== 'offline_mode_token') ? 'var(--green)' : 'var(--orange)'}}></span>
+              <span style={{color: 'var(--text4)'}}>
+                {localStorage.getItem('jrh_token') === 'offline_mode_token' 
+                  ? '⚠️ Sesión Offline (Re-inicia sesión para IA)' 
+                  : (backendOk ? 'Backend conectado' : 'Modo local')}
+              </span>
             </div>
             <button onClick={() => { window.Api?.logout?.() || (localStorage.clear(), window.location.reload()); }} style={{width: '100%', padding: '8px', background: 'rgba(249, 115, 22, 0.1)', border: '1px solid var(--orange)', borderRadius: '6px', color: 'var(--orange)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s'}} onMouseEnter={(e) => e.target.style.background = 'rgba(249, 115, 22, 0.2)'} onMouseLeave={(e) => e.target.style.background = 'rgba(249, 115, 22, 0.1)'}>
               Cerrar Sesión
@@ -4172,7 +4220,7 @@ function App() {
           </div>
 
           <div className={`page ${currentPage === 'aplicables' ? 'active' : ''}`}>
-            <PageAplicables applied={applied} onRemove={handleRemoveApplied} config={config} toastMsg={showToast} />
+            <PageAplicables applied={applied} onRemove={handleRemoveApplied} config={config} toastMsg={showToast} onOpenDetailModal={setDetailModal} onOpenAIModal={setAiModal} />
           </div>
 
           <div className={`page ${currentPage === 'fechas' ? 'active' : ''}`}>
@@ -4196,7 +4244,7 @@ function App() {
       {detailModal && (
         <div className="modal-overlay open" onClick={() => setDetailModal(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxHeight: '90vh', overflow: 'auto' }}>
-            <DetailModal process={detailModal} onClose={() => setDetailModal(null)} onApply={handleApply} config={config} toastMsg={showToast} />
+            <DetailModal process={detailModal} onClose={() => setDetailModal(null)} onApply={handleApply} config={config} toastMsg={showToast} onOpenAIModal={setAiModal} />
           </div>
         </div>
       )}

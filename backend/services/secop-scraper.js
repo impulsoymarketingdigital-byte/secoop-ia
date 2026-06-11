@@ -17,7 +17,7 @@ const crypto = require('crypto');
 
 const LOGIN_URL   = 'https://community.secop.gov.co/STS/Users/Login/Index'
                   + '?SkinName=CCE&currentLanguage=es-CO&Page=login&Country=CO';
-const MAX_DOCS    = 15;
+const MAX_DOCS    = 1000;
 const PAGE_WAIT   = 8_000;    // ms tras cargar página
 const TIMEOUT     = 30_000;   // ms máx por navegación
 
@@ -109,13 +109,16 @@ async function extractDocumentLinks(page, processUrl) {
     document.querySelectorAll('a[href]').forEach(a => {
       const href = a.href || '';
       const text = a.textContent.trim();
-      if (
-        href.match(/\.(pdf|xlsx?|docx?|pptx?|zip)/i) ||
-        href.toLowerCase().includes('download') ||
-        href.toLowerCase().includes('getdocument') ||
-        href.toLowerCase().includes('descargar') ||
-        /descargar|download|ver documento/i.test(text)
-      ) {
+      const lowerHref = href.toLowerCase();
+      const lowerText = text.toLowerCase();
+      
+      const hasDownloadKeyword = lowerHref.includes('download') ||
+                                 lowerHref.includes('getdocument') ||
+                                 lowerHref.includes('descargar') ||
+                                 /descargar|download|ver documento/i.test(lowerText);
+      const isFile = lowerHref.match(/\.([a-zA-Z0-9]{2,5})(?:\?|$)/i);
+      
+      if (hasDownloadKeyword || isFile || lowerHref.includes('documentid=')) {
         results.push({
           url:  href,
           name: text || href.split('/').pop() || 'documento',
@@ -405,12 +408,16 @@ function _guessType(url, name) {
   if (s.includes('paa'))  return 'paa';
   if (s.includes('.xlsx') || s.includes('.xls')) return 'excel';
   if (s.includes('.docx') || s.includes('.doc')) return 'word';
-  return 'pdf';
+  if (s.includes('.pptx') || s.includes('.ppt')) return 'powerpoint';
+  if (s.includes('.png') || s.includes('.jpg') || s.includes('.jpeg') || s.includes('.tiff') || s.includes('.bmp') || s.includes('.gif') || s.includes('.webp')) return 'imagen';
+  if (s.includes('.zip') || s.includes('.rar') || s.includes('.7z')) return 'comprimido';
+  const ext = _getExt(url);
+  return ext ? ext.substring(1) : 'documento';
 }
 
 function _getExt(url) {
-  const m = (url || '').match(/\.(pdf|xlsx?|docx?|pptx?|zip)(\?|$)/i);
-  return m ? '.' + m[1].toLowerCase() : '.pdf';
+  const m = (url || '').match(/\.([a-zA-Z0-9]{2,5})(\?|$)/);
+  return m ? '.' + m[1].toLowerCase() : '';
 }
 
 module.exports = { scrapeSecopDocuments, extractProcessUrl };

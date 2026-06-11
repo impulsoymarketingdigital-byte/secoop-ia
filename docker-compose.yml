@@ -5,9 +5,25 @@ services:
     build: .
     container_name: jirehai-app
     ports:
-      - "3000:3000"
+      - "8000:8000"
     env_file:
       - backend/.env
+    environment:
+      - PORT=8000
+      - NODE_ENV=production
     volumes:
-      - ./backend/jirehai.db:/app/backend/jirehai.db
+      # Base de datos SQLite persistente — se guarda FUERA del contenedor
+      - jirehai_db:/app/backend/data
+      # Salidas del motor IA
+      - jirehai_ai_outputs:/app/backend/ai/outputs
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  jirehai_db:
+  jirehai_ai_outputs:

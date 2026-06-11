@@ -160,7 +160,31 @@ function createAIService(db) {
     try {
       const { scrapeSecopDocuments, extractProcessUrl } = require('./secop-scraper');
       const rawUrl = processData._url || processData.url_proceso || processData.urlproceso || '';
-      const processUrl = extractProcessUrl(rawUrl);
+      let processUrl = extractProcessUrl(rawUrl);
+
+      // Fallback si no hay URL del proceso pero sí hay referencia
+      if (!processUrl) {
+        const ref = processData._referencia || processData.referencia_del_proceso || processData.numero_del_proceso || '';
+        if (ref) {
+          console.log(`[AI:${jobId.slice(0,8)}] URL del proceso vacía. Buscando en datos.gov.co para referencia: ${ref}`);
+          try {
+            const axios = require('axios');
+            const searchUrl = `https://www.datos.gov.co/resource/p6dx-8zbt.json?referencia_del_proceso=${encodeURIComponent(ref)}`;
+            const resp = await axios.get(searchUrl, { timeout: 10000 });
+            if (resp.data && resp.data.length > 0) {
+              const row = resp.data[0];
+              const foundUrl = row.urlproceso?.url || row.urlproceso || '';
+              processUrl = extractProcessUrl(foundUrl);
+              if (processUrl) {
+                console.log(`[AI:${jobId.slice(0,8)}] URL encontrada en datos.gov.co: ${processUrl}`);
+              }
+            }
+          } catch (e) {
+            console.error(`[AI:${jobId.slice(0,8)}] Error buscando URL por referencia:`, e.message);
+          }
+        }
+      }
+
       if (processUrl && processUrl.startsWith('http')) {
         upsertAnalysis(jobId, {
           progress_msg: 'Extrayendo documentos del portal SECOP II...',

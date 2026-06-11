@@ -27,3 +27,11 @@ yarn-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Root dependencies and worktrees
+node_modules/
+.claude/
+
+# Local session credentials and temp folders
+backend/.secop_session.json
+backend/ai/secop-ai-analyst/temp/

@@ -23,8 +23,8 @@ if [ ! -d "node_modules" ]; then
 fi
 
 echo ""
-echo "  Abre en tu navegador: http://localhost:3001/JIREHAI.html"
-echo "  Admin:                http://localhost:3001/admin.html"
+echo "  Abre en tu navegador: http://localhost:${PORT:-3001}/"
+echo "  Admin:                http://localhost:${PORT:-3001}/admin.html"
 echo ""
 echo "  Presiona Ctrl+C para detener"
 echo "  =================================================="

@@ -1,7 +1,6 @@
-# Dockploy configuration
-# Ajusta este archivo según el formato que tu servicio Dockploy requiera.
-# La configuración aquí está pensada para desplegar la app como un contenedor Docker
-# que sirve el backend de Node.js en el puerto 3000.
+# Dokploy configuration
+# Este archivo es de referencia — la configuración real se maneja
+# desde el panel de Dokploy al crear la aplicación.
 
 version: 1
 app:
@@ -16,17 +15,23 @@ services:
   api:
     container_name: jirehai-api
     ports:
-      - 3000:3000
+      - 8000:8000
     env_file:
       - backend/.env
     volumes:
-      - backend/jirehai.db:/app/backend/jirehai.db
-    command: ["npm", "start"]
+      - jirehai_db:/app/backend/data
+      - jirehai_ai_outputs:/app/backend/ai/outputs
+    command: ["node", "backend/server.js"]
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/api/health"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
+      start_period: 40s
+
+volumes:
+  jirehai_db:
+  jirehai_ai_outputs:
 
 deploy:
   strategy: rolling

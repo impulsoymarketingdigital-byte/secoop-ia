@@ -128,7 +128,7 @@ if !RETRIES! geq 30 (
     echo.
     echo  Es posible que haya un error. Revisa la ventana "JIREHAI Backend".
     echo  Si vez que el servidor esta corriendo, abre manualmente:
-    echo    http://localhost:!PORT!/JIREHAI.html
+    echo    http://localhost:!PORT!/
     echo.
     pause
     exit /b 0
@@ -150,13 +150,13 @@ echo  ===========================================================
 echo    JIREHAI esta corriendo correctamente
 echo  ===========================================================
 echo.
-echo  Aplicacion principal:   http://localhost:!PORT!/JIREHAI.html
+echo  Aplicacion principal:   http://localhost:!PORT!/
 echo  Panel de Administracion: http://localhost:!PORT!/admin.html
 echo  Estado del servidor:    http://localhost:!PORT!/api/health
 echo.
 echo  Abriendo el navegador...
 echo.
-start "" "http://localhost:!PORT!/JIREHAI.html"
+start "" "http://localhost:!PORT!/"
 
 echo  ===========================================================
 echo.

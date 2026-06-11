@@ -17,7 +17,7 @@ const dbModule = require('./db');
 let db; // Se asigna después de initDB()
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'jirehai_dev_secret_2025';
 const FRONTEND_URL = process.env.FRONTEND_URL || '*';
 const SECOP_API = process.env.SECOP_API_URL || 'https://www.datos.gov.co/resource/p6dx-8zbt.json';

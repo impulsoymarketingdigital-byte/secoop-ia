@@ -1,5 +1,5 @@
 // api.js — JIREHAI API Client
-const API_BASE = window.JIREHAI_API_BASE || 'http://localhost:3001';
+const API_BASE = window.JIREHAI_API_BASE || '';
 
 const Api = {
   // Get stored token

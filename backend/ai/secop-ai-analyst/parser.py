@@ -33,26 +33,30 @@ def parse_document(file_path) -> dict:
     suffix = path.suffix.lower()
     try:
         if suffix == ".pdf":
-            return _parse_pdf(path)
+            res = _parse_pdf(path)
         elif suffix in (".docx", ".doc"):
-            return _parse_docx(path)
+            res = _parse_docx(path)
         elif suffix in (".xlsx", ".xls"):
-            return _parse_excel(path)
+            res = _parse_excel(path)
         elif suffix in (".pptx", ".ppt"):
-            return _parse_pptx(path)
+            res = _parse_pptx(path)
         elif suffix in (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".gif", ".webp"):
-            return _parse_image(path)
+            res = _parse_image(path)
         else:
             # Intentar como texto plano
             try:
                 text = path.read_text(encoding="utf-8", errors="replace")
-                return _empty(file_type=suffix) | {
+                res = _empty(file_type=suffix) | {
                     "text": text, "page_count": 1, "is_scanned": False,
                     "pages": [{"page": 1, "text": text, "char_count": len(text)}],
                     "error": None,
                 }
             except Exception:
-                return _empty(error=f"Tipo no soportado: {suffix}", file_type=suffix)
+                res = _empty(error=f"Tipo no soportado: {suffix}", file_type=suffix)
+        
+        # Extraer metadatos y asignarlos
+        res["metadata"] = extract_metadata(path)
+        return res
     except Exception as e:
         logger.exception(f"Error parseando {path.name}: {e}")
         return _empty(error=str(e), file_type=suffix)
@@ -592,4 +596,106 @@ def _empty(error=None, file_type="") -> dict:
         "page_count": 0,
         "file_type": file_type,
         "error": error,
+        "metadata": {},
     }
+
+
+def extract_metadata(file_path: Path) -> dict:
+    meta = {
+        "author": "",
+        "created": "",
+        "modified": "",
+        "title": "",
+        "creator": "",
+        "size_kb": round(file_path.stat().st_size / 1024, 1) if file_path.exists() else 0
+    }
+    if not file_path.exists():
+        return meta
+
+    suffix = file_path.suffix.lower()
+    try:
+        if suffix == ".pdf":
+            import fitz
+            doc = fitz.open(str(file_path))
+            d = doc.metadata or {}
+            meta["author"] = d.get("author") or ""
+            meta["title"] = d.get("title") or ""
+            meta["creator"] = d.get("creator") or d.get("producer") or ""
+            meta["created"] = d.get("creationDate") or ""
+            meta["modified"] = d.get("modDate") or ""
+            doc.close()
+        elif suffix in (".docx", ".doc"):
+            from docx import Document
+            doc = Document(str(file_path))
+            props = doc.core_properties
+            meta["author"] = props.author or ""
+            meta["title"] = props.title or ""
+            meta["created"] = props.created.isoformat() if props.created else ""
+            meta["modified"] = props.modified.isoformat() if props.modified else ""
+        elif suffix in (".xlsx", ".xls"):
+            import openpyxl
+            wb = openpyxl.load_workbook(str(file_path), data_only=True, read_only=True)
+            props = wb.properties
+            meta["author"] = props.creator or ""
+            meta["title"] = props.title or ""
+            meta["created"] = props.created.isoformat() if props.created else ""
+            meta["modified"] = props.modified.isoformat() if props.modified else ""
+            wb.close()
+        elif suffix in (".pptx", ".ppt"):
+            from pptx import Presentation
+            prs = Presentation(str(file_path))
+            props = prs.core_properties
+            meta["author"] = props.author or ""
+            meta["title"] = props.title or ""
+            meta["created"] = props.created.isoformat() if props.created else ""
+            meta["modified"] = props.modified.isoformat() if props.modified else ""
+    except Exception as e:
+        logger.debug(f"Error extracting metadata from {file_path.name}: {e}")
+
+    # Fallback to file system dates if empty
+    try:
+        from datetime import datetime
+        if not meta["created"]:
+            meta["created"] = datetime.fromtimestamp(file_path.stat().st_ctime).isoformat()
+        if not meta["modified"]:
+            meta["modified"] = datetime.fromtimestamp(file_path.stat().st_mtime).isoformat()
+    except Exception:
+        pass
+
+    # Clean up string values (strip and handle None)
+    for k, v in meta.items():
+        if isinstance(v, str):
+            meta[k] = v.strip()
+            
+    return meta
+
+
+def table_to_markdown(headers: list, data: list) -> str:
+    if not headers and not data:
+        return ""
+    
+    # Clean up headers
+    clean_headers = [str(h).strip().replace("\n", " ") for h in headers]
+    if not clean_headers:
+        # If no headers, create dummy headers
+        col_count = max(len(row) for row in data) if data else 0
+        clean_headers = [f"Columna {i+1}" for i in range(col_count)]
+    
+    # Format headers row
+    header_row = "| " + " | ".join(clean_headers) + " |"
+    separator_row = "| " + " | ".join(["---"] * len(clean_headers)) + " |"
+    
+    # Format data rows
+    data_rows = []
+    for row in data:
+        # Pad row to match header length
+        padded_row = list(row)
+        while len(padded_row) < len(clean_headers):
+            padded_row.append("")
+        # Truncate if row is longer than headers
+        padded_row = padded_row[:len(clean_headers)]
+        
+        clean_cells = [str(c).strip().replace("\n", " ").replace("|", "\\|") for c in padded_row]
+        data_rows.append("| " + " | ".join(clean_cells) + " |")
+        
+    return "\n".join([header_row, separator_row] + data_rows)
