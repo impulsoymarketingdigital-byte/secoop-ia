@@ -56,6 +56,21 @@ def parse_document(file_path) -> dict:
         
         # Extraer metadatos y asignarlos
         res["metadata"] = extract_metadata(path)
+
+        # Check if the extracted text is actually HTML source code (redirect/error page)
+        text = res.get("text", "")
+        if text and (
+            "<!DOCTYPE html" in text or 
+            "xhtml1-transitional.dtd" in text or 
+            "/STS/Users/Login" in text or 
+            "<html" in text or 
+            "lt-ie9" in text
+        ):
+            res["text"] = ""
+            res["pages"] = []
+            res["tables"] = []
+            res["error"] = "El documento descargado es una página de inicio de sesión o error de SECOP II, no un pliego de condiciones válido. Verifica las credenciales de SECOP II en la configuración."
+
         return res
     except Exception as e:
         logger.exception(f"Error parseando {path.name}: {e}")

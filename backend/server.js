@@ -908,11 +908,17 @@ app.post('/api/procesos/analyze-pliego', authMiddleware, subscriptionMiddleware,
           timeout: 10000,
           headers: { 'User-Agent': 'Mozilla/5.0' }
         });
-        // Extraer texto básico de la página HTML
-        const htmlText = pageRes.data.replace(/<[^>]+>/g, ' ').replace(/\s{3,}/g, '\n');
-        if (htmlText.length > 200) {
-          pdfText = htmlText.substring(0, 8000);
-          pdfSource = 'html_page';
+        const dataStr = String(pageRes.data);
+        // Verificar que no sea la página de login o error
+        if (dataStr.includes('<!DOCTYPE html') && (dataStr.includes('Login') || dataStr.includes('xhtml1') || dataStr.includes('lt-ie9'))) {
+          console.warn('⚠️  La URL del proceso redirigió a la página de login de SECOP II o contiene XHTML DTD. Ignorando.');
+        } else {
+          // Extraer texto básico de la página HTML
+          const htmlText = dataStr.replace(/<[^>]+>/g, ' ').replace(/\s{3,}/g, '\n');
+          if (htmlText.length > 200) {
+            pdfText = htmlText.substring(0, 8000);
+            pdfSource = 'html_page';
+          }
         }
       } catch (urlErr) {
         console.log('⚠️  No se pudo acceder a la URL del proceso:', urlErr.message);
