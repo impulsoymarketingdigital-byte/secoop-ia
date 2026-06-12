@@ -1480,12 +1480,24 @@ app.post('/api/wompi/create-link', authMiddleware, async (req, res) => {
 
   const publicKey     = process.env.WOMPI_PUBLIC_KEY;
   const integrityKey  = process.env.WOMPI_INTEGRITY_KEY || process.env.WOMPI_PRIVATE_KEY;
-  if (!publicKey) {
-    return res.status(503).json({ error: 'WOMPI_PUBLIC_KEY no configurado en .env' });
-  }
+  const isFallback    = !process.env.WOMPI_INTEGRITY_KEY && !!process.env.WOMPI_PRIVATE_KEY;
 
   const amountCents = WOMPI_PRICES[plan];
   const reference   = `JIREHAI-${req.user.id}-${plan.toUpperCase()}-${Date.now()}`;
+
+  console.log(`[Wompi Checkout] Generando link de pago. Plan: ${plan}, Referencia: ${reference}, Centavos: ${amountCents}`);
+  console.log(`[Wompi Checkout] Llave Pública: ${publicKey ? publicKey.substring(0, 12) + '...' : 'FALTA'}`);
+  if (isFallback) {
+    console.warn(`[Wompi Checkout] ⚠️ ADVERTENCIA: No se detectó WOMPI_INTEGRITY_KEY en las variables de entorno.`);
+    console.warn(`                 Se está usando WOMPI_PRIVATE_KEY (${integrityKey ? integrityKey.substring(0, 12) + '...' : 'FALTA'}) como fallback.`);
+    console.warn(`                 Esto causará firmas inválidas ya que Wompi exige usar el Secreto de Integridad.`);
+  } else {
+    console.log(`[Wompi Checkout] Llave de Integridad: ${integrityKey ? integrityKey.substring(0, 17) + '...' : 'FALTA'}`);
+  }
+
+  if (!publicKey) {
+    return res.status(503).json({ error: 'WOMPI_PUBLIC_KEY no configurado en .env' });
+  }
   const currency    = 'COP';
   const frontendBase = process.env.FRONTEND_URL || 'http://localhost:3001';
   const redirectUrl  = `${frontendBase}/JIREHAI.html?payment=success&plan=${plan}&uid=${req.user.id}`;
