@@ -925,7 +925,70 @@ app.post('/api/procesos/analyze-pliego', authMiddleware, subscriptionMiddleware,
             scrapedDocs = await scrapeSecopDocuments(processUrl, docsDir, secopUser, secopPass);
             console.log(`[analyze-pliego] Playwright encontró/descargó ${scrapedDocs.length} documentos`);
 
+            // Crear lista expandida de archivos (descomprimiendo ZIPs si los hay)
+            let filesToProcess = [];
             for (const doc of scrapedDocs) {
+              if (!doc.path) continue;
+              const ext = path.extname(doc.path).toLowerCase();
+              if (ext === '.zip') {
+                const zipPath = doc.path;
+                const extractDir = path.join(path.dirname(zipPath), path.basename(zipPath, '.zip') + '_extracted');
+                try {
+                  console.log(`[analyze-pliego] Descomprimiendo archivo ZIP: ${zipPath} en ${extractDir}`);
+                  fs.mkdirSync(extractDir, { recursive: true });
+                  
+                  // Resolver ejecutable de Python
+                  let pythonBin = 'python';
+                  try {
+                    const { execSync } = require('child_process');
+                    execSync('python3 --version', { stdio: 'ignore' });
+                    pythonBin = 'python3';
+                  } catch (e) {
+                    try {
+                      const { execSync } = require('child_process');
+                      execSync('python --version', { stdio: 'ignore' });
+                      pythonBin = 'python';
+                    } catch (e2) {
+                      try {
+                        const { execSync } = require('child_process');
+                        execSync('py --version', { stdio: 'ignore' });
+                        pythonBin = 'py';
+                      } catch (e3) {}
+                    }
+                  }
+
+                  const { execFileSync } = require('child_process');
+                  execFileSync(pythonBin, ['-c', 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])', zipPath, extractDir]);
+                  console.log(`[analyze-pliego] ZIP descomprimido exitosamente`);
+
+                  // Escaneo recursivo
+                  const scanDir = (dir) => {
+                    const items = fs.readdirSync(dir);
+                    for (const item of items) {
+                      const fullPath = path.join(dir, item);
+                      const stat = fs.statSync(fullPath);
+                      if (stat.isDirectory()) {
+                        scanDir(fullPath);
+                      } else {
+                        filesToProcess.push({
+                          path: fullPath,
+                          filename: item
+                        });
+                      }
+                    }
+                  };
+                  scanDir(extractDir);
+                } catch (zipErr) {
+                  console.error(`⚠️ Error al descomprimir archivo ZIP ${doc.filename}:`, zipErr.message);
+                }
+              } else {
+                filesToProcess.push(doc);
+              }
+            }
+
+            console.log(`[analyze-pliego] Procesando ${filesToProcess.length} archivos totales (incluyendo archivos extraídos de ZIPs)`);
+
+            for (const doc of filesToProcess) {
               if (!doc.path) continue;
               try {
                 const ext = path.extname(doc.path).toLowerCase();
@@ -940,7 +1003,7 @@ app.post('/api/procesos/analyze-pliego', authMiddleware, subscriptionMiddleware,
                 } else if (ext === '.txt' || ext === '.html' || ext === '.aspx' || ext === '.htm' || ext === '.xml') {
                   let text = fs.readFileSync(doc.path, 'utf8');
                   if (text.includes('<!DOCTYPE html') && (text.includes('Login') || text.includes('xhtml1') || text.includes('lt-ie9'))) {
-                    console.warn(`⚠️ El documento descargado por Playwright ${doc.filename} es una redirección a la página de login o error de SECOP II. Ignorando.`);
+                    console.warn(`⚠️ El documento ${doc.filename} es una redirección a la página de login o error de SECOP II. Ignorando.`);
                     continue;
                   }
                   if (ext !== '.txt') {
