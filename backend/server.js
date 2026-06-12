@@ -904,24 +904,95 @@ app.post('/api/procesos/analyze-pliego', authMiddleware, subscriptionMiddleware,
     const urlProceso = processData._url || processData.url_proceso || processData.urlproceso || processData.urlSecop || '';
     if (!pdfText && urlProceso) {
       try {
-        const pageRes = await axios.get(urlProceso, {
-          timeout: 10000,
-          headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
-        const dataStr = String(pageRes.data);
-        // Verificar que no sea la página de login o error
-        if (dataStr.includes('<!DOCTYPE html') && (dataStr.includes('Login') || dataStr.includes('xhtml1') || dataStr.includes('lt-ie9'))) {
-          console.warn('⚠️  La URL del proceso redirigió a la página de login de SECOP II o contiene XHTML DTD. Ignorando.');
-        } else {
-          // Extraer texto básico de la página HTML
-          const htmlText = dataStr.replace(/<[^>]+>/g, ' ').replace(/\s{3,}/g, '\n');
-          if (htmlText.length > 200) {
-            pdfText = htmlText.substring(0, 8000);
-            pdfSource = 'html_page';
+        const { scrapeSecopDocuments, extractProcessUrl } = require('./services/secop-scraper');
+        const processUrl = extractProcessUrl(urlProceso);
+        
+        const userCfg = getUserConfig(req.user.id);
+        const secopUser = userCfg?.secop?.user || process.env.SECOP_USER || '';
+        const secopPass = userCfg?.secop?.pass || process.env.SECOP_PASS || '';
+        
+        let scrapedDocs = [];
+        let tempJobId = '';
+
+        if (secopUser && secopPass && processUrl) {
+          console.log(`[analyze-pliego] Iniciando scraping con Playwright para el proceso: ${processUrl} usando credenciales de: ${secopUser}`);
+          tempJobId = 'temp_' + crypto.randomBytes(8).toString('hex');
+          const docsDir = path.join(__dirname, 'ai', 'outputs', tempJobId, 'docs');
+          const fs = require('fs');
+          fs.mkdirSync(docsDir, { recursive: true });
+
+          try {
+            scrapedDocs = await scrapeSecopDocuments(processUrl, docsDir, secopUser, secopPass);
+            console.log(`[analyze-pliego] Playwright encontró/descargó ${scrapedDocs.length} documentos`);
+
+            for (const doc of scrapedDocs) {
+              if (!doc.path) continue;
+              try {
+                const ext = path.extname(doc.path).toLowerCase();
+                if (ext === '.pdf') {
+                  const fileData = fs.readFileSync(doc.path);
+                  const parsed = await pdfParse(fileData);
+                  if (parsed.text && parsed.text.length > 50) {
+                    pdfText += parsed.text + '\n\n---\n\n';
+                    pdfSource = 'secop_auth_playwright';
+                    documentsFound++;
+                  }
+                } else if (ext === '.txt' || ext === '.html' || ext === '.aspx' || ext === '.htm' || ext === '.xml') {
+                  let text = fs.readFileSync(doc.path, 'utf8');
+                  if (text.includes('<!DOCTYPE html') && (text.includes('Login') || text.includes('xhtml1') || text.includes('lt-ie9'))) {
+                    console.warn(`⚠️ El documento descargado por Playwright ${doc.filename} es una redirección a la página de login o error de SECOP II. Ignorando.`);
+                    continue;
+                  }
+                  if (ext !== '.txt') {
+                    text = text.replace(/<[^>]+>/g, ' ').replace(/\s{3,}/g, '\n');
+                  }
+                  if (text && text.length > 50) {
+                    pdfText += text + '\n\n---\n\n';
+                    pdfSource = 'secop_auth_playwright';
+                    documentsFound++;
+                  }
+                }
+              } catch (docErr) {
+                console.log(`⚠️ Error parseando documento local ${doc.filename}: ${docErr.message}`);
+              }
+            }
+          } catch (scrapeErr) {
+            console.error('[analyze-pliego] Falló el scraping con Playwright:', scrapeErr.message);
+          } finally {
+            // Limpiar archivos temporales
+            try {
+              if (tempJobId) {
+                const fs = require('fs');
+                fs.rmSync(path.join(__dirname, 'ai', 'outputs', tempJobId), { recursive: true, force: true });
+              }
+            } catch (rmErr) {
+              console.warn('⚠️ Error al limpiar directorio temporal:', rmErr.message);
+            }
+          }
+        }
+
+        // Si Playwright no descargó nada o no había credenciales configuradas, fallamos al método original (axios.get)
+        if (!pdfText) {
+          console.log('[analyze-pliego] No se pudo obtener texto con Playwright. Intentando axios.get fallback...');
+          const pageRes = await axios.get(urlProceso, {
+            timeout: 10000,
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+          });
+          const dataStr = String(pageRes.data);
+          // Verificar que no sea la página de login o error
+          if (dataStr.includes('<!DOCTYPE html') && (dataStr.includes('Login') || dataStr.includes('xhtml1') || dataStr.includes('lt-ie9'))) {
+            console.warn('⚠️ La URL del proceso redirigió a la página de login de SECOP II o contiene XHTML DTD. Ignorando.');
+          } else {
+            // Extraer texto básico de la página HTML
+            const htmlText = dataStr.replace(/<[^>]+>/g, ' ').replace(/\s{3,}/g, '\n');
+            if (htmlText.length > 200) {
+              pdfText = htmlText.substring(0, 8000);
+              pdfSource = 'html_page';
+            }
           }
         }
       } catch (urlErr) {
-        console.log('⚠️  No se pudo acceder a la URL del proceso:', urlErr.message);
+        console.log('⚠️ No se pudo acceder a la URL del proceso:', urlErr.message);
       }
     }
 
